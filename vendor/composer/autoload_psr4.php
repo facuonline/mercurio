@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'PHPSecureSession\\' => array($vendorDir . '/ezimuel/php-secure-session/src'),
     'Latitude\\QueryBuilder\\' => array($vendorDir . '/latitude/latitude/src'),
 );

@@ -20,6 +20,10 @@ class MroStory extends MroDB {
 
     }
 
+    private function load() {
+        
+    }
+
     public function setStory() {
 
     }
@@ -33,7 +37,7 @@ class MroStory extends MroDB {
     }
 
     public function getLink() {
-        
+
     }
 
     public function getAuthors() {
@@ -41,14 +45,6 @@ class MroStory extends MroDB {
     }
 
     public function getPosts() {
-
-    }
-
-    public function getComments() {
-
-    }
-
-    public function getStars() {
 
     }
 }

@@ -1,1 +1,5 @@
+# Environmental variables #
 /app/src/.env.php
+
+# Composer #
+/vendor/

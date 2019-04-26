@@ -19,6 +19,11 @@ require MROINDEX.'/vendor/autoload.php';
 require MROINDEX.'/app/src/index.php';
 
 /**
+ * Load static index
+ */
+require MROINDEX.'/app/static/index.php';
+
+/**
  * Run environmental variables
  */
 require MROSRC.'/.env.php';

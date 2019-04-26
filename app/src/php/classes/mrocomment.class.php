@@ -1,18 +1,20 @@
 <?php
 /**
- * MroPost class
+ * MroComment class
  * @package Mercurio
  * @subpackage Included classes
+ * 
+ * 
  */
 
-class MroPost extends MroDB {
+class MroComment extends MroDB {
     public $info, $body, $GID;
 
     public function __construct() {
 
     }
 
-    public function getPost() {
+    public function getComment() {
 
     }
 
@@ -20,7 +22,7 @@ class MroPost extends MroDB {
 
     }
 
-    public function setPost() {
+    public function setComment() {
 
     }
 
@@ -37,14 +39,6 @@ class MroPost extends MroDB {
     }
 
     public function getAuthor() {
-
-    }
-
-    public function getComments() {
-
-    }
-
-    public function getStars() {
-
+        
     }
 }
