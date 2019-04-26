@@ -1,0 +1,14 @@
+{
+    "name": "mercurio/mercurio",
+    "description": "Courier. Not CMS.",
+    "authors": [
+        {
+            "name": "Facundo Subiabre",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "latitude/latitude": "^3.3"
+    },
+    "license": "GPL-3.0"
+}
