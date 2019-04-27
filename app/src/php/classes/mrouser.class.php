@@ -274,18 +274,35 @@ class MroUser extends MroDB {
     /**
      * Get link to user profile page
      * @return string URL
+     * @see MroCVURL class
+     * This took way longer than what it looks like, please take a second to appreciate this piece of code
      */
     public function getLink() {
         if ($this->handle) {
             $CVURL = new util_MroCVURL;
-            return $CVURL->link('users', $this->handle);
+            return $CVURL->targetLink('users', $this->handle);
         } else {
             throw new Exception("METHOD FAILURE: getLink can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
+    /**
+     * This method will cost you a db query, do not waste it
+     */
     public function getEmail() {
-
+        if ($this->GID) {
+            $query = $this->sql()
+                ->select('email')
+                ->from('mro_users')
+                ->where(field('GID')->eq($this->GID))
+                ->compile();
+            return $this->pdo(
+                $query->sql(),
+                $query->params()
+            )->fetch()['email'];
+        } else {
+            throw new Exception("METHOD FAILURE: getEmail can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+        }
     }
 
     public function getImg() {

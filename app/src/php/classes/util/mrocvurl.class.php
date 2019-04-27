@@ -66,12 +66,12 @@ class util_MroCVURL extends MroDB {
     }
 
     /**
-     * Builds and return links
+     * Builds and return links for specified targets
      * @param string $referrer Referrer type
      * @param mixed $target Target entity identifier, either handle or GID
      * @return string
      */
-    public function link(string $referrer, $target) {
+    public function targetLink(string $referrer, $target) {
         return $this->baseUrl.$this->referrer($referrer).'/'.$target;
     }
 
