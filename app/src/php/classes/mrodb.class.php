@@ -124,13 +124,14 @@ class MroDB {
         } else {
             $query = $this->sql()
                 ->insert('mro_configs', [
-                    'name' => $name,
-                    'value' => $value
-                ])
+                        'name' => $name,
+                        'value' => $value
+                    ])
                 ->compile();
         }
         return $this->pdo(
-            $query->sql()
+            $query->sql(),
+            $query->params()
         );
     }
 }

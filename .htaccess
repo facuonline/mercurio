@@ -1,7 +1,6 @@
 # Mercurio CVURL 
 <IfModule mod_rewrite.c>
 RewriteEngine On
-
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/(.*)$ ?referrer=$1&target=$2

@@ -6,8 +6,3 @@
  */
 
 require 'config.php';
-
-$vera = new MroUser;
-$vera->getUser('verano');
-
-echo $vera->getLink();

@@ -16,7 +16,7 @@
 
 class util_MroCVURL extends MroDB {
     public $baseUrl, $referrer, $target;
-    protected $htacess, $mod_rewrite;
+    protected $htaccess, $mod_rewrite;
 
     public function __construct() {
         $this->conn();
@@ -80,63 +80,61 @@ class util_MroCVURL extends MroDB {
      */
     private function readHtaccess() {
         if (file_exists(MROINDEX.'/.htaccess')) {
-            $this->htacess = file(MROINDEX.'/.htaccess');
+            $this->htaccess = file(MROINDEX.'/.htaccess');
         } else {
-            $this->htacess = [];
+            $this->htaccess = [""];
         }
     }
     /**
      * Starts rewrite engine
      */
     private function startHtaccess() {
-        $start = false;
-        foreach ($this->htacess as $key => $value) {
-            if (!strpos($value, '# Mercurio CVURL')) {
-                $start = count($this->htacess)+1;
-            } else {
-                $start = false;
+        $engine = count($this->htaccess)+2;
+        foreach ($this->htaccess as $key => $value) {
+            if (strpos($value, "Mercurio CVURL")) {
+                $engine = false;
             }
         }
-        if ($start) {
-            $this->htacess[$start] = "# Mercurio CVURL \n<IfModule mod_rewrite.c>\nRewriteEngine On\n";
+        if ($engine) {
+            $this->htaccess[$engine] = "# Mercurio CVURL \n<IfModule mod_rewrite.c>\nRewriteEngine On";
             return true;
         } else {
-           return false;
+            return false;
         }
     }
     /**
      * Stops rewrite engine
      */
     private function endHtaccess() {
-        $end = count($this->htacess)+1;
-        foreach ($this->htacess as $key => $value) {
+        $end = count($this->htaccess)+1;
+        foreach ($this->htaccess as $key => $value) {
             if (strpos($value, "</IfModule>\n# CVURL end")) {
                 $start = $key+1;
             }
         }
         if ($end) {
-            $this->htacess[$end] = "</IfModule>\n# CVURL end";
+            $this->htaccess[$end] = "</IfModule>\n# CVURL end";
         }
+    }
+    /**
+     * Sets up a rewrite mask for referrers and targets
+     */
+    public function referrerHtaccess() {
+        $cond = count($this->htaccess);
+        foreach ($this->htaccess as $key => $value) {
+            if (strpos($value, '# Mercurio CVURL ')) {
+                $cond = $key+3;
+            }
+        }
+        $this->htaccess[$cond] = "\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/(.*)$ ?referrer=$1&target=$2\n";
     }
     /**
      * Writes to htacess
      */
     private function writeHtacess() {
         $this->endHtaccess();
-        file_put_contents(MROINDEX.'/.htacess', $this->htacess);
+        file_put_contents(MROINDEX.'/.htaccess', $this->htaccess);
         $this->configReferrers();
-    }
-    /**
-     * Sets up a rewrite mask for referrers and targets
-     */
-    public function referrerHtaccess() {
-        $cond = count($this->htacess)+1;
-        foreach ($this->htacess as $key => $value) {
-            if (strpos($value, '# Mercurio CVURL')) {
-                $cond = $key+3;
-            }
-        }
-        $this->htacess[$cond] = "\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/(.*)$ ?referrer=$1&target=$2\n";
     }
 
     /**
