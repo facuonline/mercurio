@@ -1,7 +1,5 @@
 <?php
 /**
- * Define /static/ absolute path
- * 
- * DO NOT ALTER THIS FILE
+ * Set /static/ absolute path
  */
 define('MROSTATIC', __DIR__);

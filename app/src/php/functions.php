@@ -2,15 +2,15 @@
 /**
  * functions.php
  * @package Mercurio
- * @package Included functions
+ * @subpackage Included functions
  * 
  * Following is a set of functions meant to help developers, assist classes and perform different basic tasks
  * Mostly DRY things
  */
 
 /**
- * Multipurpose
- * This set of functions have very different purposes and perform basic, core tasks
+ * Database transactions
+ * Help MroDB and child classes to perform db queries and tasks
  */
 
     /**
@@ -19,7 +19,7 @@
      * @return array
      */
     function mroStampSet(array $set = []) {
-        $set['GID'] = new MroGID;
+        $set['GID'] = util_MroGID::new();
         $set['stamp'] = time();
         return $set;
     }
@@ -38,7 +38,41 @@
         } else {
             return false;
         }
-    } 
+    }
+
+/**
+ * Static content
+ * Manipulate and work with content in /static/ folder
+ */
+
+    /**
+     * Delete user uploaded images
+     * @param string $img Img hash name
+     */
+    function mroRemoveImg(string $img) {
+        // delete only user uploaded things
+        $db = new MroDB;
+        if (strstr($img, $db->getConfig('uploadPrefix'))) {
+            unlink(MROSTATIC.'/'.$img);
+        }
+    }
+
+/**
+ * User and Session
+ * Perform various user and session tasks
+ */
+
+    /**
+     * Determine if there is a registered user attached to the session
+     * @return false|array
+     */
+    function mroSession() {
+        if (isset($_SESSION['user']['GID'])) {
+            return $_SESSION['user'];
+        } else {
+            return false;
+        }
+    }
 
     /**
      * DRY helper function 
@@ -48,13 +82,39 @@
      */
     function mroNoUser() {
         // search user in http request via $_GET
-        $httpRequest = new Nette\Http\Request;
-        if ($httpRequest->isMethod('GET')) {
-            return $httpRequest->getQuery('user');
+        $httpRequest = new Nette\Http\UrlScript;
+        if ($httpRequest->isMethod('GET')
+        && mroCheckReferrer('users')) {
+            return $httpRequest->getQuery('target');
         // search user attached to $_SESSION
         } elseif (mroSession()) {
             return mroSession()['GID'];
         } else {
             return false;
         }
+    }
+
+/**
+ * Multipurpose
+ * This set of functions have very different purposes and perform basic, core tasks
+ */
+    
+    /**
+     * Checks if an url referrer is of the same type as specified
+     * @param string $referrer Type of referrer, 
+     * expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
+     * @return bool
+     */
+    function mroCheckReferrer(string $referrer) {
+        $httpRequest = new Nette\Http\UrlScript;
+        $CVURL = new util_MroCVURL;
+        if ($httpRequest->getQuery('referrer') === $CVURL->referrer($referrer)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function mroReport() {
+
     }

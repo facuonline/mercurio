@@ -4,12 +4,6 @@
  * @package Mercurio
  * @subpackage Included classes
  * 
- * All of the following are determined by environmental variables
- * @var string $host Server address
- * @var string $user Username of database
- * @var string $pass User password
- * @var string $name Database name in server 
- * 
  * @var object $PDO PDO instance with db connection
  */
 
@@ -35,14 +29,9 @@ use function Latitude\QueryBuilder\literal;
 use function Latitude\QueryBuilder\alias;
 
 class MroDB {
-    private $host, $user, $pass, $name;
-    protected $PDO;
+    private $PDO;
 
     public function __construct() {
-        $this->host = getenv('DB_HOST');
-        $this->user = getenv('DB_USER');
-        $this->pass = getenv('DB_PASS');
-        $this->name = getenv('DB_NAME');
         $this->conn();
     }
 
@@ -51,14 +40,21 @@ class MroDB {
      * @throws Exception on error with db connection
      */
     protected function conn() {
-        $dsn = "mysql:host=$this->host;dbname=$this->name;charset=utf8mb4";
+        // get db envs
+        $host = getenv('DB_HOST');
+        $user = getenv('DB_USER');
+        $pass = getenv('DB_PASS');
+        $name = getenv('DB_NAME');
+        // config pdo
+        $dsn = "mysql:host=$host;dbname=$name;charset=utf8mb4";
 		$options = [
 	    	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 	   		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 			PDO::ATTR_EMULATE_PREPARES => false,
-		];
+        ];
+        // make it so
 		try {
-			$this->PDO = new PDO($dsn, $this->user, $this->pass, $options);
+			$this->PDO = new PDO($dsn, $user, $pass, $options);
 		} catch (\PDOException $error) {
 			throw new \PDOException($error->getMessage(), (int)$error->getCode());
 	    	die();
@@ -95,14 +91,13 @@ class MroDB {
     public function getConfig($config) {
         $query = $this->sql()
             ->select('value')
-            ->from('mro_config')
+            ->from('mro_configs')
             ->where(field('name')->eq($config))
             ->compile();
         $result = $this->pdo(
             $query->sql(),
             $query->params()
-        )
-        ->fetch()['value'];
+        )->fetch()['value'];
         if ($result) {
             return $result;
         } else {
@@ -120,7 +115,7 @@ class MroDB {
         // update
         if ($this->getConfig($name)) {
             $query = $this->sql()
-                ->update('mro_config', [
+                ->update('mro_configs', [
                         'value' => $value
                     ])
                 ->where(field('name')->eq($name))
@@ -128,7 +123,7 @@ class MroDB {
         // insert
         } else {
             $query = $this->sql()
-                ->insert('mro_config', [
+                ->insert('mro_configs', [
                     'name' => $name,
                     'value' => $value
                 ])

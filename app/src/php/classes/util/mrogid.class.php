@@ -14,12 +14,9 @@
  * 
  * @var int $GID Stores the generated GID
  * @return int Ready to go and use, a new unique GID with simple instantiation */
-class MroGID {
-	static $GID;
 
-	function __construct(){
-		return self::new();
-	}
+class util_MroGID {
+    static $GID;
 
 	/**
 	 * Create new int GID

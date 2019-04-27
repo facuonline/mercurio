@@ -11,11 +11,13 @@
  * @var string $password
  */
 
+use function Latitude\QueryBuilder\field;
 class MroUser extends MroDB {
     public $info, $meta, $GID, $handle;
     private $password;
 
     public function __construct() {
+        $this->conn();
         $this->GID = false;
         $this->handle = false;
     }
@@ -31,7 +33,7 @@ class MroUser extends MroDB {
         } else {
             $this->handle = $user;
         }
-        return $user;
+        $this->load();
     }
 
     private function load() {
@@ -55,7 +57,7 @@ class MroUser extends MroDB {
             $result = $this->pdo(
                 $query->sql(),
                 $query->params()
-            )->fetchAll();
+            )->fetchAll()[0];
             $this->info = $result;
             $this->GID = $result['GID'];
             $this->handle = $result['handle'];
@@ -78,7 +80,7 @@ class MroUser extends MroDB {
             $result = $this->pdo(
                 $query->sql(),
                 $query->params()
-            )->fetchAll();
+            )->fetchAll()[0];
             $this->meta = $result;
         }
     }
@@ -110,7 +112,7 @@ class MroUser extends MroDB {
             $this->GID = $properties['GID'];
             $this->load();
         // update loaded user
-        } elseif (mroValidateSet($properties)) {
+        } elseif (mroValidateSet($properties) && $this->GID) {
             $query = $this->sql()
                 ->update('mro_users', $properties)
                 ->where(field('GID')->eq($this->GID))
@@ -119,6 +121,8 @@ class MroUser extends MroDB {
                 $query->sql(),
                 $query->params()
             );
+        } else {
+            throw new Exception("METHOD FAILURE: setUser was called but object of class MroUser has not been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -128,14 +132,18 @@ class MroUser extends MroDB {
      * @see setUser to learn how to insert a new mro_usermeta row
      */
     public function setMeta(array $meta = []) {
-        $query = $this->sql()
-            ->update('mro_usermeta', $meta)
-            ->where(field('user')->eq($this->GID))
-            ->compile();
-        $this->pdo(
-            $query->sql(),
-            $query->params()
-        );
+        if ($this->GID) {
+            $query = $this->sql()
+                ->update('mro_usermeta', $meta)
+                ->where(field('user')->eq($this->GID))
+                ->compile();
+            $this->pdo(
+                $query->sql(),
+                $query->params()
+            );
+        } else {
+            throw new Exception("METHOD FAILURE: setMeta can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+        }
     }
 
     /**
@@ -143,85 +151,137 @@ class MroUser extends MroDB {
      * @param bool $likeItNeverExisted True to delete user generated content
      */
     public function deleteUser(bool $likeItNeverExisted = false) {
-        if ($likeItNeverExisted) {
-            // delete posts
-            $posts = $this->sql()
-                ->delete('mro_posts')
-                ->where(field('author')->eq($this->GID))
-                ->compile();
-            $this->pdo(
-                $posts->sql(),
-                $posts->params()
-            );
-            // delete comments
-            $comments = $this->sql()
-                ->delete('mro_posts')
-                ->where(field('author')->eq($this->GID))
-                ->compile();
-            $this->pdo(
-                $comments->sql(),
-                $comments->params()
-            );
-            // delete non collaborative stories
-            $storiesImg = $this->sql()
-                ->select('img')
-                ->from('mro_stories')
-                ->where(field('author')->eq($this->GID))
-                ->andWhere(field('open')->eq('0'))
-                ->compile();
-            $imgs = $this->pdo(
-                $storiesImg->sql(),
-                $storiesImg->params()
-            )->fetchAll();
-            foreach($imgs as $key => $value) {
-                unlink(MROSTATIC.$value);
+        if ($this->GID) {
+            if ($likeItNeverExisted) {
+                // delete posts
+                $posts = $this->sql()
+                    ->delete('mro_posts')
+                    ->where(field('author')->eq($this->GID))
+                    ->compile();
+                $this->pdo(
+                    $posts->sql(),
+                    $posts->params()
+                );
+                // delete comments
+                $comments = $this->sql()
+                    ->delete('mro_posts')
+                    ->where(field('author')->eq($this->GID))
+                    ->compile();
+                $this->pdo(
+                    $comments->sql(),
+                    $comments->params()
+                );
+                // delete non collaborative stories
+                $storiesImg = $this->sql()
+                    ->select('img')
+                    ->from('mro_stories')
+                    ->where(field('author')->eq($this->GID))
+                    ->andWhere(field('open')->eq('0'))
+                    ->compile();
+                $imgs = $this->pdo(
+                    $storiesImg->sql(),
+                    $storiesImg->params()
+                )->fetchAll();
+                foreach($imgs as $key => $value) {
+                    mroRemoveImg($value);
+                }
+                $stories = $this->sql()
+                    ->delete('mro_stories')
+                    ->where(field('author')->eq($this->GID))
+                    ->andWhere(field('open')->eq('0'))
+                    ->compile();
+                $this->pdo(
+                    $stories->sql(),
+                    $stories->params()
+                );
+                $this->deleteUser();
+            } else {
+                // mro_user
+                $user = $this->sql()
+                    ->delete('mro_users')
+                    ->where(field('GID')->eq($this->GID))
+                    ->compile();
+                $this->pdo(
+                    $user->sql(),
+                    $user->params()
+                );
+                // user img
+                mroRemoveImg($this->getImg());
+                // mro_usermeta
+                $meta = $this->sql()
+                    ->delete('mro_usermeta')
+                    ->where(field('user')->eq($this->GID))
+                    ->compile();
+                $this->pdo(
+                    $meta->sql(),
+                    $meta->params()
+                );
             }
-            $stories = $this->sql()
-                ->delete('mro_stories')
-                ->where(field('author')->eq($this->GID))
-                ->andWhere(field('open')->eq('0'))
-                ->compile();
-            $this->pdo(
-                $stories->sql(),
-                $stories->params()
-            );
-            $this->delete();
         } else {
-            // mro_user
-            $user = $this->sql()
-                ->delete('mro_users')
-                ->where('GID', $this->GID)
+            throw new Exception("METHOD FAILURE: deleteUser can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+        }
+    }
+
+    /**
+     * Select user badges
+     * @return array
+     */
+    public function getBadges() {
+        if ($this->GID) {
+            $query = $this->sql()
+                ->select()
+                ->from('mro_userbadges')
+                ->where(field('user')->eq($this->GID))
+                ->compile();
+            return $this->pdo(
+                $query->sql(),
+                $query->params()
+            )->fetchAll();
+        } else {
+            throw new Exception("METHOD FAILURE: getBadges can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+        }
+    }
+
+    /**
+     * Update or insert a new user badge
+     * @param array $properties Associative array for badge properties
+     * @param bool|int $badge False to insert new badge, Badge GID to update it
+     */
+    public function setBadge(array $properties = [], $badge = false) {
+        // new badge
+        if (!$badge && $this->GID) {
+            $properties = mroStampSet(); 
+            $properties['user'] = $this->GID;
+            $query = $this->sql()
+                ->insert('mro_userbadges', $properties)
                 ->compile();
             $this->pdo(
-                $user->sql(),
-                $user->params()
+                $query->sql()
             );
-            // user img
-            if (strstr($this->getImg(), 'upload_')) {
-                unlink($this->getImg());
-            }
-            // mro_usermeta
-            $meta = $this->sql()
-                ->delete('mro_usermeta')
-                ->where('user', $this->GID)
+        // update
+        } elseif (mroValidateSet($properties) && ctype_digit($badge)) {
+            $query = $this->sql()
+                ->update('mro_userbadges', $properties)
+                ->where(field('GID')->eq($badge))
                 ->compile();
             $this->pdo(
-                $meta->sql(),
-                $meta->params()
+                $query->sql(),
+                $query->params()
             );
         }
     }
 
-    public function getBadges() {
-
-    }
-
-    public function setBadge() {
-
-    }
-
+    /**
+     * Get link to user profile page
+     * @return string URL
+     */
     public function getLink() {
-
+        if ($this->handle) {
+            $CVURL = new util_MroCVURL;
+            return $CVURL->link('users', $this->handle);
+        } else {
+            throw new Exception("METHOD FAILURE: getLink can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+        }
     }
 
     public function getEmail() {

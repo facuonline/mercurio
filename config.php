@@ -9,7 +9,7 @@
  * Welcome to Mercurio.
  * This is the configuration file, here is the only configuration you may need to setup manually
  * 
- * REMEMBER that you still need to run the GUI installation page to generate a fingerprint value
+ * REMEMBER that you need to update your env file at app/src/.env.php 
  */
 
 /**
