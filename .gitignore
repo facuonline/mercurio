@@ -1,5 +1,6 @@
 # Environmental variables #
 /app/src/.env.php
+.htaccess
 
 # Composer #
 /vendor/
