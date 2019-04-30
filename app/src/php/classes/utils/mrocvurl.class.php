@@ -14,7 +14,7 @@
  * @var bool $mod_rewrite State of mod_rewrite module, can't make vanities without it
  */
 
-class util_MroCVURL extends MroDB {
+class utils_MroCVURL extends MroDB {
     public $baseUrl, $referrer, $target;
     protected $htaccess, $mod_rewrite;
 
@@ -24,10 +24,12 @@ class util_MroCVURL extends MroDB {
         // check mod_rewrite availability
         if (in_array('mod_rewrite', apache_get_modules())) {
             $this->mod_rewrite = true;
-            $this->readHtaccess();
-            if ($this->startHtaccess()) {
+            if ($this->readHtaccess()
+            && $this->startHtaccess()) {
                 $this->referrerHtaccess();
                 $this->writeHtacess();
+            } else {
+                $this->htaccess = false;
             }
 		} else {
             $this->mod_rewrite = false;
@@ -41,27 +43,39 @@ class util_MroCVURL extends MroDB {
      * @return string URL
      */
     public function referrer(string $path, $value = false) {
-        if ($path == 'users') {
-            $referrer = 'refrrUsers';
-        } elseif ($path == 'stories') {
-            $referrer = 'refrrStories';
-        } elseif ($path == 'posts') {
-            $referrer = 'refrrPosts';
-        } elseif ($path == 'sections') {
-            $referrer = 'refrrSections';
-        } elseif ($path == 'messages') {
-            $referrer = 'refrrMessages';
-        }  elseif ($path == 'search') {
-            $referrer = 'refrrSearch';
-        }  elseif ($path == 'admin') {
-            $referrer = 'refrrAdmin';
+        if ($this->htaccess) {
+            if ($path == 'users') {
+                $referrer = 'refrrUsers';
+            } elseif ($path == 'stories') {
+                $referrer = 'refrrStories';
+            } elseif ($path == 'posts') {
+                $referrer = 'refrrPosts';
+            } elseif ($path == 'sections') {
+                $referrer = 'refrrSections';
+            } elseif ($path == 'messages') {
+                $referrer = 'refrrMessages';
+            }  elseif ($path == 'search') {
+                $referrer = 'refrrSearch';
+            }  elseif ($path == 'admin') {
+                $referrer = 'refrrAdmin';
+            } else {
+                throw new Exception("Unable to locate path referrer to <<$path>>", 1);
+            }
+            if ($value && $referrer) {
+                $this->setConfig($referrer, rtrim($value, '/').'/');
+            } elseif ($referrer) {
+                return $this->getConfig($referrer);
+            }
         } else {
-            throw new Exception("Unable to locate path referrer to <<$path>>", 1);
+            return '?referrer='.$path;
         }
-        if ($value && $referrer) {
-            $this->setConfig($referrer, $value);
-        } elseif ($referrer) {
-            return $this->getConfig($referrer);
+    }
+
+    public function target($target) {
+        if ($this->htaccess) {
+            return $target;
+        } else {
+            return '&target='.$target;
         }
     }
 
@@ -71,8 +85,10 @@ class util_MroCVURL extends MroDB {
      * @param mixed $target Target entity identifier, either handle or GID
      * @return string
      */
-    public function targetLink(string $referrer, $target) {
-        return $this->baseUrl.$this->referrer($referrer).'/'.$target;
+    public function buildLink(string $referrer, $target) {
+        return $this->baseUrl
+            .$this->referrer($referrer)
+            .$this->target($target);
     }
 
     /**
@@ -143,13 +159,13 @@ class util_MroCVURL extends MroDB {
     private function configReferrers() {
         // make sure referrers are always there
         $referrers = [
-            'refrrUsers' => 'user',
-            'refrrStories' => 'story',
-            'refrrPosts' => 'post',
-            'refrrSections' => 'section',
-            'refrrMessages' => 'message',
-            'refrrSearch' => 'search',
-            'refrrAdmin' => 'admin'
+            'refrrUsers' => 'user/',
+            'refrrStories' => 'story/',
+            'refrrPosts' => 'post/',
+            'refrrSections' => 'section/',
+            'refrrMessages' => 'message/',
+            'refrrSearch' => 'search/',
+            'refrrAdmin' => 'admin/'
         ];
         foreach ($referrers as $key => $value) {
             if (!$this->getConfig($key)) {

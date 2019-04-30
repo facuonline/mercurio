@@ -24,6 +24,11 @@ require MROINDEX.'/app/src/index.php';
 require MROINDEX.'/app/static/index.php';
 
 /**
+ * Load vistas index
+ */
+require MROINDEX.'/app/vistas/index.php';
+
+/**
  * Run environmental variables
  */
 require MROSRC.'/.env.php';

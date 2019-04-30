@@ -8,4 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'PHPSecureSession\\' => array($vendorDir . '/ezimuel/php-secure-session/src'),
     'Latitude\\QueryBuilder\\' => array($vendorDir . '/latitude/latitude/src'),
+    'CsrfMagic\\' => array($vendorDir . '/yetiforce/csrf-magic/src'),
+    'Aura\\Session\\_Config\\' => array($vendorDir . '/aura/session/config'),
+    'Aura\\Session\\' => array($vendorDir . '/aura/session/src'),
 );

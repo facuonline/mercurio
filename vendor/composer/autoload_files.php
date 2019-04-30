@@ -8,5 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     '5255c38a0faeba867671b61dfda6d864' => $vendorDir . '/paragonie/random_compat/lib/random.php',
     'c7a1089ba35f8274cf630debb7de059c' => $vendorDir . '/ezimuel/php-secure-session/bin/register_secure_session.php',
+    '2cffec82183ee1cea088009cef9a6fc3' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
     '094883ee9da9e6fabd95b86a5ef61b72' => $vendorDir . '/latitude/latitude/src/functions.php',
 );

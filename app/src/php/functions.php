@@ -4,7 +4,8 @@
  * @package Mercurio
  * @subpackage Included functions
  * 
- * Following is a set of functions meant to help developers, assist classes and perform different basic tasks
+ * Following is a set of functions meant to help developers, 
+ * assist classes and perform different basic tasks
  * Mostly DRY things
  */
 
@@ -19,7 +20,7 @@
      * @return array
      */
     function mroStampSet(array $set = []) {
-        $set['GID'] = util_MroGID::new();
+        $set['GID'] = utils_MroGID::new();
         $set['stamp'] = time();
         return $set;
     }
@@ -107,7 +108,7 @@
      */
     function mroCheckReferrer(string $referrer) {
         $httpRequest = new Nette\Http\UrlScript;
-        $CVURL = new util_MroCVURL;
+        $CVURL = new utils_MroCVURL;
         if ($httpRequest->getQuery('referrer') === $CVURL->referrer($referrer)) {
             return true;
         } else {

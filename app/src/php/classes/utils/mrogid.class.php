@@ -13,16 +13,15 @@
  * Not fixed length, with enough (a lot of years) time GIDs will overflow 64 bits
  * 
  * @var int $GID Stores the generated GID
- * @return int Ready to go and use, a new unique GID with simple instantiation */
+ */
 
-class util_MroGID {
-    static $GID;
+class utils_MroGID {
+    private static $GID;
 
 	/**
 	 * Create new int GID
 	 *
 	 * Timestamp base with custom epoch
-	 * 4 digits miliseconds resolution
 	 * 1 digit server ip based discriminator
 	 * 1 digit connection port based discriminator
 	 * 1 digit client ip based discriminator
@@ -30,13 +29,12 @@ class util_MroGID {
 	public static function new(){
 		// Custom epoch from the january 1st 2019
 		$time = time() - 1546300800;
-		$mili = substr(base_convert(microtime(), 10, 10), 0, 4);
 		$server = substr(base_convert(gethostbyname(gethostname()), 10, 10), -1);
 		$port = substr($_SERVER['REMOTE_PORT'], -1);
 		$client = substr(base_convert($_SERVER['REMOTE_ADDR'], 10, 10), -1);
 		$entropy = random_int(0, 9);
 
-		self::$GID = $time.$mili.$server.$port.$client.$entropy;
+		self::$GID = $time.$server.$port.$client.$entropy;
 		return self::$GID;
 	}
 

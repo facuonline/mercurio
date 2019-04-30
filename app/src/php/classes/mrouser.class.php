@@ -95,6 +95,10 @@ class MroUser extends MroDB {
         // set up new user
         if ($new) {
             $properties = mroStampSet($properties);
+            // password
+            if (array_key_exists('password', $properties)) {
+                $properties['password'] = password_hash($properties['password'], PASSWORD_DEFAULT);
+            }
             // build query
             $query = $this->sql()
                 ->insert('mro_users', $properties)
@@ -279,8 +283,8 @@ class MroUser extends MroDB {
      */
     public function getLink() {
         if ($this->handle) {
-            $CVURL = new util_MroCVURL;
-            return $CVURL->targetLink('users', $this->handle);
+            $CVURL = new utils_MroCVURL;
+            return $CVURL->buildLink('users', $this->handle);
         } else {
             throw new Exception("METHOD FAILURE: getLink can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -305,16 +309,103 @@ class MroUser extends MroDB {
         }
     }
 
-    public function getImg() {
-
+    /**
+     * Get path to user img
+     * @todo MroVista class
+     * @param bool $full True for full scale img, false for minimg
+     * @return string URL
+     */
+    public function getImg(bool $full = false) {
+        $Vista = new utils_MroVista;
+        if ($this->info['img'] !== $Vista->default('userImg')) {
+            if ($full){
+                $img = 'upload_max_'.$this->info['img'];
+            } else {
+                $img = 'upload_min_'.$this->info['img'];
+            }
+        } else {
+            $img = $Vista->default('userImg');
+        }
+        return getenv('APP_URL').'app/static/'.$img;
     }
 
-    public function getLogin() {
-
+    /**
+     * Loads and sets an user to perform a login with setLogin
+     * @param string $user User handle or email
+     * @return bool
+     */
+    public function getLogin(string $user) {
+        // start session to save login attempts
+        $session_factory = new \Aura\Session\SessionFactory;
+        $session = $session_factory->newInstance($_COOKIE);
+        $segment = $session->getSegment('MroUser');
+        $attempts = $segment->get('loginAttempts', 0);
+        // build query 
+        $query = $this->sql()
+            ->select('GID', 'handle', 'password')
+            ->from('mro_users')
+            ->where(field('handle')->eq($user))
+            ->orWhere(field('email')->eq($user))
+            ->compile();
+        // perform it
+        $result = $this->pdo(
+            $query->sql(),
+            $query->params()
+        )->fetchAll()[0];
+        if ($result) {
+            $segment->set('loginAttempts', 0);
+            $this->GID = $result['GID'];
+            $this->password = $result['password'];
+            return true;
+        // protect against bruteforce attacks
+        } else {
+            $segment->set('loginAttempts', $attempts++);
+            if ($attempts > 3) {
+                sleep($attempts);
+            } elseif ($attempts > 9) {
+                sleep($attemps*3);
+                $httpRequest = new Nette\Http\UrlScript; $remoteAddress = $httpRequest->getRemoteAddress();
+                error_log("SECURITY: Too many (+10) failed login attempts with wrong credentials from ip address: $remoteAddress");
+            }
+            return false;
+        }
     }
 
-    public function setLogin() {
-
+    /**
+     * Perform a password check and a login
+     * @param string $password User password
+     * @return bool
+     */
+    public function setLogin(string $password) {
+        if ($this->GID) {
+            if (!$this->meta) {
+                $this->loadMeta();
+            }
+            // check login attempts on db
+            $attempts = $this->meta['login'];
+            if ($attempts < time()) {
+                if (password_verify($password, $this->password)) {
+                    $this->load();
+                    // attach session to user
+                    $session_factory = new \Aura\Session\SessionFactory;
+                    $session = $session_factory->newInstance($_COOKIE);
+                    $segment = $session->getSegment('MroUser');
+                    $segment->set('user', $this->info);
+                    $segment->set('meta', $this->meta);
+                // progressive delay
+                } else {
+                    $this->setMeta(['login' => $attempts++]);
+                    sleep($attempts);
+                }
+            // lockdown for 5 minutes
+            } elseif ($attempts > 9) {
+                $this->setMeta(['login' => time()+300]);
+                $httpRequest = new Nette\Http\UrlScript; $remoteAddress = $httpRequest->getRemoteAddress();
+                error_log("SECURITY: Too many (+10) failed login attempts with wrong password for user $this->handle $this->GID from ip address: $remoteAddress");
+            }
+        } else {
+            throw new Exception("METHOD FAILURE: setLogin can only be called if object of class MroUser has been loaded with an existing user.", 1);
+        }
     }
 
     public function getStories() {

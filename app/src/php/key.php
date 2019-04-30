@@ -6,11 +6,11 @@
  * 
  * App key generator, just run this file via your browser or your terminal to get a strong app key value
  */
+require '../../../config.php';
+
 $lame[] = microtime();
-$lame[] = getenv('DB_HOST');
-$lame[] = getenv('DB_USER');
-$lame[] = getenv('DB_PASS');
-$lame[] = getenv('DB_NAME');
+$lame[] = mt_rand(1111, 9999);
+$lame[] = getenv('APP_URL');
 $lame[] = openssl_random_pseudo_bytes(16);
 
 $glue = base64_encode(random_bytes(4));

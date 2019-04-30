@@ -9,6 +9,7 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
     public static $files = array (
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         'c7a1089ba35f8274cf630debb7de059c' => __DIR__ . '/..' . '/ezimuel/php-secure-session/bin/register_secure_session.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '094883ee9da9e6fabd95b86a5ef61b72' => __DIR__ . '/..' . '/latitude/latitude/src/functions.php',
     );
 
@@ -21,6 +22,15 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         array (
             'Latitude\\QueryBuilder\\' => 22,
         ),
+        'C' => 
+        array (
+            'CsrfMagic\\' => 10,
+        ),
+        'A' => 
+        array (
+            'Aura\\Session\\_Config\\' => 21,
+            'Aura\\Session\\' => 13,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -31,6 +41,28 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         'Latitude\\QueryBuilder\\' => 
         array (
             0 => __DIR__ . '/..' . '/latitude/latitude/src',
+        ),
+        'CsrfMagic\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yetiforce/csrf-magic/src',
+        ),
+        'Aura\\Session\\_Config\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aura/session/config',
+        ),
+        'Aura\\Session\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aura/session/src',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'H' => 
+        array (
+            'HTMLPurifier' => 
+            array (
+                0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
+            ),
         ),
     );
 
@@ -98,6 +130,7 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit62fd7fefe19080b023657508e587fc96::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit62fd7fefe19080b023657508e587fc96::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit62fd7fefe19080b023657508e587fc96::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit62fd7fefe19080b023657508e587fc96::$classMap;
 
         }, null, ClassLoader::class);

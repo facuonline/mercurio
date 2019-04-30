@@ -7,4 +7,4 @@
 
 require 'config.php';
 
-echo util_MroGID::new();
+echo utils_MroGID::new();
