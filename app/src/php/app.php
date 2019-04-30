@@ -56,6 +56,39 @@ if (!getenv('APP_KEY')) {
 }
 
 /**
+ * Start CSRFGuard library
+ */
+if (!file_exists(MROINDEX.'/vendor/owasp/csrf-protector-php/libs/config.php')) {
+    $appKey = getenv('APP_KEY');
+    $jsUrl = getenv('APP_URL').'vendor/owasp/csrf-protector-php/js/csrfprotector.js';
+    $jsMessage = "This site attempts to protect users against Cross-Site Request Forgeries attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you. See details of your web browser for how to enable JavaScript.";
+    $csrfConfig[] = "<?php
+    return [
+        'CSRFP_TOKEN' => 'Mercurio CSRF',
+        'logDirectory' => '../log',
+        'failedAuthAction' => [
+            'GET' => 0,
+            'POST' => 0
+        ],
+        'errorRedirectionPage' => '',
+        'customErrorMessage' => '',
+        'jsUrl' => '$jsUrl',
+        'tokenLength' => 12,
+        'cookieConfig' => [
+            'path' => '',
+            'domain' => '',
+            'secure' => false,
+            'expire' => '',
+        ],
+        'disabledJavascriptMessage' => '$jsMessage',
+        'verifyGetFor' => []
+    ];";
+    file_put_contents(MROINDEX.'/vendor/owasp/csrf-protector-php/libs/config.php', $csrfConfig);
+} else {
+    csrfProtector::init();
+}
+
+/**
  * Load functions
  */
 require 'functions.php';

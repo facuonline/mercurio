@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'LoggerInterface' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/LoggerInterface.php',
     'Nette\\ArgumentOutOfRangeException' => $vendorDir . '/nette/utils/src/Utils/exceptions.php',
     'Nette\\Bridges\\HttpDI\\HttpExtension' => $vendorDir . '/nette/http/src/Bridges/HttpDI/HttpExtension.php',
     'Nette\\Bridges\\HttpDI\\SessionExtension' => $vendorDir . '/nette/http/src/Bridges/HttpDI/SessionExtension.php',
@@ -62,4 +63,15 @@ return array(
     'Nette\\Utils\\Strings' => $vendorDir . '/nette/utils/src/Utils/Strings.php',
     'Nette\\Utils\\UnknownImageFileException' => $vendorDir . '/nette/utils/src/Utils/exceptions.php',
     'Nette\\Utils\\Validators' => $vendorDir . '/nette/utils/src/Utils/Validators.php',
+    'alreadyInitializedException' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'baseJSFileNotFoundExceptio' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'configFileNotFoundException' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'csrfProtector' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'csrfpAction' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfpAction.php',
+    'csrfpCookieConfig' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfpCookieConfig.php',
+    'csrfpDefaultLogger' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
+    'incompleteConfigurationException' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'jsFileNotFoundException' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+    'logDirectoryNotFoundException' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
+    'logFileWriteError' => $vendorDir . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
 );

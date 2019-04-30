@@ -22,10 +22,6 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         array (
             'Latitude\\QueryBuilder\\' => 22,
         ),
-        'C' => 
-        array (
-            'CsrfMagic\\' => 10,
-        ),
         'A' => 
         array (
             'Aura\\Session\\_Config\\' => 21,
@@ -41,10 +37,6 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         'Latitude\\QueryBuilder\\' => 
         array (
             0 => __DIR__ . '/..' . '/latitude/latitude/src',
-        ),
-        'CsrfMagic\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/yetiforce/csrf-magic/src',
         ),
         'Aura\\Session\\_Config\\' => 
         array (
@@ -67,6 +59,7 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
     );
 
     public static $classMap = array (
+        'LoggerInterface' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/LoggerInterface.php',
         'Nette\\ArgumentOutOfRangeException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Bridges\\HttpDI\\HttpExtension' => __DIR__ . '/..' . '/nette/http/src/Bridges/HttpDI/HttpExtension.php',
         'Nette\\Bridges\\HttpDI\\SessionExtension' => __DIR__ . '/..' . '/nette/http/src/Bridges/HttpDI/SessionExtension.php',
@@ -123,6 +116,17 @@ class ComposerStaticInit62fd7fefe19080b023657508e587fc96
         'Nette\\Utils\\Strings' => __DIR__ . '/..' . '/nette/utils/src/Utils/Strings.php',
         'Nette\\Utils\\UnknownImageFileException' => __DIR__ . '/..' . '/nette/utils/src/Utils/exceptions.php',
         'Nette\\Utils\\Validators' => __DIR__ . '/..' . '/nette/utils/src/Utils/Validators.php',
+        'alreadyInitializedException' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'baseJSFileNotFoundExceptio' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'configFileNotFoundException' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'csrfProtector' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'csrfpAction' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfpAction.php',
+        'csrfpCookieConfig' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfpCookieConfig.php',
+        'csrfpDefaultLogger' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
+        'incompleteConfigurationException' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'jsFileNotFoundException' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfprotector.php',
+        'logDirectoryNotFoundException' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
+        'logFileWriteError' => __DIR__ . '/..' . '/owasp/csrf-protector-php/libs/csrf/csrfpDefaultLogger.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
