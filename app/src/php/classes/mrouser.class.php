@@ -293,7 +293,7 @@ class MroUser extends MroDB {
     public function getImg() {
         if (!$this->info['img']) {
             return MroVista::getVistaUrl()
-                .'/'.MroVista::default('userImg');
+                .'/'.MroVista::default('img', 'user');
         } else {
             return getenv('APP_URL')
                 .'app/static/'.$this->info['img'];
@@ -319,35 +319,40 @@ class MroUser extends MroDB {
      * @return bool
      */
     public function getLogin(string $user) {
-        // start session to save login attempts
-        $segment = AuraSession()->getSegment('MroUser');
+        // start error checker
+        $error = false;
+        // start session to store login attempts
+        $session = AuraSession();
+        $segment = $session->getSegment('MroUser');
         $attempts = $segment->get('loginAttempts', 0);
-        // build query 
-        $query = $this->sql()
-            ->select('GID', 'handle', 'password')
-            ->from('mro_users')
-            ->where(field('handle')->eq($user))
-            ->orWhere(field('email')->eq($user))
-            ->compile();
-        // perform it
-        $result = $this->pdo($query)
-            ->fetchAll()[0];
-        if ($result) {
-            $segment->set('loginAttempts', 0);
-            $this->GID = $result['GID'];
-            $this->password = $result['password'];
-            return true;
-        // protect against bruteforce attacks
-        } else {
-            $segment->set('loginAttempts', $attempts++);
-            if ($attempts > 3) {
-                sleep($attempts);
-            } elseif ($attempts > 9) {
-                sleep($attemps*3);
-                $remoteAddress = NetteHttpUrl()->getRemoteAddress();
-                error_log("SECURITY: Too many (+10) failed login attempts with wrong credentials from ip address: $remoteAddress");
+        // check if credential is a valid type
+        if (!is_string($user)
+        && !filter_var($user, FILTER_VALIDATE_EMAIL)) {
+            $error = true;
+        }
+        if (!$error) {
+            // build query
+            $query = $this->sql()
+                ->select('GID', 'password')
+                ->from('mro_users')
+                ->where(field('handle')->eq($user))
+                ->orWhere(field('email')->eq($user))
+                ->compile();
+            $result = $this->pdo($query)->fetch();
+            // succesful login
+            if ($result) {
+                $segment->set('loginAttempts', 0);
+                $this->GID = $result['GID'];
+                $this->password = $result['password'];
+            // progressive delay for wrong credentials
+            } else {
+                $segment->set('loginAttempts', $attempts++);
+                if ($attempts > 3) {
+                    sleep($attempts);
+                } elseif ($attempts > 9) {
+                    sleep($attempts*3);
+                }
             }
-            return false;
         }
     }
 

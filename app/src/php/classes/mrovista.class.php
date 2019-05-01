@@ -10,6 +10,7 @@
  */
 
 class MroVista {
+    public static $notifications;
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 
     /**
@@ -85,11 +86,17 @@ class MroVista {
     /**
      * Get default values of Vista
      * @param string $setting Name of default setting
-     * @return mixed
+     * @param string $subsetting Optional name for nested values
+     * @return false|string
      */
-    public static function default(string $setting) {
-        if (self::$defaults[$setting]) {
-            return self::$defaults[$setting];
+    public static function default(string $setting, string $subsetting = '') {
+        if (array_key_exists($setting, self::$defaults)) {
+            if (empty($subsetting)
+            && array_key_exists($setting, self::$defaults[$setting])) {
+                return self::$defaults[$setting];
+            } else {
+                return self::$defaults[$setting][$subsetting];
+            }
         } else {
             return false;
         }
