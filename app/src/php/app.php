@@ -29,11 +29,6 @@ require MROINDEX.'/app/static/index.php';
 require MROINDEX.'/app/vistas/index.php';
 
 /**
- * Run environmental variables
- */
-require MROSRC.'/.env.php';
-
-/**
  * Start HTTP Requests library
  */
 Requests::register_autoloader();
@@ -56,7 +51,7 @@ set_error_handler('mroError'); set_exception_handler('mroError');
  * Check app key
  */
 if (!getenv('APP_KEY')) {
-    throw new Exception("APP KEY IS NOT PRESENT. Please configure your .env file at app/src/.env.php", 1);
+    throw new Exception("APP KEY IS NOT PRESENT. Please configure your config.php file", 1);
     exit;
 }
 

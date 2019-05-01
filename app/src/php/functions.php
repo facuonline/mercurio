@@ -51,9 +51,7 @@
      * @param string $img Img hash name
      */
     function mroRemoveImg(string $img) {
-        // delete only user uploaded things
-        $db = new MroDB;
-        if (strstr($img, $db->getConfig('uploadPrefix'))) {
+        if (strstr($img, $db->getConfig('upload_'))) {
             unlink(MROSTATIC.'/'.$img);
         }
     }
@@ -90,10 +88,28 @@
  * This set of functions have very different purposes and perform basic, core tasks
  */
 
+    /**
+     * @todo Delete this function once finished dev,
+     * should probably get a real debugger or even bother to use vscode built in
+     */
     function mroTracy($todump) {
         echo "<pre>\n";
         var_dump($todump);
         echo "</pre>";
+    }
+
+    /**
+     * Generate sha256 hashes to be used as strong keys
+     * @return string
+     */
+    function mroKeyGen(){
+        $lame[] = microtime();
+        $lame[] = mt_rand(1111, 9999);
+        $lame[] = getenv('APP_URL');
+        $lame[] = openssl_random_pseudo_bytes(16);
+        $glue = base64_encode(random_bytes(4));
+        shuffle($lame);
+        return hash('sha256', implode($glue, $lame));
     }
 
     function mroReport() {

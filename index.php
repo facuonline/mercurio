@@ -10,4 +10,4 @@ require 'config.php';
 /**
  * Start Vista, effectively starting app
  */
-Vista::start();
+MroVista::start();

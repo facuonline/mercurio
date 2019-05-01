@@ -16,7 +16,7 @@
         "samayo/bulletproof": "^4.0",
         "rmccue/requests": "^1.7"
     },
-    "license": "GPL-3.0",
-    "version": "0.21.1-dev",
+    "license": "GPL-3.0-or-later",
+    "version": "0.31.1-dev",
     "homepage": "https://github.com/facuonline/mercurio"
 }

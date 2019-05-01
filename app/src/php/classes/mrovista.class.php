@@ -9,7 +9,7 @@
  * @var string $vistaFolder Folder name of active vista inside /vistas/ folder
  */
 
-class Vista {
+class MroVista {
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 
     /**
@@ -51,6 +51,7 @@ class Vista {
                 .'app/vistas/'.$vistaFolder.'/';
             self::$vista = $json['vista'];
             self::$defaults = $json['defaults'];
+            self::$htmlTitle = false;
         } else {
             trigger_error("VISTA FAILURE: Required file vista.json is not at current vista main folder:\n$vistaFolder\n");
             die();

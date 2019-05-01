@@ -292,8 +292,8 @@ class MroUser extends MroDB {
      */
     public function getImg() {
         if (!$this->info['img']) {
-            return Vista::getVistaUrl()
-                .'/'.Vista::default('userImg');
+            return MroVista::getVistaUrl()
+                .'/'.MroVista::default('userImg');
         } else {
             return getenv('APP_URL')
                 .'app/static/'.$this->info['img'];
