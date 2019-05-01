@@ -7,4 +7,7 @@
 
 require 'config.php';
 
-echo utils_MroGID::new();
+/**
+ * Start Vista, effectively starting app
+ */
+MroUtils\Vista::start();

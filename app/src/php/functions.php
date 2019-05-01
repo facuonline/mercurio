@@ -20,7 +20,7 @@
      * @return array
      */
     function mroStampSet(array $set = []) {
-        $set['GID'] = utils_MroGID::new();
+        $set['GID'] = MroUtils\GID::new();
         $set['stamp'] = time();
         return $set;
     }
@@ -64,18 +64,6 @@
  */
 
     /**
-     * Determine if there is a registered user attached to the session
-     * @return false|array
-     */
-    function mroSession() {
-        if (isset($_SESSION['user']['GID'])) {
-            return $_SESSION['user'];
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * DRY helper function 
      * Searches for hints of users id for MroUser class
      * @see MroUser class
@@ -83,10 +71,9 @@
      */
     function mroNoUser() {
         // search user in http request via $_GET
-        $httpRequest = new Nette\Http\UrlScript;
-        if ($httpRequest->isMethod('GET')
-        && mroCheckReferrer('users')) {
-            return $httpRequest->getQuery('target');
+        $URL = new MroUtils\URLHandler;
+        if ($URL->getUrl()['referrer'] === 'users') {
+            return $URL->getUrl()['target'];
         // search user attached to $_SESSION
         } elseif (mroSession()) {
             return mroSession()['GID'];
@@ -99,21 +86,20 @@
  * Multipurpose
  * This set of functions have very different purposes and perform basic, core tasks
  */
-    
+
+    function mroTracy($todump) {
+        echo "<pre>\n";
+        var_dump($todump);
+        echo "</pre>";
+    }
+
     /**
-     * Checks if an url referrer is of the same type as specified
-     * @param string $referrer Type of referrer, 
-     * expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
-     * @return bool
+     * Aura Session DRY helper
+     * @return object Aura Session Factory instance
      */
-    function mroCheckReferrer(string $referrer) {
-        $httpRequest = new Nette\Http\UrlScript;
-        $CVURL = new utils_MroCVURL;
-        if ($httpRequest->getQuery('referrer') === $CVURL->referrer($referrer)) {
-            return true;
-        } else {
-            return false;
-        }
+    function AuraSession() {
+        $session = new \Aura\Session\SessionFactory;
+        return $session->newInstance($_COOKIE);
     }
 
     function mroReport() {

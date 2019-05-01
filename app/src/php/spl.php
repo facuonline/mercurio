@@ -10,8 +10,7 @@
  * *Classes can also be the root for other classes and new methods (inheritance)
  * *Them and their inheritance can and should maintain their basic ideas even if acting differently (polymorphism)
  *
- * Underscore (_) in class names indicates a subfolder
  */
 spl_autoload_register(function ($class) {
-    include 'classes/'.str_replace('_', '/', $class).'.class.php';
+    include 'classes/'.$class.'.class.php';
 });

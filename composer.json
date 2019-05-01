@@ -9,11 +9,12 @@
     ],
     "require": {
         "latitude/latitude": "^3.3",
-        "nette/http": "^3.0",
         "ezimuel/php-secure-session": "^1.1",
         "ezyang/htmlpurifier": "^4.10",
         "aura/session": "^2.1",
-        "owasp/csrf-protector-php": "^1.0"
+        "owasp/csrf-protector-php": "^1.0",
+        "samayo/bulletproof": "^4.0",
+        "rmccue/requests": "^1.7"
     },
     "license": "GPL-3.0",
     "version": "0.21.1-dev",

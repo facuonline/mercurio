@@ -1,12 +1,14 @@
 {
     "vista": {
         "name": "Skeleton",
+        "folder": "skeleton",
         "version": "1.0",
         "author": "Mercurio",
         "license": "GPL-3.0",
         "url": "https://github.com/facuonline/mercurio-skeleton"
     },
     "defaults": {
+        "templates": "parts/",
         "userImg": "img/default_user.png",
         "siteImg": "img/default_site.png"
     }

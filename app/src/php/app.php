@@ -34,6 +34,11 @@ require MROINDEX.'/app/vistas/index.php';
 require MROSRC.'/.env.php';
 
 /**
+ * Start HTTP Requests library
+ */
+Requests::register_autoloader();
+
+/**
  * Error and warning reporting, developer friendly
  */
 function mroError($error_no, $error_string = '', $error_file = '', $error_line = '') {
@@ -64,7 +69,7 @@ if (!file_exists(MROINDEX.'/vendor/owasp/csrf-protector-php/libs/config.php')) {
     $jsMessage = "This site attempts to protect users against Cross-Site Request Forgeries attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you. See details of your web browser for how to enable JavaScript.";
     $csrfConfig[] = "<?php
     return [
-        'CSRFP_TOKEN' => 'Mercurio CSRF',
+        'CSRFP_TOKEN' => 'MercurioCSRF',
         'logDirectory' => '../log',
         'failedAuthAction' => [
             'GET' => 0,

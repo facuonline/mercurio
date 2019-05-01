@@ -99,6 +99,10 @@ class MroUser extends MroDB {
             if (array_key_exists('password', $properties)) {
                 $properties['password'] = password_hash($properties['password'], PASSWORD_DEFAULT);
             }
+            // image
+            if (array_key_exists('img', $properties)) {
+                throw new Exception("setUser method exception. User img property can only be set with setImg method.");
+            }
             // build query
             $query = $this->sql()
                 ->insert('mro_users', $properties)
@@ -278,13 +282,14 @@ class MroUser extends MroDB {
     /**
      * Get link to user profile page
      * @return string URL
-     * @see MroCVURL class
-     * This took way longer than what it looks like, please take a second to appreciate this piece of code
+     * @see URLHandler class
+     * This took way longer than what it looks like, 
+     * please take a second to appreciate this piece of code
      */
     public function getLink() {
         if ($this->handle) {
-            $CVURL = new utils_MroCVURL;
-            return $CVURL->buildLink('users', $this->handle);
+            $CVURL = new MroUtils\URLHandler;
+            return $CVURL->linkMaker('users', $this->handle);
         } else {
             throw new Exception("METHOD FAILURE: getLink can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -311,22 +316,33 @@ class MroUser extends MroDB {
 
     /**
      * Get path to user img
-     * @todo MroVista class
-     * @param bool $full True for full scale img, false for minimg
-     * @return string URL
+     * @return string Image URL
+     * @see Vista class
+     * This also took way longer than expected and what it looks like, 
+     * please take a second to appreciate this piece of code
      */
-    public function getImg(bool $full = false) {
-        $Vista = new utils_MroVista;
-        if ($this->info['img'] !== $Vista->default('userImg')) {
-            if ($full){
-                $img = 'upload_max_'.$this->info['img'];
-            } else {
-                $img = 'upload_min_'.$this->info['img'];
-            }
+    public function getImg() {
+        if (!$this->info['img']) {
+            return getenv('APP_URL')
+                .'app/vistas/'.getenv('APP_VISTA')
+                .'/'.MroUtils\Vista::default('userImg');
         } else {
-            $img = $Vista->default('userImg');
+            return getenv('APP_URL')
+                .'app/static/'.$this->info['img'];
         }
-        return getenv('APP_URL').'app/static/'.$img;
+    }
+
+    /**
+     * Set and upload user image
+     * @param string $input Name of file type input field where image is loaded
+     * @param int $width Width in pixels of image
+     * @param int $height Height in pixels of image
+     * @return string Image URL
+     * @see https://github.com/samayo/bulletproof
+     * @todo
+     */
+    public function setImg(string $input, int $width = 400, int $height = 400) {
+
     }
 
     /**
@@ -336,9 +352,7 @@ class MroUser extends MroDB {
      */
     public function getLogin(string $user) {
         // start session to save login attempts
-        $session_factory = new \Aura\Session\SessionFactory;
-        $session = $session_factory->newInstance($_COOKIE);
-        $segment = $session->getSegment('MroUser');
+        $segment = AuraSession()->getSegment('MroUser');
         $attempts = $segment->get('loginAttempts', 0);
         // build query 
         $query = $this->sql()
@@ -364,7 +378,7 @@ class MroUser extends MroDB {
                 sleep($attempts);
             } elseif ($attempts > 9) {
                 sleep($attemps*3);
-                $httpRequest = new Nette\Http\UrlScript; $remoteAddress = $httpRequest->getRemoteAddress();
+                $remoteAddress = NetteHttpUrl()->getRemoteAddress();
                 error_log("SECURITY: Too many (+10) failed login attempts with wrong credentials from ip address: $remoteAddress");
             }
             return false;
@@ -387,9 +401,7 @@ class MroUser extends MroDB {
                 if (password_verify($password, $this->password)) {
                     $this->load();
                     // attach session to user
-                    $session_factory = new \Aura\Session\SessionFactory;
-                    $session = $session_factory->newInstance($_COOKIE);
-                    $segment = $session->getSegment('MroUser');
+                    $segment = AuraSession()->getSegment('MroUser');
                     $segment->set('user', $this->info);
                     $segment->set('meta', $this->meta);
                 // progressive delay
@@ -400,7 +412,7 @@ class MroUser extends MroDB {
             // lockdown for 5 minutes
             } elseif ($attempts > 9) {
                 $this->setMeta(['login' => time()+300]);
-                $httpRequest = new Nette\Http\UrlScript; $remoteAddress = $httpRequest->getRemoteAddress();
+                $remoteAddress = NetteHttpUrl()->getRemoteAddress();
                 error_log("SECURITY: Too many (+10) failed login attempts with wrong password for user $this->handle $this->GID from ip address: $remoteAddress");
             }
         } else {

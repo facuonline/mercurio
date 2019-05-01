@@ -15,7 +15,8 @@
  * @var int $GID Stores the generated GID
  */
 
-class utils_MroGID {
+namespace MroUtils;
+class MroGID {
     private static $GID;
 
 	/**

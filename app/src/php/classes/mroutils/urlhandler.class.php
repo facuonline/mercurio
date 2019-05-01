@@ -1,10 +1,10 @@
 <?php
 /**
- * MroCVURL class
+ * URLHandler
  * @package Mercurio
  * @package Included classes
  * 
- * Custom Vanity URL handler and worker,
+ * URL handler and worker
  * not only does rewrites but also manages path to things
  * 
  * @var string $baseUrl site URL address
@@ -14,7 +14,9 @@
  * @var bool $mod_rewrite State of mod_rewrite module, can't make vanities without it
  */
 
-class utils_MroCVURL extends MroDB {
+namespace MroUtils;
+use MroDB;
+class URLHandler extends MroDB {
     public $baseUrl, $referrer, $target;
     protected $htaccess, $mod_rewrite;
 
@@ -22,7 +24,8 @@ class utils_MroCVURL extends MroDB {
         $this->conn();
         $this->baseUrl = getenv('APP_URL');
         // check mod_rewrite availability
-        if (in_array('mod_rewrite', apache_get_modules())) {
+        if (in_array('mod_rewrite', apache_get_modules())
+        && $this->getConfig('urlMasking') === 1) {
             $this->mod_rewrite = true;
             if ($this->readHtaccess()
             && $this->startHtaccess()) {
@@ -42,7 +45,7 @@ class utils_MroCVURL extends MroDB {
      * @param string $value New value of referrer to set
      * @return string URL
      */
-    public function referrer(string $path, $value = false) {
+    public function getReferrer(string $path, $value = false) {
         if ($this->htaccess) {
             if ($path == 'users') {
                 $referrer = 'refrrUsers';
@@ -71,7 +74,7 @@ class utils_MroCVURL extends MroDB {
         }
     }
 
-    public function target($target) {
+    public function getTarget($target) {
         if ($this->htaccess) {
             return $target;
         } else {
@@ -85,10 +88,49 @@ class utils_MroCVURL extends MroDB {
      * @param mixed $target Target entity identifier, either handle or GID
      * @return string
      */
-    public function buildLink(string $referrer, $target) {
+    public function linkMaker(string $referrer, $target) {
         return $this->baseUrl
-            .$this->referrer($referrer)
-            .$this->target($target);
+            .$this->getReferrer($referrer)
+            .$this->getTarget($target);
+    }
+
+    /**
+     * Filter, read and return GET query params
+     * @return array 
+     */
+    public function getUrl() {
+        $params;
+        if (isset($_GET['referrer'])
+        && !empty($_GET['referrer'])) {
+           $referrer = filter_input(INPUT_GET, 'referrer', FILTER_SANITIZE_STRING);
+           if ($referrer == $this->getConfig('refrrUsers')) {
+                $params['referrer'] = 'users';
+           } elseif ($referrer == $this->getConfig('refrrStories')) {
+                $params['referrer'] = 'stories';
+           } elseif ($referrer == $this->getConfig('refrrPosts')) {
+                $params['referrer'] = 'posts';
+           } elseif ($referrer == $this->getConfig('refrrSections')) {
+                $params['referrer'] = 'sections';
+           } elseif ($referrer == $this->getConfig('refrrMessages')) {
+                $params['referrer'] = 'messages';
+           } elseif ($referrer == $this->getConfig('refrrSearch')) {
+                $params['referrer'] = 'search';
+           } elseif ($referrer == $this->getConfig('refrrAdmin')) {
+                $params['referrer'] = 'admin';
+           } else {
+               $params['referrer'] = false;
+           }
+        } else {
+            $params['referrer'] = false;
+        }
+        if (isset($_GET['target'])
+        && !empty($_GET['target'])) {
+            $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
+            $params['target'] = $target;
+        } else {
+            $params['target'] = false;
+        }
+        return $params;
     }
 
     /**
