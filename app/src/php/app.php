@@ -36,16 +36,15 @@ Requests::register_autoloader();
 /**
  * Error and warning reporting, developer friendly
  */
-function mroError($error_no, $error_string = '', $error_file = '', $error_line = '') {
-    if (is_object($error_no)) {
-        $error = "<pre><b>EXCEPTION:</b> $error_no</pre>\n";
-    } else {
-        $error = "<pre><b>ERROR:</b> [$error_no] $error_string\n\n
-        In $error_file @ L#<b>$error_line</b></pre>\n";
-    }
+set_error_handler(function ($error_no, $error_string = '', $error_file = '', $error_line = '') {
+    $error = "<pre><b>ERROR:</b> [$error_no] $error_string\n\n
+    In $error_file @ L#<b>$error_line</b></pre>\n";
     error_log($error); print_r($error);
-}
-set_error_handler('mroError'); set_exception_handler('mroError');
+}); 
+set_exception_handler(function ($error_no, $error_string = '', $error_file = '', $error_line = '') {
+    $error = "<pre><b>EXCEPTION:</b> $error_no</pre>\n";
+    error_log($error); print_r($error);
+});
 
 /**
  * Check app key

@@ -29,10 +29,18 @@ use function Latitude\QueryBuilder\literal;
 use function Latitude\QueryBuilder\alias;
 
 class MroDB {
-    private $PDO;
+    protected $PDO;
 
     public function __construct() {
         $this->conn();
+    }
+
+    public function __sleep() {
+        return [];
+    }
+
+    public function __wakeup() {
+        $this->PDO;
     }
 
     /**
@@ -56,7 +64,7 @@ class MroDB {
 		try {
 			$this->PDO = new PDO($dsn, $user, $pass, $options);
 		} catch (\PDOException $error) {
-			throw new \PDOException($error->getMessage(), (int)$error->getCode());
+			throw new \PDOException($error->getMessage(), $error->getCode());
 	    	die();
 		}
     }

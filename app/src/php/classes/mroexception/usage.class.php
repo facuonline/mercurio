@@ -4,6 +4,7 @@
  * @subpackage Extended Exception classes
  */
 namespace MroException;
+use Exception;
 class Usage extends Exception{
 
 }

@@ -72,12 +72,13 @@
 
     /**
      * Session retriever, check if there is an user object attached to the session
-     * @return false|object
+     * @return false|array
      */
     function mroSession() {
         $session = AuraSession();
-        if ($session->get('GID')) {
-            return $session->get('User');
+        $segment = $session->getSegment('MroUser');
+        if ($segment->get('User')) {
+            return $segment->get('User');
         } else {
             return false;
         }

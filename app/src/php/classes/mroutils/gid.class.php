@@ -1,6 +1,6 @@
 <?php
 /** 
- * MroGID class
+ * GID class
  * @package Mercurio
  * @subpackage Included Classes
  * 

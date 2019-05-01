@@ -10,7 +10,7 @@
  */
 
 class MroVista {
-    public static $notifications;
+    public static $notices;
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 
     /**
@@ -91,11 +91,11 @@ class MroVista {
      */
     public static function default(string $setting, string $subsetting = '') {
         if (array_key_exists($setting, self::$defaults)) {
-            if (empty($subsetting)
+            if (!empty($subsetting)
             && array_key_exists($setting, self::$defaults[$setting])) {
-                return self::$defaults[$setting];
-            } else {
                 return self::$defaults[$setting][$subsetting];
+            } else {
+                return self::$defaults[$setting];
             }
         } else {
             return false;
@@ -149,5 +149,16 @@ class MroVista {
      */
     public static function htmlTitle(string $title) {
         self::$htmlTitle = $title;
+    }
+
+    /**
+     * Trigger a frontend friendly success, warning or error message
+     * @param object instance of MroException\Usage Exception class
+     */
+    public static function notice(MroException\Usage $e) {
+        if (function_exists(self::default('notices'))) {
+            $error = self::default('notices');
+            $error($e->getCode());
+        }
     }
 }
