@@ -1,6 +1,5 @@
-# Environmental variables #
-/app/src/.env.php
-.htaccess
+# Apache config #
+/.htaccess
 
 # Vistas #
 /app/vistas
