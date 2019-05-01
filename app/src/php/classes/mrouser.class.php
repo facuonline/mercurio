@@ -27,13 +27,19 @@ class MroUser extends MroDB {
      * @param mixed $user
      */
     public function getUser($user = false) {
-        if (!$user) $user = mroNoUser();
-        if (ctype_digit($user)) {
-            $this->GID = $user;
-        } else {
-            $this->handle = $user;
+        // search user in http request via $_GET
+        $URL = new MroUtils\URLHandler;
+        if ($URL->getUrl()['referrer'] === 'users') {
+            $this->handle = $URL->getUrl()['target'];
+            $this->load();
+        // search user attached to $_SESSION
+        } elseif (mroSession()) {
+            $session =  mroSession();
+            $this->info = $session->info;
+            $this->meta = $session->meta;
+            $this->GID = $session->GID;
+            $this->handle = $session->handle;
         }
-        $this->load();
     }
 
     private function load() {
@@ -52,36 +58,31 @@ class MroUser extends MroDB {
                 ->where(field('handle')->eq($this->handle))
                 ->compile();
         }
-        // make query
         if ($query) {
-            $result = $this->pdo(
-                $query->sql(),
-                $query->params()
-            )->fetchAll()[0];
-            $this->info = $result;
-            $this->GID = $result['GID'];
-            $this->handle = $result['handle'];
-            $this->loadMeta();
+            // make query
+            $result = $this->pdo($query)->fetch();
+            if ($result) {
+                $this->info = $result;
+                $this->GID = $result['GID'];
+                $this->handle = $result['handle'];
+                $this->loadMeta();
+            }
         }
     }
 
     private function loadMeta() {
-        $query = false;
-        // build query
         if ($this->GID) {
+            // build query
             $query = $this->sql()
                 ->select()
                 ->from('mro_usermeta')
                 ->where(field('user')->eq($this->GID))
                 ->compile();
-        }
-        // make query
-        if ($query) {
-            $result = $this->pdo(
-                $query->sql(),
-                $query->params()
-            )->fetchAll()[0];
-            $this->meta = $result;
+            // make query
+            $result = $this->pdo($query)->fetch();
+            if ($result) {
+                $this->meta = $result;
+            }
         }
     }
 
@@ -108,14 +109,14 @@ class MroUser extends MroDB {
                 ->insert('mro_users', $properties)
                 ->compile();
             // make query
-            $this->pdo($query->sql());
+            $this->pdo($query);
             // add meta row
             $meta = $this->sql()
                 ->insert('mro_usermeta', [
                         'user' => $properties['GID']
                     ])
                 ->compile();
-            $this->pdo($meta->sql());
+            $this->pdo($meta);
             // load this user
             $this->GID = $properties['GID'];
             $this->load();
@@ -125,10 +126,7 @@ class MroUser extends MroDB {
                 ->update('mro_users', $properties)
                 ->where(field('GID')->eq($this->GID))
                 ->compile();
-            $this->pdo(
-                $query->sql(),
-                $query->params()
-            );
+            $this->pdo($query);
         } else {
             throw new Exception("METHOD FAILURE: setUser was called but object of class MroUser has not been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -145,10 +143,7 @@ class MroUser extends MroDB {
                 ->update('mro_usermeta', $meta)
                 ->where(field('user')->eq($this->GID))
                 ->compile();
-            $this->pdo(
-                $query->sql(),
-                $query->params()
-            );
+            $this->pdo($query);
         } else {
             throw new Exception("METHOD FAILURE: setMeta can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -166,19 +161,13 @@ class MroUser extends MroDB {
                     ->delete('mro_posts')
                     ->where(field('author')->eq($this->GID))
                     ->compile();
-                $this->pdo(
-                    $posts->sql(),
-                    $posts->params()
-                );
+                $this->pdo($posts);
                 // delete comments
                 $comments = $this->sql()
                     ->delete('mro_posts')
                     ->where(field('author')->eq($this->GID))
                     ->compile();
-                $this->pdo(
-                    $comments->sql(),
-                    $comments->params()
-                );
+                $this->pdo($comments);
                 // delete non collaborative stories
                 $storiesImg = $this->sql()
                     ->select('img')
@@ -186,10 +175,8 @@ class MroUser extends MroDB {
                     ->where(field('author')->eq($this->GID))
                     ->andWhere(field('open')->eq('0'))
                     ->compile();
-                $imgs = $this->pdo(
-                    $storiesImg->sql(),
-                    $storiesImg->params()
-                )->fetchAll();
+                $imgs = $this->pdo($storiesImg)
+                    ->fetchAll();
                 foreach($imgs as $key => $value) {
                     mroRemoveImg($value);
                 }
@@ -198,32 +185,23 @@ class MroUser extends MroDB {
                     ->where(field('author')->eq($this->GID))
                     ->andWhere(field('open')->eq('0'))
                     ->compile();
-                $this->pdo(
-                    $stories->sql(),
-                    $stories->params()
-                );
+                $this->pdo($stories);
                 $this->deleteUser();
             } else {
-                // mro_user
-                $user = $this->sql()
-                    ->delete('mro_users')
-                    ->where(field('GID')->eq($this->GID))
-                    ->compile();
-                $this->pdo(
-                    $user->sql(),
-                    $user->params()
-                );
-                // user img
-                mroRemoveImg($this->getImg());
                 // mro_usermeta
                 $meta = $this->sql()
                     ->delete('mro_usermeta')
                     ->where(field('user')->eq($this->GID))
                     ->compile();
-                $this->pdo(
-                    $meta->sql(),
-                    $meta->params()
-                );
+                $this->pdo($meta);
+                // mro_user
+                $user = $this->sql()
+                    ->delete('mro_users')
+                    ->where(field('GID')->eq($this->GID))
+                    ->compile();
+                $this->pdo($user);
+                // user img
+                mroRemoveImg($this->getImg());
             }
         } else {
             throw new Exception("METHOD FAILURE: deleteUser can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
@@ -241,10 +219,8 @@ class MroUser extends MroDB {
                 ->from('mro_userbadges')
                 ->where(field('user')->eq($this->GID))
                 ->compile();
-            return $this->pdo(
-                $query->sql(),
-                $query->params()
-            )->fetchAll();
+            return $this->pdo($query)
+                ->fetchAll();
         } else {
             throw new Exception("METHOD FAILURE: getBadges can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -263,19 +239,14 @@ class MroUser extends MroDB {
             $query = $this->sql()
                 ->insert('mro_userbadges', $properties)
                 ->compile();
-            $this->pdo(
-                $query->sql()
-            );
+            $this->pdo($query);
         // update
         } elseif (mroValidateSet($properties) && ctype_digit($badge)) {
             $query = $this->sql()
                 ->update('mro_userbadges', $properties)
                 ->where(field('GID')->eq($badge))
                 ->compile();
-            $this->pdo(
-                $query->sql(),
-                $query->params()
-            );
+            $this->pdo($query);
         }
     }
 
@@ -305,10 +276,8 @@ class MroUser extends MroDB {
                 ->from('mro_users')
                 ->where(field('GID')->eq($this->GID))
                 ->compile();
-            return $this->pdo(
-                $query->sql(),
-                $query->params()
-            )->fetch()['email'];
+            return $this->pdo($query)
+                ->fetch()['email'];
         } else {
             throw new Exception("METHOD FAILURE: getEmail can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
         }
@@ -323,9 +292,8 @@ class MroUser extends MroDB {
      */
     public function getImg() {
         if (!$this->info['img']) {
-            return getenv('APP_URL')
-                .'app/vistas/'.getenv('APP_VISTA')
-                .'/'.MroUtils\Vista::default('userImg');
+            return Vista::getVistaUrl()
+                .'/'.Vista::default('userImg');
         } else {
             return getenv('APP_URL')
                 .'app/static/'.$this->info['img'];
@@ -362,10 +330,8 @@ class MroUser extends MroDB {
             ->orWhere(field('email')->eq($user))
             ->compile();
         // perform it
-        $result = $this->pdo(
-            $query->sql(),
-            $query->params()
-        )->fetchAll()[0];
+        $result = $this->pdo($query)
+            ->fetchAll()[0];
         if ($result) {
             $segment->set('loginAttempts', 0);
             $this->GID = $result['GID'];
@@ -400,10 +366,9 @@ class MroUser extends MroDB {
             if ($attempts < time()) {
                 if (password_verify($password, $this->password)) {
                     $this->load();
-                    // attach session to user
+                    // attach user object to session
                     $segment = AuraSession()->getSegment('MroUser');
-                    $segment->set('user', $this->info);
-                    $segment->set('meta', $this->meta);
+                    $segment->set('User', $this);
                 // progressive delay
                 } else {
                     $this->setMeta(['login' => $attempts++]);

@@ -9,7 +9,6 @@
  * @var string $vistaFolder Folder name of active vista inside /vistas/ folder
  */
 
-namespace MroUtils;
 class Vista {
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 
@@ -19,7 +18,7 @@ class Vista {
     public static function start() {
         self::init();
         // include vista files
-        $URL = new URLHandler;
+        $URL = new MroUtils\URLHandler;
         if ($URL->getUrl()['referrer']) {
             include MROVISTAS
                 .'/'.self::$vistaFolder
@@ -76,6 +75,10 @@ class Vista {
                 die();
             }
         }
+    }
+
+    public static function getVistaUrl(){
+        return self::$vistaUrl;
     }
 
     /**
@@ -136,7 +139,7 @@ class Vista {
      * Set a title
      * @param string $title Title to be displayed
      */
-    public static function title(string $title) {
+    public static function htmlTitle(string $title) {
         self::$htmlTitle = $title;
     }
 }

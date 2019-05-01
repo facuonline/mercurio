@@ -64,19 +64,22 @@
  */
 
     /**
-     * DRY helper function 
-     * Searches for hints of users id for MroUser class
-     * @see MroUser class
-     * @return mixed User hints (GID or @handle)
+     * Aura Session DRY helper
+     * @return object Aura Session Factory instance
      */
-    function mroNoUser() {
-        // search user in http request via $_GET
-        $URL = new MroUtils\URLHandler;
-        if ($URL->getUrl()['referrer'] === 'users') {
-            return $URL->getUrl()['target'];
-        // search user attached to $_SESSION
-        } elseif (mroSession()) {
-            return mroSession()['GID'];
+    function AuraSession() {
+        $session = new \Aura\Session\SessionFactory;
+        return $session->newInstance($_COOKIE);
+    }
+
+    /**
+     * Session retriever, check if there is an user object attached to the session
+     * @return false|object
+     */
+    function mroSession() {
+        $session = AuraSession();
+        if ($session->get('GID')) {
+            return $session->get('User');
         } else {
             return false;
         }
@@ -91,15 +94,6 @@
         echo "<pre>\n";
         var_dump($todump);
         echo "</pre>";
-    }
-
-    /**
-     * Aura Session DRY helper
-     * @return object Aura Session Factory instance
-     */
-    function AuraSession() {
-        $session = new \Aura\Session\SessionFactory;
-        return $session->newInstance($_COOKIE);
     }
 
     function mroReport() {

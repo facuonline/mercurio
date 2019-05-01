@@ -2,5 +2,8 @@
 /app/src/.env.php
 .htaccess
 
+# Vistas #
+/app/vistas
+
 # Composer #
-/vendor/
+/vendor

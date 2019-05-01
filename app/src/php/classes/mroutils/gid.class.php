@@ -16,7 +16,7 @@
  */
 
 namespace MroUtils;
-class MroGID {
+class GID {
     private static $GID;
 
 	/**
@@ -36,7 +36,7 @@ class MroGID {
 		$entropy = random_int(0, 9);
 
 		self::$GID = $time.$server.$port.$client.$entropy;
-		return self::$GID;
+		return (int) self::$GID;
 	}
 
 	/**
@@ -58,7 +58,7 @@ class MroGID {
 			return openssl_encrypt(self::$GID, 'aes-192-ctr', session_id(), 0, $iv);
 		} else {
 			$iv = substr(md5(getenv('APP_KEY')), -16);
-			return openssl_decrypt(self::$GID, 'aes-192-ctr', session_id(), 0, $iv);
+			return (int) openssl_decrypt(self::$GID, 'aes-192-ctr', session_id(), 0, $iv);
 		}
 	}
 }

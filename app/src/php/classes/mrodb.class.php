@@ -73,13 +73,17 @@ class MroDB {
 
     /**
      * DRY helper function to perform PDO queries with less code
-     * @param mixed $statement SQL statement
-     * @param array $placeholders SQL statement placeholders
+     * @param object Latitude query object
      * @return object PDO object
      */
-    protected function pdo($statement, array $placeholders = []) {
-        $query = $this->PDO->prepare($statement);
-        $query->execute($placeholders);
+    protected function pdo(Latitude\QueryBuilder\Query $query) {
+        if ($query->params()) {
+            $params = $query->params();
+        } else {
+            $params = NULL;
+        }
+        $query = $this->PDO->prepare($query->sql());
+        $query->execute($params);
         return $query;
     }
 
@@ -94,10 +98,8 @@ class MroDB {
             ->from('mro_configs')
             ->where(field('name')->eq($config))
             ->compile();
-        $result = $this->pdo(
-            $query->sql(),
-            $query->params()
-        )->fetch()['value'];
+        $result = $this->pdo($query)
+            ->fetch()['value'];
         if ($result) {
             return $result;
         } else {
@@ -129,9 +131,6 @@ class MroDB {
                     ])
                 ->compile();
         }
-        return $this->pdo(
-            $query->sql(),
-            $query->params()
-        );
+        return $this->pdo($query);
     }
 }
