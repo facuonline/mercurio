@@ -12,40 +12,56 @@
  */
 
 use function Latitude\QueryBuilder\field;
+use function Latitude\QueryBuilder\order;
 class MroUser extends MroDB {
     public $info, $meta, $GID, $handle;
     private $password;
 
-    public function __construct() {
+    /**
+     * @param mixed $user User locator, either GID or handle
+     */
+    public function __construct($user = false) {
         $this->conn();
-        $this->GID = false;
-        $this->handle = false;
-        $this->password = false;
+        if ($user) {
+            $this->getUser($user);
+        } else {
+            $this->GID = false;
+            $this->handle = false;
+            $this->password = false;
+        }
     }
 
     /**
-     * Select and initialize user into class
-     * @param mixed $user
+     * Select and initialize user into instance
+     * @param mixed $user User locator, either GID or handle
      * @return bool
      */
     public function getUser($user = false) {
-        // search user in http request via $_GET
-        $URL = new MroUtils\URLHandler;
-        if ($URL->getUrl()['referrer'] === 'users'
-        && $URL->getUrl()['target']) {
-            $this->handle = $URL->getUrl()['target'];
-            $this->load();
+        if (!$user) {
+            // search user in http request via $_GET
+            $URL = new MroUtils\URLHandler;
+            if ($URL->getUrl()['referrer'] === 'users'
+            && $URL->getUrl()['target']) {
+                $this->handle = ltrim($URL->getUrl()['target'], '@');
+                $this->load();
+                return true;
+            // search user attached to $_SESSION
+            } elseif (mroSession()) {
+                $session = mroSession();
+                $this->info = $session['info'];
+                $this->meta = $session['meta'];
+                $this->GID = $session['GID'];
+                $this->handle = $session['handle'];
+                return true;
+            } else {
+                return false;
+            }
+        } elseif (ctype_digit($user)) {
+            $this->GID = $user;
             return true;
-        // search user attached to $_SESSION
-        } elseif (mroSession()) {
-            $session = mroSession();
-            $this->info = $session['info'];
-            $this->meta = $session['meta'];
-            $this->GID = $session['GID'];
-            $this->handle = $session['handle'];
+        } elseif (is_string($user)) {
+            $this->handle = ltrim($user, '@');
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -100,7 +116,7 @@ class MroUser extends MroDB {
         if (array_key_exists('img', $properties)) {
             throw new MroException\Runtime("METHOD FAILURE: User img property can only be set with setImg method.", 301);
         } 
-        // check password
+        // hash password
         if (array_key_exists('password', $properties)) {
             $properties['password'] = password_hash($properties['password'], PASSWORD_DEFAULT);
         }
@@ -462,19 +478,105 @@ class MroUser extends MroDB {
         }
     }
 
-    public function getStories() {
-
+    /**
+     * Get stories of current user
+     * @param string $criteria Name of property to sort by
+     * @param string $order Sort order
+     * @return array|false Array with GIDs of stories entities
+     * @throws object Runtime class Exception if condition not met
+     */
+    public function getStories(string $criteria = 'GID', string $order = 'DESC') {
+        if ($this->GID) {
+            // build query
+            $query = $this->sql()
+                ->select('GID')
+                ->from('mro_stories')
+                ->where(field('author')->eq($this->GID))
+                ->order($criteria, $order)
+                ->compile();
+            $result = $this->pdo($query)->fetchAll();
+            if ($result) {
+                return $result;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: getStories can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+        }
     }
 
-    public function getPosts() {
-
+    /**
+     * Get posts of current user
+     * @param string $criteria Name of property to sort by
+     * @param string $order Sort order
+     * @return array|false Array with GIDs of posts
+     * @throws object Runtime class Exception if condition not met
+     */
+    public function getPosts(string $criteria = 'GID', string $order = 'DESC') {
+        if ($this->GID) {
+            // build query
+            $query = $this->sql()
+                ->select('GID')
+                ->from('mro_posts')
+                ->where(field('author')->eq($this->GID))
+                ->order($criteria, $order)
+                ->compile();
+            $result = $this->pdo($query)->fetchAll();
+            if ($result) {
+                return $result;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: getPosts can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+        }
     }
 
+    /**
+     * Get comments made by current user
+     * @return array|false Array with GIDs of comments
+     * @throws object Runtime class Exception if condition not met
+     */
     public function getComments() {
-
+        if ($this->GID) {
+            // build query
+            $query = $this->sql()
+                ->select('GID')
+                ->from('mro_comments')
+                ->where(field('author')->eq($this->GID))
+                ->compile();
+            $result = $this->pdo($query)->fetchAll();
+            if ($result) {
+                return $result;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: getComments can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+        }
     }
 
+    /**
+     * Get posts with stars given by current user
+     * @return array|false Array with GIDs of posts
+     * @throws object Runtime class Exception if condition not met
+     */
     public function getStars() {
-        
+        if ($this->GID) {
+            // build query
+            $query = $this->sql()
+                ->select('post')
+                ->from('mro_stars')
+                ->where(field('author')->eq($this->GID))
+                ->compile();
+            $result = $this->pdo($query)->fetchAll();
+            if ($result) {
+                return $result;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: getStars can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+        }
     }
 }
