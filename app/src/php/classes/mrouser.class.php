@@ -345,22 +345,27 @@ class MroUser extends MroDB {
     /**
      * Get path to user img
      * @return string Image URL
+     * @throws object Runtime class Exception if condition not met
      * @see Vista class
      * This also took way longer than expected and what it looks like, 
      * please take a second to appreciate this piece of code
      */
     public function getImg(string $size = 'max') {
-        if (!$this->info['img']) {
-            return MroVista::getVistaUrl()
-                .'/'.MroVista::default('img', 'user');
-        } else {
-            if ($size = 'min') {
-                return getenv('APP_URL')
-                .'app/static/upload_min'.$this->info['img'];
+        if ($this->GID) {
+            if (!$this->info['img']) {
+                return MroVista::getVistaUrl()
+                    .'/'.MroVista::default('img', 'user');
             } else {
-                return getenv('APP_URL')
-                .'app/static/upload_'.$this->info['img'];
+                if ($size = 'min') {
+                    return getenv('APP_URL')
+                    .'app/static/upload_min'.$this->info['img'];
+                } else {
+                    return getenv('APP_URL')
+                    .'app/static/upload_'.$this->info['img'];
+                }
             }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: getImg can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.");
         }
     }
 
@@ -370,8 +375,8 @@ class MroUser extends MroDB {
      * @param int $width Width in pixels of image
      * @param int $height Height in pixels of image
      * @return string Image URL
+     * @throws object Runtime class Exception if condition not met
      * @see MroUtils\IMG
-     * @todo
      */
     public function setImg(string $input, int $width = 400, int $height = 400) {
         if ($this->GID) {
@@ -385,7 +390,7 @@ class MroUser extends MroDB {
                 ->compile();
             $this->pdo($query);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setImg can only be used to set img property of already loaded users. Use getUser first.");
+            throw new MroException\Runtime("METHOD FAILURE: setImg can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.");
         }
     }
 
