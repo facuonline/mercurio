@@ -24,15 +24,12 @@ class URLHandler extends MroDB {
         $this->conn();
         $this->baseUrl = getenv('APP_URL');
         // check mod_rewrite availability
-        if (in_array('mod_rewrite', apache_get_modules())
-        && $this->getConfig('urlMasking') === 1) {
+        if (in_array('mod_rewrite', apache_get_modules())) {
             $this->mod_rewrite = true;
-            if ($this->readHtaccess()
-            && $this->startHtaccess()) {
+            $this->readHtaccess();
+            if ($this->startHtaccess()) {
                 $this->referrerHtaccess();
                 $this->writeHtacess();
-            } else {
-                $this->htaccess = false;
             }
 		} else {
             $this->mod_rewrite = false;
@@ -40,42 +37,58 @@ class URLHandler extends MroDB {
     }
 
     /**
-     * Get referrer path to something or modify it
+     * Determine wether a provided path is a valid referrer type
      * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
-     * @param string $value New value of referrer to set
+     * @return string
+     * @throws object Runtime class Exception if condition not met
+     */
+    private function referrerPath(string $path) {
+        if ($path == 'users') {
+            return 'refrrUsers';
+        } elseif ($path == 'stories') {
+            return 'refrrStories';
+        } elseif ($path == 'posts') {
+            return 'refrrPosts';
+        } elseif ($path == 'sections') {
+            return 'refrrSections';
+        } elseif ($path == 'messages') {
+            return 'refrrMessages';
+        }  elseif ($path == 'search') {
+            return 'refrrSearch';
+        }  elseif ($path == 'admin') {
+            return 'refrrAdmin';
+        } else {
+            throw new MroException\Runtime("Unable to locate path referrer to <<$path>>", 400);
+        }
+    }
+
+    /**
+     * Get preset referrer path to something.
+     * To get the referrer in a given URL use getUrl()['referrer']
+     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
      * @return string URL
      */
-    public function getReferrer(string $path, $value = false) {
-        if ($this->htaccess) {
-            if ($path == 'users') {
-                $referrer = 'refrrUsers';
-            } elseif ($path == 'stories') {
-                $referrer = 'refrrStories';
-            } elseif ($path == 'posts') {
-                $referrer = 'refrrPosts';
-            } elseif ($path == 'sections') {
-                $referrer = 'refrrSections';
-            } elseif ($path == 'messages') {
-                $referrer = 'refrrMessages';
-            }  elseif ($path == 'search') {
-                $referrer = 'refrrSearch';
-            }  elseif ($path == 'admin') {
-                $referrer = 'refrrAdmin';
-            } else {
-                throw new Exception("Unable to locate path referrer to <<$path>>", 1);
-            }
-            if ($value && $referrer) {
-                $this->setConfig($referrer, rtrim($value, '/').'/');
-            } elseif ($referrer) {
-                return $this->getConfig($referrer);
-            }
+    public function getReferrer(string $path) {
+        if ($this->mod_rewrite) {
+            $referrer = $this->referrerPath($path);
+            return $this->getConfig($referrer);
         } else {
             return '?referrer='.$path;
         }
     }
 
+    /**
+     * Sets up a referrer value
+     * @param string $path Referrer name
+     * @param string $value Referrer new value
+     */
+    public function setReferrer(string $path, string $value) {
+        $referrer = $this->referrerPath($path);
+        $this->setConfig($referrer, $value);
+    }
+
     public function getTarget($target) {
-        if ($this->htaccess) {
+        if ($this->mod_rewrite) {
             return $target;
         } else {
             return '&target='.$target;
@@ -99,27 +112,27 @@ class URLHandler extends MroDB {
      * @return array 
      */
     public function getUrl() {
-        $params;
+        $params = [];
         if (isset($_GET['referrer'])
         && !empty($_GET['referrer'])) {
-           $referrer = filter_input(INPUT_GET, 'referrer', FILTER_SANITIZE_STRING);
-           if ($referrer == $this->getConfig('refrrUsers')) {
+            $referrer = filter_input(INPUT_GET, 'referrer', FILTER_SANITIZE_STRING);
+            if ($referrer == $this->getConfig('refrrUsers')) {
                 $params['referrer'] = 'users';
-           } elseif ($referrer == $this->getConfig('refrrStories')) {
+            } elseif ($referrer == $this->getConfig('refrrStories')) {
                 $params['referrer'] = 'stories';
-           } elseif ($referrer == $this->getConfig('refrrPosts')) {
+            } elseif ($referrer == $this->getConfig('refrrPosts')) {
                 $params['referrer'] = 'posts';
-           } elseif ($referrer == $this->getConfig('refrrSections')) {
+            } elseif ($referrer == $this->getConfig('refrrSections')) {
                 $params['referrer'] = 'sections';
-           } elseif ($referrer == $this->getConfig('refrrMessages')) {
+            } elseif ($referrer == $this->getConfig('refrrMessages')) {
                 $params['referrer'] = 'messages';
-           } elseif ($referrer == $this->getConfig('refrrSearch')) {
+            } elseif ($referrer == $this->getConfig('refrrSearch')) {
                 $params['referrer'] = 'search';
-           } elseif ($referrer == $this->getConfig('refrrAdmin')) {
+            } elseif ($referrer == $this->getConfig('refrrAdmin')) {
                 $params['referrer'] = 'admin';
-           } else {
-               $params['referrer'] = false;
-           }
+            } else {
+                $params['referrer'] = false;
+            }
         } else {
             $params['referrer'] = false;
         }
@@ -155,10 +168,8 @@ class URLHandler extends MroDB {
         }
         if ($engine) {
             $this->htaccess[$engine] = "# Mercurio CVURL \n<IfModule mod_rewrite.c>\nRewriteEngine On";
-            return true;
-        } else {
-            return false;
         }
+        return $engine;
     }
     /**
      * Stops rewrite engine
