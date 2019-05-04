@@ -71,7 +71,7 @@ class URLHandler extends MroDB {
     public function getReferrer(string $path) {
         if ($this->mod_rewrite) {
             $referrer = $this->referrerPath($path);
-            return $this->getConfig($referrer);
+            return $this->getConfig($referrer).'/';
         } else {
             return '?referrer='.$path;
         }
@@ -212,13 +212,13 @@ class URLHandler extends MroDB {
     private function configReferrers() {
         // make sure referrers are always there
         $referrers = [
-            'refrrUsers' => 'user/',
-            'refrrStories' => 'story/',
-            'refrrPosts' => 'post/',
-            'refrrSections' => 'section/',
-            'refrrMessages' => 'message/',
-            'refrrSearch' => 'search/',
-            'refrrAdmin' => 'admin/'
+            'refrrUsers' => 'user',
+            'refrrStories' => 'story',
+            'refrrPosts' => 'post',
+            'refrrSections' => 'section',
+            'refrrMessages' => 'message',
+            'refrrSearch' => 'search',
+            'refrrAdmin' => 'admin'
         ];
         foreach ($referrers as $key => $value) {
             if (!$this->getConfig($key)) {
