@@ -452,11 +452,11 @@ class MroUser extends MroDB {
             }
             if ($attempts < time()) {
                 if (password_verify($password, $this->password)) {
-                    $this->load();
                     $this->setMeta([
                         'login' => 1,
                         'lastlogin' => time()
                     ]);
+                    $this->load();
                     // attach user object to session
                     $user['info'] = $this->info;
                     $user['meta'] = $this->meta;
