@@ -62,26 +62,12 @@
  */
 
     /**
-     * Aura Session DRY helper
+     * Aura Session DRY instantiator
      * @return object Aura Session Factory instance
      */
     function AuraSession() {
         $session = new \Aura\Session\SessionFactory;
         return $session->newInstance($_COOKIE);
-    }
-
-    /**
-     * Session retriever, check if there is an user object attached to the session
-     * @return false|array
-     */
-    function mroSession() {
-        $session = AuraSession();
-        $segment = $session->getSegment('MroUser');
-        if ($segment->get('User')) {
-            return $segment->get('User');
-        } else {
-            return false;
-        }
     }
 
 /**

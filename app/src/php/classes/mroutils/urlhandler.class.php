@@ -21,7 +21,6 @@ class URLHandler extends MroDB {
     protected $htaccess, $mod_rewrite;
 
     public function __construct() {
-        $this->conn();
         $this->baseUrl = getenv('APP_URL');
         // check mod_rewrite availability
         if (in_array('mod_rewrite', apache_get_modules())) {

@@ -4,9 +4,13 @@
  * @package Mercurio
  * @subpackage Included classes
  * 
- * View (vista) models management and initialization
+ * View models (vista) management and initialization
  * 
  * @var string $vistaFolder Folder name of active vista inside /vistas/ folder
+ * @var string $vistaUrl URL path to active vista of app, not url inside vista json
+ * @var array $vista Values of vista index in vista json
+ * @var array $defaults Default values of vista in default index in vista json
+ * @var string $htmlTitle 
  */
 
 class MroVista {
@@ -18,9 +22,14 @@ class MroVista {
      */
     public static function start() {
         self::init();
-        // include vista files
         $URL = new MroUtils\URLHandler;
-        if ($URL->getUrl()['referrer']) {
+        // include vista functions
+        $functions = MROVISTAS
+            .'/'.self::$vistaFolder
+            .'/functions.php';
+        if (file_exists($functions)) include $functions;
+        // include vista files
+        if (array_key_exists('referrer', $URL->getUrl())) {
             include MROVISTAS
                 .'/'.self::$vistaFolder
                 .'/'.self::default('templates')
@@ -29,12 +38,6 @@ class MroVista {
             include MROVISTAS
                 .'/'.self::$vistaFolder
                 .'/main.php';
-        }
-        // send GET petitions of targets
-        if ($URL->getUrl()['target']) {
-            Requests::get(getenv('APP_URL'), [
-                'target' => $URL->getUrl()['target']
-            ]);
         }
     }
 
@@ -92,7 +95,7 @@ class MroVista {
     public static function default(string $setting, string $subsetting = '') {
         if (array_key_exists($setting, self::$defaults)) {
             if (!empty($subsetting)
-            && array_key_exists($setting, self::$defaults[$setting])) {
+            && array_key_exists($subsetting, self::$defaults[$setting])) {
                 return self::$defaults[$setting][$subsetting];
             } else {
                 return self::$defaults[$setting];
@@ -149,16 +152,5 @@ class MroVista {
      */
     public static function htmlTitle(string $title) {
         self::$htmlTitle = $title;
-    }
-
-    /**
-     * Trigger a frontend friendly success, warning or error message
-     * @param object instance of MroException\Usage Exception class
-     */
-    public static function notice(MroException\Usage $e) {
-        if (function_exists(self::default('notices'))) {
-            $error = self::default('notices');
-            $error($e->getCode());
-        }
     }
 }

@@ -9,6 +9,7 @@
  * @var int $GID User generated incremental discriminator
  * @var string $handle User hexadecimal locator
  * @var string $password
+ * @var array $session MroUser segment of Aura Session
  */
 
 use function Latitude\QueryBuilder\field;
@@ -16,12 +17,12 @@ use function Latitude\QueryBuilder\order;
 class MroUser extends MroDB {
     public $info, $meta, $GID, $handle;
     private $password;
+    protected $session;
 
     /**
      * @param mixed $user User locator, either GID or handle
      */
     public function __construct($user = false) {
-        $this->conn();
         if ($user) {
             $this->getUser($user);
         } else {
@@ -29,6 +30,9 @@ class MroUser extends MroDB {
             $this->handle = false;
             $this->password = false;
         }
+        $session = AuraSession();
+        $segment = $session->getSegment('MroUser');
+        $this->session = $segment;
     }
 
     /**
@@ -46,12 +50,11 @@ class MroUser extends MroDB {
                 $this->load();
                 return true;
             // search user attached to $_SESSION
-            } elseif (mroSession()) {
-                $session = mroSession();
-                $this->info = $session['info'];
-                $this->meta = $session['meta'];
-                $this->GID = $session['GID'];
-                $this->handle = $session['handle'];
+            } elseif ($this->session->get('User')) {
+                $this->info = $this->session->get('User')['info'];
+                $this->meta = $this->session->get('User')['meta'];
+                $this->GID = $this->session->get('User')['GID'];
+                $this->handle = $this->session->get('User')['handle'];
                 return true;
             } else {
                 return false;
@@ -354,7 +357,7 @@ class MroUser extends MroDB {
         if ($this->GID) {
             if (!$this->info['img']) {
                 return MroVista::getVistaUrl()
-                    .'/'.MroVista::default('img', 'user');
+                    .MroVista::default('img', 'user');
             } else {
                 if ($size = 'min') {
                     return getenv('APP_URL')
@@ -400,10 +403,7 @@ class MroUser extends MroDB {
      * @return bool
      */
     public function getLogin(string $user) {
-        // start session to store login attempts
-        $session = AuraSession();
-        $segment = $session->getSegment('MroUser');
-        $attempts = $segment->get('loginAttempts', 0);
+        $attempts = $this->session->get('loginAttempts', 0);
         // check if credential is a valid type
         if (!is_string($user)
         || empty($user)) {
@@ -419,14 +419,14 @@ class MroUser extends MroDB {
         $result = $this->pdo($query)->fetch();
         // succesful login
         if ($result) {
-            $segment->set('loginAttempts', 0);
+            $this->session->set('loginAttempts', 0);
             $this->GID = $result['GID'];
             $this->password = $result['password'];
             $this->loadMeta();
             return true;
         // progressive delay for wrong credentials
         } else {
-            $segment->set('loginAttempts', $attempts++);
+            $this->session->set('loginAttempts', $attempts++);
             if ($attempts > 3) {
                 sleep($attempts);
             } elseif ($attempts > 9) {
@@ -458,12 +458,11 @@ class MroUser extends MroDB {
                         'lastlogin' => time()
                     ]);
                     // attach user object to session
-                    $segment = AuraSession()->getSegment('MroUser');
                     $user['info'] = $this->info;
                     $user['meta'] = $this->meta;
                     $user['GID'] = $this->GID;
                     $user['handle'] = $this->handle;
-                    $segment->set('User', $user);
+                    $this->session->set('User', $user);
                     return true;
                 // progressive delay
                 } else {
@@ -474,12 +473,47 @@ class MroUser extends MroDB {
             // lockdown for 5 minutes
             } elseif ($attempts > 9) {
                 $this->setMeta(['login' => time()+300]);
-                $remoteAddress = NetteHttpUrl()->getRemoteAddress();
-                error_log("SECURITY: Too many (+10) failed login attempts with wrong password for user $this->handle $this->GID from ip address: $remoteAddress");
+                $remoteAddress = $_SERVER['REMOTE_ADDR'];
+                error_log("SECURITY: Too many (+10) failed login attempts with wrong password for user @$this->handle ($this->GID) from ip address: $remoteAddress");
                 return false;
             }
         } else {
             throw new MroException\Runtime("METHOD FAILURE: setLogin can only be called if object of class MroUser has been loaded with an existing user. Use getLogin first.", 1);
+        }
+    }
+
+    /**
+     * Detaches an user from the current session
+     * @throws object Runtime class Exception if condition not met
+     */
+    public function logout() {
+        if ($this->GID) {
+            $this->setMeta([
+                'lastlogout' => time()
+            ]);
+            $this->session->set('User', false);
+            $session = AuraSession();
+            $session->destroy();
+            $session->regenerateId();
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: logout can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+        }
+    }
+
+    /**
+     * Check if loaded user is in session
+     * @return bool
+     * @throws object Runtime class Exception if condition not met
+     */
+    public function isInSession() {
+        if ($this->GID) {
+            if (array_key_exists('GID', $this->session->get('User', []))) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: isInSession can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 

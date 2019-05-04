@@ -3,8 +3,6 @@
  * MroDB class
  * @package Mercurio
  * @subpackage Included classes
- * 
- * @var object $PDO PDO instance with db connection
  */
 
 /**
@@ -29,20 +27,6 @@ use function Latitude\QueryBuilder\literal;
 use function Latitude\QueryBuilder\alias;
 
 class MroDB {
-    protected $PDO;
-
-    public function __construct() {
-        $this->conn();
-    }
-
-    public function __sleep() {
-        return [];
-    }
-
-    public function __wakeup() {
-        $this->PDO;
-    }
-
     /**
      * Stablish connection with db
      * @throws Exception on error with db connection
@@ -62,7 +46,7 @@ class MroDB {
         ];
         // make it so
 		try {
-			$this->PDO = new PDO($dsn, $user, $pass, $options);
+			return new PDO($dsn, $user, $pass, $options);
 		} catch (\PDOException $error) {
 			throw new \PDOException($error->getMessage(), $error->getCode());
 	    	die();
@@ -90,7 +74,8 @@ class MroDB {
         } else {
             $params = NULL;
         }
-        $query = $this->PDO->prepare($query->sql());
+        $PDO = $this->conn();
+        $query = $PDO->prepare($query->sql());
         $query->execute($params);
         return $query;
     }
