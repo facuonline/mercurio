@@ -454,7 +454,7 @@ class MroUser extends MroDB {
                 if (password_verify($password, $this->password)) {
                     $this->load();
                     $this->setMeta([
-                        'login' => 0,
+                        'login' => 1,
                         'lastlogin' => time()
                     ]);
                     // attach user object to session
@@ -483,12 +483,30 @@ class MroUser extends MroDB {
     }
 
     /**
+     * Check if an user is logged in
+     * @return bool
+     * @throws object Runtime class Exception if condition not met
+     */
+    public function isLoggedIn() {
+        if ($this->GID) {
+            if ($this->meta['login'] == '1') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            throw new MroException\Runtime("METHOD FAILURE: isLoggedIn can only be called if object of class MroUser has been loaded with an existing user. Use getLogin first.", 1);
+        }
+    }
+
+    /**
      * Detaches an user from the current session
      * @throws object Runtime class Exception if condition not met
      */
     public function logout() {
         if ($this->GID) {
             $this->setMeta([
+                'login' => 0,
                 'lastlogout' => time()
             ]);
             $this->session->set('User', false);

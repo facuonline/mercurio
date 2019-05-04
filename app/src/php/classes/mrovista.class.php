@@ -29,7 +29,7 @@ class MroVista {
             .'/functions.php';
         if (file_exists($functions)) include $functions;
         // include vista files
-        if (array_key_exists('referrer', $URL->getUrl())) {
+        if ($URL->getUrl()['referrer']) {
             include MROVISTAS
                 .'/'.self::$vistaFolder
                 .'/'.self::default('templates')
