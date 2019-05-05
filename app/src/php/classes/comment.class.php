@@ -1,13 +1,14 @@
 <?php
 /**
- * MroComment class
+ * Comment class
  * @package Mercurio
  * @subpackage Included classes
  * 
  * 
  */
 
-class MroComment extends MroDB {
+namespace Mercurio;
+class Comment extends Database {
     public $info, $body, $GID;
 
     public function __construct() {

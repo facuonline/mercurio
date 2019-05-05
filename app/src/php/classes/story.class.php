@@ -1,6 +1,6 @@
 <?php
 /**
- * MroStory class
+ * Story class
  * @package Mercurio
  * @subpackage Included classes
  * 
@@ -9,7 +9,8 @@
  * @var int $GID Story generated incremental discriminator
  */
 
-class MroStory extends MroDB {
+namespace Mercurio;
+class Story extends Database {
     public $info, $body, $GID;
 
     public function __construct() {

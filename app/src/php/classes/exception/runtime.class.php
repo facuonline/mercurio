@@ -6,7 +6,7 @@
  * These types of exceptions are triggered on third party developers failure
  * e.g When not properly using a class method
  */
-namespace MroException;
+namespace Exception;
 use Exception;
 class Runtime extends Exception {
 

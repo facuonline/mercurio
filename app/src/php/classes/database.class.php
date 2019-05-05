@@ -1,32 +1,12 @@
 <?php
 /**
- * MroDB class
+ * DB class
  * @package Mercurio
  * @subpackage Included classes
  */
 
-/**
- * Latitude functions
- * Latitude Query Buider helps developers to build better, safer SQL queries
- * and makes easier migrating to other db models than MySQL
- */
-use function Latitude\QueryBuilder\fn;
-use function Latitude\QueryBuilder\param;
-use function Latitude\QueryBuilder\paramAll;
-use function Latitude\QueryBuilder\order;
-use function Latitude\QueryBuilder\identify;
-use function Latitude\QueryBuilder\identifyAll;
-use function Latitude\QueryBuilder\listing;
-use function Latitude\QueryBuilder\field;
-use function Latitude\QueryBuilder\search;
-use function Latitude\QueryBuilder\on;
-use function Latitude\QueryBuilder\group;
-use function Latitude\QueryBuilder\express;
-use function Latitude\QueryBuilder\criteria;
-use function Latitude\QueryBuilder\literal;
-use function Latitude\QueryBuilder\alias;
-
-class MroDB {
+namespace Mercurio;
+class Database {
     /**
      * Stablish connection with db
      * @throws Exception on error with db connection
@@ -40,13 +20,13 @@ class MroDB {
         // config pdo
         $dsn = "mysql:host=$host;dbname=$name;charset=utf8mb4";
 		$options = [
-	    	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-	   		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-			PDO::ATTR_EMULATE_PREPARES => false,
+	    	\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+	   		\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+			\PDO::ATTR_EMULATE_PREPARES => false,
         ];
         // make it so
 		try {
-			return new PDO($dsn, $user, $pass, $options);
+			return new \PDO($dsn, $user, $pass, $options);
 		} catch (\PDOException $error) {
 			throw new \PDOException($error->getMessage(), $error->getCode());
 	    	die();
@@ -59,8 +39,8 @@ class MroDB {
      * @return object Instance of Latitude with MySQL engine
      */
     protected function sql() {
-        $engine = new Latitude\QueryBuilder\Engine\MySqlEngine;
-		return new Latitude\QueryBuilder\QueryFactory($engine);
+        $engine = new \Latitude\QueryBuilder\Engine\MySqlEngine;
+		return new \Latitude\QueryBuilder\QueryFactory($engine);
     }
 
     /**
@@ -68,7 +48,7 @@ class MroDB {
      * @param object Latitude query object
      * @return object PDO object
      */
-    protected function pdo(Latitude\QueryBuilder\Query $query) {
+    protected function pdo(\Latitude\QueryBuilder\Query $query) {
         if ($query->params()) {
             $params = $query->params();
         } else {
@@ -89,7 +69,7 @@ class MroDB {
         $query = $this->sql()
             ->select('value')
             ->from('mro_configs')
-            ->where(field('name')->eq($config))
+            ->where(\Latitude\QueryBuilder\field('name')->eq($config))
             ->compile();
         $result = $this->pdo($query)
             ->fetch()['value'];
@@ -113,7 +93,7 @@ class MroDB {
                 ->update('mro_configs', [
                         'value' => $value
                     ])
-                ->where(field('name')->eq($name))
+                ->where(\Latitude\QueryBuilder\field('name')->eq($name))
                 ->compile();
         // insert
         } else {

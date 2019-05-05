@@ -1,6 +1,6 @@
 <?php
 /**
- * MroVista class
+ * Vista class
  * @package Mercurio
  * @subpackage Included classes
  * 
@@ -13,7 +13,8 @@
  * @var string $htmlTitle 
  */
 
-class MroVista {
+namespace Mercurio;
+class Vista {
     public static $notices;
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 
@@ -22,7 +23,7 @@ class MroVista {
      */
     public static function start() {
         self::init();
-        $URL = new MroUtils\URLHandler;
+        $URL = new Utils\URLHandler;
         // include vista functions
         $functions = MROVISTAS
             .'/'.self::$vistaFolder

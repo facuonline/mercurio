@@ -13,7 +13,7 @@
  * Not fixed length, with enough (a lot of years) time GIDs will overflow 64 bits
  */
 
-namespace MroUtils;
+namespace Mercurio\Utils;
 class GID {
 
 	/**

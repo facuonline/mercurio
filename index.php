@@ -8,6 +8,6 @@
 require 'config.php';
 
 /**
- * Start Vista, effectively starting app
+ * Start Vista, effectively starting Mercurio
  */
-MroVista::start();
+Mercurio\Vista::start();

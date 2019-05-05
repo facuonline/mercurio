@@ -1,11 +1,12 @@
 <?php
 /**
- * MroPost class
+ * Post class
  * @package Mercurio
  * @subpackage Included classes
  */
 
-class MroPost extends MroDB {
+namespace Mercurio;
+class Post extends Database {
     public $info, $body, $GID;
 
     public function __construct() {

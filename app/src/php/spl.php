@@ -12,5 +12,6 @@
  *
  */
 spl_autoload_register(function ($class) {
+    if (strstr($class, 'Mercurio\\')) $class = str_replace('Mercurio\\', '', $class);
     include 'classes/'.$class.'.class.php';
 });

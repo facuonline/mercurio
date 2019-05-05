@@ -14,9 +14,9 @@
  * @var bool $mod_rewrite State of mod_rewrite module, can't make vanities without it
  */
 
-namespace MroUtils;
-use MroDB;
-class URLHandler extends MroDB {
+namespace Mercurio\Utils;
+use \Mercurio\Database;
+class URLHandler extends Database {
     public $baseUrl, $referrer, $target;
     protected $htaccess, $mod_rewrite;
 
@@ -57,7 +57,7 @@ class URLHandler extends MroDB {
         }  elseif ($path == 'admin') {
             return 'refrrAdmin';
         } else {
-            throw new MroException\Runtime("Unable to locate path referrer to <<$path>>", 400);
+            throw new Exception\Runtime("Unable to locate path referrer to <<$path>>", 400);
         }
     }
 

@@ -21,7 +21,7 @@
  * @var string $path Stores path to save image
  */
 
-namespace MroUtils;
+namespace Mercurio\Utils;
 class IMG {
 	public $hash, $mxflsz;
 	private $file, $path;

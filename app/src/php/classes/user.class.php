@@ -1,6 +1,6 @@
 <?php
 /**
- * MroUser class
+ * User class
  * @package Mercurio
  * @subpackage Included classes
  * 
@@ -9,12 +9,11 @@
  * @var int $GID User generated incremental discriminator
  * @var string $handle User hexadecimal locator
  * @var string $password
- * @var array $session MroUser segment of Aura Session
+ * @var array $session User segment of Aura Session
  */
 
-use function Latitude\QueryBuilder\field;
-use function Latitude\QueryBuilder\order;
-class MroUser extends MroDB {
+namespace Mercurio;
+class User extends Database {
     public $info, $meta, $GID, $handle;
     private $password;
     protected $session;
@@ -31,7 +30,7 @@ class MroUser extends MroDB {
             $this->password = false;
         }
         $session = AuraSession();
-        $segment = $session->getSegment('MroUser');
+        $segment = $session->getSegment('User');
         $this->session = $segment;
     }
 
@@ -43,7 +42,7 @@ class MroUser extends MroDB {
     public function getUser($user = false) {
         if (!$user) {
             // search user in http request via $_GET
-            $URL = new MroUtils\URLHandler;
+            $URL = new Utils\URLHandler;
             if ($URL->getUrl()['referrer'] === 'users'
             && $URL->getUrl()['target']) {
                 $this->handle = ltrim($URL->getUrl()['target'], '@');
@@ -117,7 +116,7 @@ class MroUser extends MroDB {
     public function setUser(array $properties = [], bool $new = false) {
         // check image
         if (array_key_exists('img', $properties)) {
-            throw new MroException\Runtime("METHOD FAILURE: User img property can only be set with setImg method.", 301);
+            throw new Exception\Runtime("METHOD FAILURE: User img property can only be set with setImg method.", 301);
         } 
         // hash password
         if (array_key_exists('password', $properties)) {
@@ -127,7 +126,7 @@ class MroUser extends MroDB {
         if ($new) {
             // check password
             if (!array_key_exists('password', $properties)) {
-                throw new MroException\Runtime("setUser method exception. New users must include a password key in properties array.", 301);
+                throw new Exception\Runtime("setUser method exception. New users must include a password key in properties array.", 301);
             }
             $properties = mroStampSet($properties);
             // build query
@@ -154,7 +153,7 @@ class MroUser extends MroDB {
                 ->compile();
             $this->pdo($query);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setUser was called but object of class MroUser has not been loaded with an existing user. Use getUser method first.", 301);
+            throw new Exception\Runtime("METHOD FAILURE: setUser was called but object of class User has not been loaded with an existing user. Use getUser method first.", 301);
         }
     }
 
@@ -172,7 +171,7 @@ class MroUser extends MroDB {
                 ->compile();
             $this->pdo($query);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setMeta can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: setMeta can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -233,7 +232,7 @@ class MroUser extends MroDB {
                 mroRemoveImg($this->getImg());
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: deleteUser can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: deleteUser can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -246,7 +245,7 @@ class MroUser extends MroDB {
         if ($this->GID) {
             return (int) $this->GID;
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getGID can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getGID can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -259,7 +258,7 @@ class MroUser extends MroDB {
         if ($this->GID) {
             return (string) '@'.$this->handle;
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getHandle can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getHandle can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -278,7 +277,7 @@ class MroUser extends MroDB {
             return $this->pdo($query)
                 ->fetchAll();
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getBadges can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getBadges can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -305,7 +304,7 @@ class MroUser extends MroDB {
                 ->compile();
             $this->pdo($query);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setBadge expects an array of properties to setup a new badge or update an specified one for the loaded user.");
+            throw new Exception\Runtime("METHOD FAILURE: setBadge expects an array of properties to setup a new badge or update an specified one for the loaded user.");
         }
     }
 
@@ -319,10 +318,10 @@ class MroUser extends MroDB {
      */
     public function getLink() {
         if ($this->handle) {
-            $CVURL = new MroUtils\URLHandler;
+            $CVURL = new Utils\URLHandler;
             return $CVURL->linkMaker('users', $this->handle);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getLink can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getLink can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -341,7 +340,7 @@ class MroUser extends MroDB {
             return $this->pdo($query)
                 ->fetch()['email'];
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getEmail can only be called if object of class MroUser has been loaded with an existing user. Use getUser method first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getEmail can only be called if object of class User has been loaded with an existing user. Use getUser method first.", 1);
         }
     }
 
@@ -356,8 +355,8 @@ class MroUser extends MroDB {
     public function getImg(string $size = 'max') {
         if ($this->GID) {
             if (!$this->info['img']) {
-                return MroVista::getVistaUrl()
-                    .MroVista::default('img', 'user');
+                return Mercurio\Vista::getVistaUrl()
+                    .Mercurio\Vista::default('img', 'user');
             } else {
                 if ($size = 'min') {
                     return getenv('APP_URL')
@@ -368,7 +367,7 @@ class MroUser extends MroDB {
                 }
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getImg can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.");
+            throw new Exception\Runtime("METHOD FAILURE: getImg can only be called if object of class User has been loaded with an existing user. Use getUser first.");
         }
     }
 
@@ -379,11 +378,11 @@ class MroUser extends MroDB {
      * @param int $height Height in pixels of image
      * @return string Image URL
      * @throws object Runtime class Exception if condition not met
-     * @see MroUtils\IMG
+     * @see Utils\IMG
      */
     public function setImg(string $input, int $width = 400, int $height = 400) {
         if ($this->GID) {
-            $image = new MroUtils\IMG;
+            $image = new Utils\IMG;
             $image->new($input, MROSTATIC, $width, false, 200);
             // store image hash
             $query = $this->sql()
@@ -393,7 +392,7 @@ class MroUser extends MroDB {
                 ->compile();
             $this->pdo($query);
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setImg can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.");
+            throw new Exception\Runtime("METHOD FAILURE: setImg can only be called if object of class User has been loaded with an existing user. Use getUser first.");
         }
     }
 
@@ -478,7 +477,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: setLogin can only be called if object of class MroUser has been loaded with an existing user. Use getLogin first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: setLogin can only be called if object of class User has been loaded with an existing user. Use getLogin first.", 1);
         }
     }
 
@@ -495,7 +494,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: isLoggedIn can only be called if object of class MroUser has been loaded with an existing user. Use getLogin first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: isLoggedIn can only be called if object of class User has been loaded with an existing user. Use getLogin first.", 1);
         }
     }
 
@@ -514,7 +513,7 @@ class MroUser extends MroDB {
             $session->destroy();
             $session->regenerateId();
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: logout can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: logout can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 
@@ -531,7 +530,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: isInSession can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: isInSession can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 
@@ -558,7 +557,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getStories can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getStories can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 
@@ -585,7 +584,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getPosts can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getPosts can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 
@@ -609,7 +608,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getComments can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getComments can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 
@@ -633,7 +632,7 @@ class MroUser extends MroDB {
                 return false;
             }
         } else {
-            throw new MroException\Runtime("METHOD FAILURE: getStars can only be called if object of class MroUser has been loaded with an existing user. Use getUser first.", 1);
+            throw new Exception\Runtime("METHOD FAILURE: getStars can only be called if object of class User has been loaded with an existing user. Use getUser first.", 1);
         }
     }
 }

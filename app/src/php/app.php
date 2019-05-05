@@ -29,11 +29,6 @@ require MROINDEX.'/app/static/index.php';
 require MROINDEX.'/app/vistas/index.php';
 
 /**
- * Start HTTP Requests library
- */
-Requests::register_autoloader();
-
-/**
  * Error and warning reporting, developer friendly
  */
 set_error_handler(function ($error_no, $error_string = '', $error_file = '', $error_line = '') {
