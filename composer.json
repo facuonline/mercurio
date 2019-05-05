@@ -8,11 +8,11 @@
         }
     ],
     "require": {
-        "latitude/latitude": "^3.3",
         "ezimuel/php-secure-session": "^1.1",
         "ezyang/htmlpurifier": "^4.10",
         "aura/session": "^2.1",
-        "owasp/csrf-protector-php": "^1.0"
+        "owasp/csrf-protector-php": "^1.0",
+        "catfan/medoo": "^1.6"
     },
     "license": "GPL-3.0-or-later",
     "version": "0.31.1-dev",

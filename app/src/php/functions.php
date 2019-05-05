@@ -86,7 +86,7 @@
     }
 
     /**
-     * Generate sha256 hashes to be used as strong keys
+     * Generate random sha256 hashes to be used as strong keys
      * @return string
      */
     function mroKeyGen(){

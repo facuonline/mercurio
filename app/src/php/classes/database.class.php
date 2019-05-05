@@ -3,107 +3,66 @@
  * DB class
  * @package Mercurio
  * @subpackage Included classes
+ * 
+ * @var object $DB Medoo instance
  */
 
 namespace Mercurio;
 class Database {
-    /**
-     * Stablish connection with db
-     * @throws Exception on error with db connection
-     */
-    protected function conn() {
-        // get db envs
-        $host = getenv('DB_HOST');
-        $user = getenv('DB_USER');
-        $pass = getenv('DB_PASS');
-        $name = getenv('DB_NAME');
-        // config pdo
-        $dsn = "mysql:host=$host;dbname=$name;charset=utf8mb4";
-		$options = [
-	    	\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-	   		\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-			\PDO::ATTR_EMULATE_PREPARES => false,
-        ];
-        // make it so
-		try {
-			return new \PDO($dsn, $user, $pass, $options);
-		} catch (\PDOException $error) {
-			throw new \PDOException($error->getMessage(), $error->getCode());
-	    	die();
-		}
+    public $DB;
+
+    public function __construct() {
+        $this->conn();
     }
 
     /**
-     * Latitude Query Buider helps developers to build better, safer SQL queries
-     * and makes easier migrating to other db models than MySQL
-     * @return object Instance of Latitude with MySQL engine
+     * To use when Database not instantiated
      */
-    protected function sql() {
-        $engine = new \Latitude\QueryBuilder\Engine\MySqlEngine;
-		return new \Latitude\QueryBuilder\QueryFactory($engine);
+    public function conn() {
+        $this->DB = new \Medoo\Medoo([
+            'database_type' => 'mysql',
+            'database_name' => getenv('DB_NAME'),
+            'server' => getenv('DB_HOST'),
+            'username' => getenv('DB_USER'),
+            'password' => getenv('DB_PASS')
+        ]);
+        return $this->DB;
     }
-
+    
     /**
-     * DRY helper function to perform PDO queries with less code
-     * @param object Latitude query object
-     * @return object PDO object
+     * Get a configuration value by name
+     * @param string $name Config name
+     * @return array|bool
      */
-    protected function pdo(\Latitude\QueryBuilder\Query $query) {
-        if ($query->params()) {
-            $params = $query->params();
-        } else {
-            $params = NULL;
-        }
-        $PDO = $this->conn();
-        $query = $PDO->prepare($query->sql());
-        $query->execute($params);
-        return $query;
-    }
-
-    /**
-     * Select configuration from mro_config
-     * @param string $config Configuration name
-     * @return mixed Configuration value or bool
-     */
-    public function getConfig($config) {
-        $query = $this->sql()
-            ->select('value')
-            ->from('mro_configs')
-            ->where(\Latitude\QueryBuilder\field('name')->eq($config))
-            ->compile();
-        $result = $this->pdo($query)
-            ->fetch()['value'];
+    public function getConfig(string $name) {
+        $result = $this->DB->select('mro_configs', 
+            ['value'],
+            ['name' => $name]
+        );
         if ($result) {
-            return $result;
+            return $result[0]['value'];
         } else {
             return false;
         }
     }
 
     /**
-     * Update or insert configuration
+     * Set or update a configuration
      * @param string $name Config name
      * @param mixed $value Config value
-     * @return mixed
+     * @return object PDOStatement
      */
-    public function setConfig($name, $value) {
-        // update
+    public function setConfig(string $name, $value) {
         if ($this->getConfig($name)) {
-            $query = $this->sql()
-                ->update('mro_configs', [
-                        'value' => $value
-                    ])
-                ->where(\Latitude\QueryBuilder\field('name')->eq($name))
-                ->compile();
-        // insert
+            return $this->DB->update('mro_configs',
+                ['value' => $value],
+                ['name' => $name]
+            );
         } else {
-            $query = $this->sql()
-                ->insert('mro_configs', [
-                        'name' => $name,
-                        'value' => $value
-                    ])
-                ->compile();
+            return $this->DB->insert('mro_configs',
+                ['name' => $name,
+                'value' => $value]
+            );
         }
-        return $this->pdo($query);
     }
 }
