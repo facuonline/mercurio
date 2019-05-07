@@ -15,8 +15,8 @@
  */
 
 namespace Mercurio\Utils;
-use \Mercurio\Database;
-class URLHandler extends Database {
+class URLHandler extends \Mercurio\Database {
+
     public $baseUrl, $referrer, $target;
     protected $htaccess, $mod_rewrite;
 

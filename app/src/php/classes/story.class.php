@@ -11,6 +11,7 @@
 
 namespace Mercurio;
 class Story extends Database {
+    
     public $info, $body, $GID;
 
     public function __construct() {

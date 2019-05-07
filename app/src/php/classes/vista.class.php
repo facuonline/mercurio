@@ -15,6 +15,7 @@
 
 namespace Mercurio;
 class Vista {
+    
     public static $notices;
     private static $vistaFolder, $vistaUrl, $vista, $defaults, $htmlTitle;
 

@@ -23,6 +23,7 @@
 
 namespace Mercurio\Utils;
 class IMG {
+	
 	public $hash, $mxflsz;
 	private $file, $path;
 

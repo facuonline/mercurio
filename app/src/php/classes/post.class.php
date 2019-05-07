@@ -7,6 +7,7 @@
 
 namespace Mercurio;
 class Post extends Database {
+    
     public $info, $body, $GID;
 
     public function __construct() {
