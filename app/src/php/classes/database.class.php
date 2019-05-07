@@ -9,16 +9,18 @@
 
 namespace Mercurio;
 class Database {
-    public $DB;
+
+    protected $DB;
 
     public function __construct() {
-        $this->conn();
+        return $this->db();
     }
 
     /**
-     * To use when Database not instantiated
+     * Make a database connection
+     * @return object Medoo instance
      */
-    public function conn() {
+    protected function db() {
         $this->DB = new \Medoo\Medoo([
             'database_type' => 'mysql',
             'database_name' => getenv('DB_NAME'),
@@ -35,15 +37,12 @@ class Database {
      * @return array|bool
      */
     public function getConfig(string $name) {
-        $result = $this->DB->select('mro_configs', 
+        $result = $this->db()->select(
+            'mro_configs', 
             ['value'],
             ['name' => $name]
         );
-        if ($result) {
-            return $result[0]['value'];
-        } else {
-            return false;
-        }
+        return ($result ? $result[0]['value'] : false);
     }
 
     /**
@@ -54,14 +53,18 @@ class Database {
      */
     public function setConfig(string $name, $value) {
         if ($this->getConfig($name)) {
-            return $this->DB->update('mro_configs',
+            return $this->db()->update(
+                'mro_configs',
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
-            return $this->DB->insert('mro_configs',
-                ['name' => $name,
-                'value' => $value]
+            return $this->db()->insert(
+                'mro_configs',
+                [
+                    'name' => $name,
+                    'value' => $value
+                ]
             );
         }
     }

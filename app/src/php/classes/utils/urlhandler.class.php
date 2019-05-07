@@ -57,7 +57,7 @@ class URLHandler extends Database {
         }  elseif ($path == 'admin') {
             return 'refrrAdmin';
         } else {
-            throw new Exception\Runtime("Unable to locate path referrer to <<$path>>", 400);
+            throw new \Exception\Runtime("Unable to locate path referrer to <<$path>>", 400);
         }
     }
 
