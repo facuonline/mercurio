@@ -1,9 +1,6 @@
 # Apache config #
 /.htaccess
 
-# Vistas #
-/app/vistas/*/
-
 # Composer #
 composer.phar
 /vendor/

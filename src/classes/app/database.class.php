@@ -7,7 +7,7 @@
  * @var object $DB Medoo instance
  */
 
-namespace Mercurio;
+namespace Mercurio\App;
 class Database {
 
     protected $DB;

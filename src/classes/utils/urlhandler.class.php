@@ -25,14 +25,10 @@ class URLHandler extends \Mercurio\Database {
         // check mod_rewrite availability
         if (in_array('mod_rewrite', apache_get_modules())) {
             $this->mod_rewrite = true;
-            $this->readHtaccess();
-            if ($this->startHtaccess()) {
-                $this->referrerHtaccess();
-                $this->writeHtacess();
-            }
 		} else {
             $this->mod_rewrite = false;
         }
+        return $this->getUrlParams();
     }
 
     /**
@@ -102,15 +98,15 @@ class URLHandler extends \Mercurio\Database {
      */
     public function linkMaker(string $referrer, $target) {
         return $this->baseUrl
-            .$this->getReferrer($referrer)
-            .$this->getTarget($target);
+            .urlencode($this->getReferrer($referrer))
+            .urlencode($this->getTarget($target));
     }
 
     /**
      * Filter, read and return GET query params
      * @return array 
      */
-    public function getUrl() {
+    public function getUrlParams() {
         $params = [];
         if (isset($_GET['referrer'])
         && !empty($_GET['referrer'])) {
@@ -135,6 +131,13 @@ class URLHandler extends \Mercurio\Database {
         } else {
             $params['referrer'] = false;
         }
+        if (isset($_GET['action'])
+        && !empty($_GET['action'])) {
+            $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+            $params['action'] = $action;
+        } else {
+            $params['action'] = false;
+        }
         if (isset($_GET['target'])
         && !empty($_GET['target'])) {
             $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
@@ -146,11 +149,29 @@ class URLHandler extends \Mercurio\Database {
     }
 
     /**
+     * Sets up URL masking via .htaccess file
+     * @param string $htaccess Absolute path to htaccess file
+     * @throws object Usage exception if no path to htaccess specified
+     */
+    public function setURLMasking(string $htaccess) {
+        if (!is_string($htaccess)) throw new \Mercurio\Exception\Usage("setURLMasking expects a string parameter. This parameter must be the absolute path to .htaccess file.");
+        if (file_exists($htaccess) && !is_readable($htaccess)) throw new \Mercurio\Exception\Runtime("The file located at '$htaccess' could not be accessed or is not readable. URL masking could not be possible.");
+
+        if ($this->mod_rewrite) {
+            $this->readHtaccess($htaccess);
+            if ($this->startHtaccess()) {
+                $this->referrerHtaccess();
+                $this->writeHtacess();
+            }
+        }
+    }
+
+    /**
      * Reads .htaccess file to allow fancy URL masking
      */
-    private function readHtaccess() {
-        if (file_exists(MROINDEX.'/.htaccess')) {
-            $this->htaccess = file(MROINDEX.'/.htaccess');
+    private function readHtaccess(string $htaccess) {
+        if (file_exists($htaccess)) {
+            $this->htaccess = file($htaccess);
         } else {
             $this->htaccess = [""];
         }

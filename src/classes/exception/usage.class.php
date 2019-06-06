@@ -8,6 +8,6 @@
  */
 namespace Exception;
 use Exception;
-class Runtime extends Exception {
+class Usage extends Exception {
 
 }
