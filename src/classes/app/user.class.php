@@ -21,8 +21,8 @@ class User extends \Mercurio\App\Database {
         $Session = new \Mercurio\Utils\Session;
         if ($URL['referrer'] == 'users' && $URL['target']) {
             return $URL['target'];
-        } elseif ($Session['user']) {
-            return $Session['user'];
+        } elseif ($Session['User']) {
+            return $Session['User'];
         } else {
             return false;
         }
@@ -34,6 +34,16 @@ class User extends \Mercurio\App\Database {
      */
     public function get($hint = false) {
         if (!$hint) $hint = $this->findHint();
+    }
+
+    /**
+     * Attach user info to session
+     */
+    private function attachSession(){
+        $Session = new \Mercurio\Utils\Session;
+        $Session->set('User', [
+            $this->info,
+        ]);
     }
 
 }

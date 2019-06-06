@@ -21,7 +21,8 @@ class Session {
             $this->start();
             $_SESSION['Mercurio'] = [
                 'UserAgent' => $_SERVER ['HTTP_USER_AGENT'],
-                'CreatedAt' => time()
+                'CreatedAt' => time(),
+                'User' => false,
             ];
             $this->session = $_SESSION['Mercurio'];
         } else {
@@ -59,10 +60,11 @@ class Session {
     
     /**
      * Store a value inside session
+     * @param string $segment String segment identifier
      * @param mixed $value
      */
-    public function set($value, $regenerate = true) {
-        $_SESSION['Mercurio'] = $value;
+    public function set($segment = 'Session', $value, $regenerate = true) {
+        $_SESSION['Mercurio'][$segment] = $value;
         if ($regenerate) {
             session_regenerate_id(true);
         }
