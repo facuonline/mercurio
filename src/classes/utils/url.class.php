@@ -1,11 +1,11 @@
 <?php
 /**
- * URLHandler
+ * URL
  * @package Mercurio
- * @package Included classes
+ * @package Utilitary classes
  * 
  * URL handler and worker
- * not only does rewrites but also manages path to things
+ * not only does rewrites but also manages paths to things
  * 
  * @var string $baseUrl site URL address
  * @var string $referrer site referrer to content types
@@ -15,7 +15,7 @@
  */
 
 namespace Mercurio\Utils;
-class URLHandler extends \Mercurio\Database {
+class URL extends \Mercurio\App\Database {
 
     public $baseUrl, $referrer, $target;
     protected $htaccess, $mod_rewrite;
@@ -33,7 +33,7 @@ class URLHandler extends \Mercurio\Database {
 
     /**
      * Determine wether a provided path is a valid referrer type
-     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
+     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'
      * @return string
      * @throws object Runtime class Exception if condition not met
      */
@@ -53,18 +53,18 @@ class URLHandler extends \Mercurio\Database {
         }  elseif ($path == 'admin') {
             return 'refrrAdmin';
         } else {
-            throw new \Exception\Runtime("Unable to locate path referrer to <<$path>>", 400);
+            throw new \Exception\Runtime("Unable to locate path referrer to '$path', expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'", 400);
         }
     }
 
     /**
-     * Get preset referrer path to something.
-     * To get the referrer in a given URL use getUrl()['referrer']
-     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search'
+     * Get preset referrer path to something syntax based on state of url masking \
+     * To get the referrer in a given URL use getUrlParams()['referrer']
+     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'
      * @return string URL
      */
     public function getReferrer(string $path) {
-        if ($this->mod_rewrite) {
+        if ($this->isMaskingOn()) {
             $referrer = $this->referrerPath($path);
             return $this->getConfig($referrer).'/';
         } else {
@@ -82,8 +82,11 @@ class URLHandler extends \Mercurio\Database {
         $this->setConfig($referrer, $value);
     }
 
-    public function getTarget($target) {
-        if ($this->mod_rewrite) {
+    /**
+     * Return proper target query syntax based on state of url masking
+     */
+    private function getTarget($target) {
+        if ($this->isMaskingOn()) {
             return $target;
         } else {
             return '&target='.$target;
@@ -96,7 +99,7 @@ class URLHandler extends \Mercurio\Database {
      * @param mixed $target Target entity identifier, either handle or GID
      * @return string
      */
-    public function linkMaker(string $referrer, $target) {
+    public function getLink(string $referrer, $target) {
         return $this->baseUrl
             .urlencode($this->getReferrer($referrer))
             .urlencode($this->getTarget($target));
@@ -146,6 +149,18 @@ class URLHandler extends \Mercurio\Database {
             $params['target'] = false;
         }
         return $params;
+    }
+
+    /**
+     * Check if url masking is on or off
+     * @return bool
+     */
+    protected function isMaskingOn() {
+        if ($this->getConfig('urlmasking')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -224,6 +239,7 @@ class URLHandler extends \Mercurio\Database {
         $this->endHtaccess();
         file_put_contents(MROINDEX.'/.htaccess', $this->htaccess);
         $this->configReferrers();
+        $this->setConfig('urlmasking', true);
     }
 
     /**

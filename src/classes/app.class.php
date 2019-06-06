@@ -54,7 +54,7 @@ class App {
     }
 
     /**
-     * Returns a random, safe sha256 hash to be used as app key
+     * Returns a very random sha256 hash
      * @param mixed $entropy Optional additional entropy
      * @return string
      */

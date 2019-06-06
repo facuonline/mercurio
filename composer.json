@@ -10,7 +10,6 @@
     "require": {
         "ezimuel/php-secure-session": "^1.1",
         "ezyang/htmlpurifier": "^4.10",
-        "aura/session": "^2.1",
         "owasp/csrf-protector-php": "^1.0",
         "catfan/medoo": "^1.6"
     },

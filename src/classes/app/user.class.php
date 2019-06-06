@@ -17,7 +17,15 @@ class User extends \Mercurio\App\Database {
      * @return false|string|int
      */
     private function findHint() {
-        $URL = new \Mercurio\Utils\URLHandler;
+        $URL = new \Mercurio\Utils\URL;
+        $Session = new \Mercurio\Utils\Session;
+        if ($URL['referrer'] == 'users' && $URL['target']) {
+            return $URL['target'];
+        } elseif ($Session['user']) {
+            return $Session['user'];
+        } else {
+            return false;
+        }
     }
 
     /**
