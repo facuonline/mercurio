@@ -49,6 +49,7 @@ class App {
      */
     public static function getApp(string $key) {
         if (getenv('APP_'.$key)) {
+            if ($key == 'URL') return rtrim(getenv('APP_URL'), '/').'/';
             return getenv('APP_'.$key);
         } else {
             throw new \Mercurio\Exception\Runtime("getApp could not find '$key' setting.", 400);
