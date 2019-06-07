@@ -29,14 +29,16 @@ class App {
      * @param array $settings
      * @throws object Usage exception if required setting not present
      */
-    public static function setApp(array $settings = []) {
+    public static function setApp(array $settings = [], array $connection = []) {
         // check for minimum required app settings
         if (!getenv('APP_KEY') && !array_key_exists('KEY', $settings)) throw new \Mercurio\Exception\Usage("setApp expects a 'KEY' index in given array. Use \Mercurio\App::getRandomKey to generate a safe hash value.", 1);
         if (!getenv('APP_URL') && !array_key_exists('URL', $settings)) throw new \Mercurio\Exception\Usage("setApp expects an 'URL' index in given array.", 1);
 
-        foreach ($connection as $key => $value) {
+        foreach ($settings as $key => $value) {
             putenv("APP_$key=$value");
         }
+
+        if (!empty($connection)) self::setDatabase($connection);
     }
 
     /**

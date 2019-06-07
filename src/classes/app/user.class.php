@@ -17,14 +17,14 @@ class User extends \Mercurio\App\Database {
      * @return false|string|int
      */
     private function findHint() {
-        $URL = new \Mercurio\Utils\URL;
-        if ($URL['referrer'] == 'users' && $URL['target']) {
-            return $URL['target'];
-        } elseif (\Mercurio\Utils\Session::get()['User']) {
-            return \Mercurio\Utils\Session::get()['User']['GID'];
-        } else {
-            return false;
+        if (\Mercurio\Utils\URL::getURLParams()['Referrer'] == 'users'
+        && \Mercurio\Utils\URL::getURLParams()['Target']) {
+            return \Mercurio\Utils\URL::getURLParams()['Target'];
         }
+        if (\Mercurio\Utils\Session::get()['User']) {
+            return \Mercurio\Utils\Session::get()['User']['GID'];
+        }
+        return false;
     }
 
     /**

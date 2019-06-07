@@ -10,25 +10,21 @@
 namespace Mercurio\App;
 class Database {
 
-    protected $DB;
-
-    public function __construct() {
-        return $this->db();
-    }
+    protected static $DB;
 
     /**
      * Make a database connection
      * @return object Medoo instance
      */
-    protected function db() {
-        $this->DB = new \Medoo\Medoo([
+    protected static function db() {
+        self::$DB = new \Medoo\Medoo([
             'database_type' => 'mysql',
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
             'username' => getenv('DB_USER'),
             'password' => getenv('DB_PASS')
         ]);
-        return $this->DB;
+        return self::$DB;
     }
     
     /**
@@ -36,8 +32,8 @@ class Database {
      * @param string $name Config name
      * @return array|bool
      */
-    public function getConfig(string $name) {
-        $result = $this->db()->select(
+    public static function getConfig(string $name) {
+        $result = self::db()->select(
             'mro_configs', 
             ['value'],
             ['name' => $name]
@@ -51,15 +47,15 @@ class Database {
      * @param mixed $value Config value
      * @return object PDOStatement
      */
-    public function setConfig(string $name, $value) {
-        if ($this->getConfig($name)) {
-            return $this->db()->update(
+    public static function setConfig(string $name, $value) {
+        if (self::getConfig($name)) {
+            return self::db()->update(
                 'mro_configs',
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
-            return $this->db()->insert(
+            return self::db()->insert(
                 'mro_configs',
                 [
                     'name' => $name,
