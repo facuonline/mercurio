@@ -1,6 +1,9 @@
 # Apache config #
 /.htaccess
 
+# PHPUnit cache #
+/.phpunit.*
+
 # Composer #
 composer.phar
 /vendor/

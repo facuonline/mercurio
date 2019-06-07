@@ -18,11 +18,10 @@ class User extends \Mercurio\App\Database {
      */
     private function findHint() {
         $URL = new \Mercurio\Utils\URL;
-        $Session = new \Mercurio\Utils\Session;
         if ($URL['referrer'] == 'users' && $URL['target']) {
             return $URL['target'];
-        } elseif ($Session['User']) {
-            return $Session['User'];
+        } elseif (\Mercurio\Utils\Session::get()['User']) {
+            return \Mercurio\Utils\Session::get()['User']['GID'];
         } else {
             return false;
         }
@@ -40,10 +39,9 @@ class User extends \Mercurio\App\Database {
      * Attach user info to session
      */
     private function attachSession(){
-        $Session = new \Mercurio\Utils\Session;
-        $Session->set('User', [
+        \Mercurio\Utils\Session::set([
             $this->info,
-        ]);
+        ], 'User');
     }
 
 }
