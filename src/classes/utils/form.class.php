@@ -41,32 +41,33 @@ class Form {
     }
 
     /**
-     * Validate submission of form
-     * @param string $name Form name to listen for
+     * Validate submission of form against SPAM
+     * @param string $name Form listener to listen for
      * @param string $method Method of form submissions
-     * @param int $time Minimun number of seconds expected for completion
-     * @return bool
+     * @param int $minTime Minimum number of seconds expected for completion
+     * @return bool True on SPAM detection, false on no SPAM
      */
-    public static function submission(string $name, string $method = 'POST', int $time = 5) {
+    public static function spam(string $name, string $method = 'POST', int $minTime = 5) {
         if ($_SERVER['REQUEST_METHOD'] === $method
         && isset($_POST[$name])) {
-            if (!empty($_POST['inputPot-email-url-website'])) return false;
-            if ((time() - $_POST['formGeneratedAt']) < $time) return false;
+            $key = \Mercurio\App::getApp('key');
+            if (!empty($_POST[$key.'-email-url-website'])) return true;
+            if (!empty($_POST[$key.'-comment-name-body'])) return true;
+            if ((time() - $_POST['formGeneratedAt']) < $minTime) return true;
+            return false;
+        } else {
             return true;
         }
     }
 
     /**
-     * Generate honeypot and timestamped inputs
+     * Generate honeypot and timestamped inputs for spam control
      * @return array
      */
     private static function honeypot() {
         // antispam honeypot and control
-        $time = time(); 
-        $pot[] = "<!--This inputs are not for humans-->";
-        $pot[] = "<input type='text' name='inputPot-email-url-website' style='display:none;'>";
-        $pot[] = "<input type='text' name='formGeneratedAt' value='$time' style='display:none;'>";
-        $pot[] = "<!--End of non human inputs-->";
+        $time = time(); $key = \Mercurio\App::getApp('key');
+        $pot = "<!--These inputs are not for humans--><!--If you are human do not fill in next inputs--><input type='text' name='$key-email-url-website' style='display:none;'><input type='text' name='$key-comment-name-body' style='display: none;'><input type='text' name='formGeneratedAt' value='$time' style='display:none;'><!--End of non human inputs-->";
         return $pot;
     }
 
@@ -77,11 +78,11 @@ class Form {
     public static function new(array $given) {
         // method
         if (!array_key_exists('method', $given)) {
-            throw new \Exception\Runtime("MISSING ARRAY KEY: compose() expects a 'method' key index in given array.");
+            throw new \Exception\Usage("MISSING ARRAY KEY: new() expects a 'method' key index in given array.");
         }
         // listener
         if (!array_key_exists('listener', $given)) {
-            throw new \Exception\Runtime("MISSING ARRAY KEY: compose() expects a 'listener' key index in given array.");
+            throw new \Exception\Usage("MISSING ARRAY KEY: new() expects a 'listener' key index in given array.");
         } else {
             $listener = $given['listener'];
             unset($given['listener']);
@@ -90,9 +91,7 @@ class Form {
         foreach ($given as $key => $value) {
             $attributes .= "$key='$value'";
         }
-        foreach (self::honeypot() as $key => $value) {
-            $honeypot .= $value;
-        }
+        $honeypot = self::honeypot();
         echo "<form $attributes>\n<input type='hidden' name='$listener'>\n$honeypot";
     }
 

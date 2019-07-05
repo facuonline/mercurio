@@ -1,0 +1,54 @@
+{
+    "Database": {
+        "Functionalities": {
+            "mro_conf": {
+                "name": "string",
+                "value": "string"
+            },
+            "mro_meta": {
+                "name": "string",
+                "value": "string",
+                "target": "integer | GID"
+            }
+        },
+        "Entities": {
+            "mro_user": {
+                "id": "integer | GID",
+                "handle": "string",
+                "email": "string",
+                "password": "string",
+                "img": "string",
+                "token": "string",
+                "stamp": "integer | timestamp"
+            },
+            "mro_media": {
+                "id": "integer | GID",
+                "author": "integer | GID",
+                "content": "string",
+                "content_type": "integer",
+                "stamp": "integer | timestamp"
+            },
+            "mro_comment": {
+                "id": "integer | GID",
+                "author": "integer | GID",
+                "body": "string",
+                "stamp": "integer | timestamp"
+            },
+            "mro_message": {
+                "id": "integer | GID",
+                "author": "integer | GID",
+                "body": "string",
+                "target": "integer | GID",
+                "stamp": "integer | timestamp"
+            }
+        },
+        "Entities_grouping": {
+            "mro_collection": {
+                "id": "integer | GID",
+                "author": "integer | GID",
+                "body": "string",
+                "stamp": "integer | timestamp"
+            }
+        }
+    }
+}

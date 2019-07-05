@@ -18,11 +18,11 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Determine wether a provided string is a valid referrer type
-     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'
+     * @param string $fixed Fixed referrer name. Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'
      * @return string
      * @throws object Runtime class Exception if condition not met
      */
-    private static function referrerPath(string $path) {
+    private static function referrerFixed(string $fixed) {
         if ($path == 'users') {
             return 'refrrUsers';
         } elseif ($path == 'stories') {
@@ -38,43 +38,66 @@ class URL extends \Mercurio\App\Database {
         }  elseif ($path == 'admin') {
             return 'refrrAdmin';
         } else {
-            throw new \Exception\Runtime("Unable to locate referrer of '$path', expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'", 400);
+            throw new \Exception\Runtime("Unable to locate referrer of '$fixed', expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'", 400);
         }
     }
 
     /**
-     * Get preset referrer path to something syntax based on state of url masking \
-     * To get the referrer in a given URL use getUrlParams()['referrer']
-     * @param string $path Expected 'users', 'stories', 'posts', 'sections', 'messages', 'search', 'admin'
+     * Get preset referrer path to something \
+     * To read the referrer in a given URL use getUrlParams()
+     * @param string $fixed Expected 'users', 'collections', 'media', 'messages', 'search', 'admin'
+     * @param bool $link Is it for a link?
      * @return string URL
      */
-    public static function getReferrer(string $path) {
-        if (self::isMaskingOn()) {
-            $referrer = self::referrerPath($path);
-            return self::getConfig($referrer).'/';
+    public static function getReferrer(string $fixed,  bool $link = true) {
+        if ($link) {
+            if (self::isMaskingOn()) {
+                $referrer = self::referrerFixed($fixed);
+                return self::getConfig($referrer).'/';
+            } else {
+                return '?referrer='.$fixed;
+            }
         } else {
-            return '?referrer='.$path;
+            return $fixed;
         }
+    }
+
+    /**
+     * Get an associative array of referrers with their fixed name and their set up masked one
+     * @return array
+     */
+    public static function getReferrerList() {
+        return [
+            'users' => self::getReferrer('users', false),
+            'collections' => self::getReferrer('collections', false),
+            'media' => self::getReferrer('media', false),
+            'messages' => self::getReferrer('messages', false),
+            'search' => self::getReferrer('search', false),
+            'admin' => self::getReferrer('admin', false)
+        ];
     }
 
     /**
      * Sets up a referrer value
-     * @param string $path Referrer name
-     * @param string $value Referrer new value
+     * @param string $fixed Referrer fixed name
+     * @param string $value Referrer new masking value
      */
-    public static function setReferrer(string $path, string $value) {
-        $referrer = self::referrerPath($path);
+    public static function setReferrer(string $fixed, string $value) {
+        $referrer = self::referrerFixed($fixed);
         self::setConfig($referrer, $value);
     }
 
     /**
      * Return proper target query syntax based on state of url masking
+     * @param mixed $target ID or handle of target Database object
+     * @param bool $link Is it for a link?
+     * @return string
      */
-    private static function getTarget($target) {
+    private static function getTarget($target, bool $link) {
         if (self::isMaskingOn()) {
             return $target;
         } else {
-            return '&target='.$target;
+            return $target;
         }
     }
 
@@ -139,9 +162,9 @@ class URL extends \Mercurio\App\Database {
     /**
      * Turn a string into something you can use in an URL
      * @param string $input Initial string
-     * @param array $replace Target characters to be replaced
      * @param bool $sign Add a pseudo unique discriminator
-     * @param int $length Max output length
+     * @param array $replace Target characters to be replaced
+     * @param string $delimiter Glue of returned string
      * @return string
      */
     public static function slugify(string $input, bool $sign = false, array $replace = [], $delimiter = ' ') {
@@ -185,7 +208,7 @@ class URL extends \Mercurio\App\Database {
             self::readHtaccess($htaccess);
             if (self::startHtaccess()) {
                 self::referrerHtaccess();
-                self::writeHtacess();
+                self::writeHtacess($htaccess);
             }
         }
     }
@@ -244,23 +267,21 @@ class URL extends \Mercurio\App\Database {
     /**
      * Writes to htacess
      */
-    private static function writeHtacess() {
+    private static function writeHtacess(string $htaccess) {
         self::endHtaccess();
-        file_put_contents(MROINDEX.'/.htaccess', self::$htaccess);
-        self::configReferrers();
+        file_put_contents($htaccess, self::$htaccess);
         self::setConfig('urlmasking', true);
     }
 
     /**
      * Guarantees that referrers are safe
      */
-    private static function configReferrers() {
+    public static function configReferrers() {
         // make sure referrers are always there
         $referrers = [
             'refrrUsers' => 'user',
-            'refrrStories' => 'story',
-            'refrrPosts' => 'post',
-            'refrrSections' => 'section',
+            'refrrCollections' => 'collection',
+            'refrrMedia' => 'media',
             'refrrMessages' => 'message',
             'refrrSearch' => 'search',
             'refrrAdmin' => 'admin'

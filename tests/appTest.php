@@ -8,6 +8,22 @@ namespace Mercurio;
 class AppTest extends \PHPUnit\Framework\TestCase {
 
     /**
+     * Returns an App setting set by setApp
+     * @param string $key
+     * @return mixed
+     * @throws object Runtime exception if setting not found
+     */
+    public function testGetAppThrowsExceptionError(string $key = 'URL') {
+        if (getenv('APP_'.$key)) {
+            if ($key == 'URL') return rtrim(getenv('APP_URL'), '/').'/';
+            return getenv('APP_'.$key);
+        } else {
+            $exception = new \Exception("getApp could not find '$key' setting.", 400);
+            $this->assertIsObject($exception);
+        }
+    }
+
+    /**
      * Returns a random, safe sha256 hash to be used as app key
      * @param mixed $entropy Optional additional entropy
      * @return string

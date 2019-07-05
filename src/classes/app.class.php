@@ -31,14 +31,14 @@ class App {
      */
     public static function setApp(array $settings = [], array $connection = []) {
         // check for minimum required app settings
-        if (!getenv('APP_KEY') && !array_key_exists('KEY', $settings)) throw new \Mercurio\Exception\Usage("setApp expects a 'KEY' index in given array. Use \Mercurio\App::getRandomKey to generate a safe hash value.", 1);
+        if (!getenv('APP_KEY') && !array_key_exists('KEY', $settings)) throw new \Mercurio\Exception\Usage("setApp expects a 'KEY' index in given array. Use \Mercurio\App::randomKey to generate a safe hash value.", 1);
         if (!getenv('APP_URL') && !array_key_exists('URL', $settings)) throw new \Mercurio\Exception\Usage("setApp expects an 'URL' index in given array.", 1);
 
         foreach ($settings as $key => $value) {
             putenv("APP_$key=$value");
         }
-
         if (!empty($connection)) self::setDatabase($connection);
+        \Mercurio\Utils\URL::configReferrers();
     }
 
     /**
@@ -61,10 +61,10 @@ class App {
      * @param mixed $entropy Optional additional entropy
      * @return string
      */
-    public static function getRandomKey($entropy = 'b05') {
+    public static function randomKey($entropy = 'EUreka') {
         $lame[] = microtime();
         $lame[] = mt_rand(1111, 9999);
-        $lame[] = getenv('APP_URL');
+        $lame[] = $_SERVER['PHP_SELF'];
         $lame[] = openssl_random_pseudo_bytes(16);
         $lame[] = $entropy;
         $glue = base64_encode(random_bytes(4));

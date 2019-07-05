@@ -1,6 +1,6 @@
 <?php
 /**
- * DB class
+ * Database connection and utils
  * @package Mercurio
  * @subpackage Included classes
  * 
@@ -34,7 +34,7 @@ class Database {
      */
     public static function getConfig(string $name) {
         $result = self::db()->select(
-            'mro_configs', 
+            'mro_conf', 
             ['value'],
             ['name' => $name]
         );
@@ -50,13 +50,13 @@ class Database {
     public static function setConfig(string $name, $value) {
         if (self::getConfig($name)) {
             return self::db()->update(
-                'mro_configs',
+                'mro_conf',
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
             return self::db()->insert(
-                'mro_configs',
+                'mro_conf',
                 [
                     'name' => $name,
                     'value' => $value
