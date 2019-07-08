@@ -10,21 +10,32 @@
 namespace Mercurio\App;
 class Database {
 
-    protected static $DB;
-
     /**
-     * Make a database connection
+     * Make a database connection, static
      * @return object Medoo instance
      */
-    protected static function db() {
-        self::$DB = new \Medoo\Medoo([
+    protected static function staticDB() {
+        return new \Medoo\Medoo([
             'database_type' => 'mysql',
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
             'username' => getenv('DB_USER'),
             'password' => getenv('DB_PASS')
         ]);
-        return self::$DB;
+    }
+
+    /**
+     * Make a database connection, non static
+     * @return object Medoo instance
+     */
+    protected function db() {
+        return new \Medoo\Medoo([
+            'database_type' => 'mysql',
+            'database_name' => getenv('DB_NAME'),
+            'server' => getenv('DB_HOST'),
+            'username' => getenv('DB_USER'),
+            'password' => getenv('DB_PASS')
+        ]);
     }
     
     /**
@@ -33,7 +44,7 @@ class Database {
      * @return array|bool
      */
     public static function getConfig(string $name) {
-        $result = self::db()->select(
+        $result = self::staticDB()->select(
             'mro_conf', 
             ['value'],
             ['name' => $name]
@@ -49,13 +60,13 @@ class Database {
      */
     public static function setConfig(string $name, $value) {
         if (self::getConfig($name)) {
-            return self::db()->update(
+            return self::staticDB()->update(
                 'mro_conf',
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
-            return self::db()->insert(
+            return self::staticDB()->insert(
                 'mro_conf',
                 [
                     'name' => $name,

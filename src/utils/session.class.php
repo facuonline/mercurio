@@ -16,9 +16,11 @@ class Session {
 
     /**
      * Returns the memory segment for Mercurio in $_SESSION
-     * @return array
+     * @param string $key Session segment key
+     * @param mixed $fallback Value to assign to key if key does not exists
+     * @return array|mixed Full Mercurio session array or key value
      */
-    public static function get() {
+    public static function get(string $key = '', $fallback = []) {
         if (!isset($_SESSION['Mercurio'])) {
             $_SESSION['Mercurio'] = [
                 'UserAgent' => $_SERVER['HTTP_USER_AGENT'],
@@ -28,7 +30,12 @@ class Session {
                 'User' => false,
             ];
         }
-        return $_SESSION['Mercurio'];
+        if (empty($key)) {
+            return $_SESSION['Mercurio'];
+        } else {
+            if (!array_key_exists($key, $_SESSION['Mercurio'])) $_SESSION['Mercurio'][$key] = $fallback;
+            return $_SESSION['Mercurio'][$key];
+        }
     }
 
     /**
@@ -109,31 +116,30 @@ class Session {
     
     /**
      * Store a value inside session
-     * @param string $segment String segment identifier
-     * @param mixed $value
+     * @param mixed $value Data to be stored
+     * @param string $segment Session key under which to store data
+     * @param bool $regenerate Regenerates session id
      */
-    public function set($value, $segment = 'Session', $regenerate = true) {
+    public static function set($value, string $segment, bool $regenerate = true) {
         self::isValid();
         $_SESSION['Mercurio'][$segment] = $value;
-        if ($regenerate) {
-            session_regenerate_id(true);
-        }
+        if ($regenerate) session_regenerate_id(true);
     }
 
     /**
      * Destroy a session variable or all of them if none specified
-     * @param mixed $value
+     * @param mixed $value Data to be destroyed
+     * @param string $segment Session key of data
+     * @param bool $regenerate Regenerates session id
      */
-    public function unset($value = false, $segment = 'Session', $regenerate = true) {
+    public function unset($value = false, string $segment, bool $regenerate = true) {
         self::isValid();
         if ($value) {
             unset($_SESSION['Mercurio'][$segment][$value]);
         } else {
             session_unset();
         }
-        if ($regenerate) {
-            session_regenerate_id(true);
-        }
+        if ($regenerate) session_regenerate_id(true);
     }
 
 }

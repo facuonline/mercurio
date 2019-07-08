@@ -6,13 +6,13 @@
  * 
  * @var array $info Story info
  * @var string $body Story text body
- * @var int $GID Story generated incremental discriminator
+ * @var int $id Story generated incremental discriminator
  */
 
 namespace Mercurio;
 class Story extends Database {
     
-    public $info, $body, $GID;
+    public $info, $body, $id;
 
     public function __construct() {
 

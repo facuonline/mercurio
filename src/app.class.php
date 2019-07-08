@@ -38,7 +38,12 @@ class App {
             putenv("APP_$key=$value");
         }
         if (!empty($connection)) self::setDatabase($connection);
+
+        // Set URL params
         \Mercurio\Utils\URL::configReferrers();
+
+        // Init Session accross app
+        \Mercurio\Utils\Session::start();
     }
 
     /**

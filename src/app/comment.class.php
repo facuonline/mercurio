@@ -10,7 +10,7 @@
 namespace Mercurio;
 class Comment extends Database {
     
-    public $info, $body, $GID;
+    public $info, $body, $id;
 
     public function __construct() {
 

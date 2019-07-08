@@ -104,7 +104,7 @@ class URL extends \Mercurio\App\Database {
     /**
      * Builds and return links for specified targets
      * @param string $referrer Referrer type
-     * @param mixed $target Target entity identifier, either handle or GID
+     * @param mixed $target Target entity identifier, either handle or id
      * @return string
      */
     public static function getLink(string $referrer, $target) {

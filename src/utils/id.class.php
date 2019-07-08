@@ -1,23 +1,22 @@
 <?php
 /** 
- * GID class
+ * ID class
  * @package Mercurio
  * @subpackage Included Classes
  * 
- * GID generation and obfuscation
- * Generated In(cremental)teger Discriminator
- * Inspired by Snowflake by Twitter, GIDs allow for decentralized, independent, meaningful id generation. 
+ * ID generation and obfuscation
+ * Inspired by Snowflake by Twitter, this class allows for decentralized, independent, meaningful id generation. 
  * Simpler, not as consuming as other implementations. 
  * _Not collision free_ but extremely unlikely to happen.
  * 
- * Not fixed length, with enough (a lot of years) time GIDs will overflow 64 bits
+ * Not fixed length, with enough (a lot of years) time IDs will overflow 64 bits
  */
 
 namespace Mercurio\Utils;
-class GID {
+class ID {
 
 	/**
-	 * Create new int GID
+	 * Create new int ID
 	 * 
 	 * Timestamp base with custom epoch.\  
 	 * 1 digit server ip based discriminator.\
@@ -28,29 +27,31 @@ class GID {
 	public static function new(){
 		// Custom epoch from the january 1st 2019
 		$time = time() - 1546300800;
-		$server = substr(base_convert(gethostbyname(gethostname()), 10, 10), -1);
+		$serveraddress = base_convert(gethostbyname(gethostname()), 10, 10);
+		$server = $serveraddress[random_int(0, strlen($serveraddress))-1];
 		$port = substr($_SERVER['REMOTE_PORT'], -1);
-		$client = substr(base_convert($_SERVER['REMOTE_ADDR'], 10, 10), -1);
+		$clientaddress = base_convert($_SERVER['REMOTE_ADDR'], 10, 10);
+		$client = $clientaddress[random_int(0, strlen($clientaddress) -1)];
 		$entropy = random_int(0, 9);
 		return $time.$server.$port.$client.$entropy;
 	}
 
 	/**
-	 * Encrypts and decrypts a GID to prevent CSRF
+	 * Encrypts and decrypts a ID to prevent CSRF
 	 *
 	 * Encrypted values are session wise decryptable 
 	 *
-	 * @param int|string $GID GID to encrypt or decrypt
+	 * @param int|string $ID ID to encrypt or decrypt
 	 * @return int|string */
-	public static function enc($GID = false){
-		if (!$GID) $GID = self::new();
+	public static function enc($ID = false){
+		if (!$ID) $ID = self::new();
 		/* aes-192-ctr is chosen because it allows for faster system performance in encryption and this function is supposed to provide an obfuscation layer rather than actually cryptosafe values, that's also the reason for no random IV */
-		if (ctype_digit($GID)) {
+		if (ctype_digit($ID)) {
 			$iv = substr(md5(getenv('APP_KEY')), -16);
-			return openssl_encrypt($GID, 'aes-192-ctr', session_id(), 0, $iv);
+			return openssl_encrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
 		} else {
 			$iv = substr(md5(getenv('APP_KEY')), -16);
-			return openssl_decrypt($GID, 'aes-192-ctr', session_id(), 0, $iv);
+			return openssl_decrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
 		}
 	}
 }

@@ -47,10 +47,10 @@ class Form {
      * @param int $minTime Minimum number of seconds expected for completion
      * @return bool True on SPAM detection, false on no SPAM
      */
-    public static function spam(string $name, string $method = 'POST', int $minTime = 5) {
+    public static function spam(string $name, string $method = 'POST', int $minTime = 5) : bool {
         if ($_SERVER['REQUEST_METHOD'] === $method
         && isset($_POST[$name])) {
-            $key = \Mercurio\App::getApp('key');
+            $key = \Mercurio\App::getApp('url');
             if (!empty($_POST[$key.'-email-url-website'])) return true;
             if (!empty($_POST[$key.'-comment-name-body'])) return true;
             if ((time() - $_POST['formGeneratedAt']) < $minTime) return true;
@@ -73,26 +73,24 @@ class Form {
 
     /**
      * Create new form
-     * @param array $form
+     * @param string $method Form method
+     * @param string $listener Form listener and trigger
+     * @param array $given Form properties
      */
-    public static function new(array $given) {
-        // method
-        if (!array_key_exists('method', $given)) {
-            throw new \Exception\Usage("MISSING ARRAY KEY: new() expects a 'method' key index in given array.");
-        }
-        // listener
-        if (!array_key_exists('listener', $given)) {
-            throw new \Exception\Usage("MISSING ARRAY KEY: new() expects a 'listener' key index in given array.");
-        } else {
-            $listener = $given['listener'];
-            unset($given['listener']);
-        }
+    public static function new(string $method, string $listener, array $given = []) {
         $attributes = ''; $honeypot = '';
         foreach ($given as $key => $value) {
             $attributes .= "$key='$value'";
         }
         $honeypot = self::honeypot();
-        echo "<form $attributes>\n<input type='hidden' name='$listener'>\n$honeypot";
+        echo "<form method='$method' $attributes>\n<input type='hidden' name='$listener' value='formSubmitted'>\n$honeypot";
+    }
+
+    /**
+     * Terminate form
+     */
+    public static function end() {
+        echo "</form>";
     }
 
 }
