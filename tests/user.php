@@ -29,30 +29,28 @@ use \Mercurio\App\User;
     // Start user object
     $user = new User;
 
-    // Validate form
-    if (!Form::spam('login')) {
-        try {
-            $user->login(
-                Form::get('login_user'),
-                Form::get('login_password')
-            );
-            echo "LOGIN SUCCESS";
-        } catch (Mercurio\Exception $error) {
-            echo "LOGIN ERROR";
-        }
-    }
-
     echo "<pre>";
 
-    print_r(\Mercurio\Utils\Session::get());
+    // Validate form against spam and sanitize
+    Form::submit('login', function($data) use (&$user) {
+        # You can perform your desired actions here
+        # $data will return array with sanitized form data from submission
+        try {
+            $user->login(
+                $data['login_user'], 
+                $data['login_password']
+            );
+        } catch (\Mercurio\Exception\User $error) {
+            echo $error->getCode();
+        }
+    }, function ($data) {
+        # You can perform aditional antispam here,
+        # by default Mercurio will only ignore their submissions
+        # $data will return array with sanitized form data from submission and session data
+        print_r($data);
+    }); ?>
 
-    $user->get();
-
-    echo $user->getHandle();
-
-    ?>
-
-    <?php Form::new('POST', 'login'); ?>
+    <?php Form::new('login', 'POST'); ?>
         <input type="text" name="login_user" placeholder="Username or email">
         <input type="password" name="login_password" placeholder="Password">
         <button type="submit">Login</button>

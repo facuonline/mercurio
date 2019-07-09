@@ -24,8 +24,7 @@ class Session {
         if (!isset($_SESSION['Mercurio'])) {
             $_SESSION['Mercurio'] = [
                 'UserAgent' => $_SERVER['HTTP_USER_AGENT'],
-                // Get first characters of IP for better dynamic and proxy IPs handling
-                'IPAddress' => substr($_SERVER['REMOTE_ADDR'], 0, 7),
+                'IPAddress' => $_SERVER['REMOTE_ADDR'],
                 'CreatedAt' => time(),
                 'User' => false,
             ];
@@ -70,9 +69,7 @@ class Session {
      */
     public static function regenerate(int $time = 10) {
         // flag old session
-        self::set([
-            'Expiry' => time() + $time,
-        ]);
+        self::set(time() + $time, 'Expiry');
         session_regenerate_id(false);
         // start new one
         $newSession = session_id();
@@ -128,14 +125,13 @@ class Session {
 
     /**
      * Destroy a session variable or all of them if none specified
-     * @param mixed $value Data to be destroyed
      * @param string $segment Session key of data
      * @param bool $regenerate Regenerates session id
      */
-    public function unset($value = false, string $segment, bool $regenerate = true) {
+    public function unset(string $segment, bool $regenerate = true) {
         self::isValid();
         if ($value) {
-            unset($_SESSION['Mercurio'][$segment][$value]);
+            unset($_SESSION['Mercurio'][$segment]);
         } else {
             session_unset();
         }

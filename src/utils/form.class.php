@@ -42,21 +42,23 @@ class Form {
 
     /**
      * Validate submission of form against SPAM
-     * @param string $name Form listener to listen for
+     * @param string $listener Form listener to listen for
      * @param string $method Method of form submissions
      * @param int $minTime Minimum number of seconds expected for completion
-     * @return bool True on SPAM detection, false on no SPAM
      */
-    public static function spam(string $name, string $method = 'POST', int $minTime = 5) : bool {
+    public static function submit(string $listener, callable $callback, callable $fallback = NULL, string $method = 'POST', int $minTime = 5) {
         if ($_SERVER['REQUEST_METHOD'] === $method
-        && isset($_POST[$name])) {
+        && isset($_POST[$listener])) {
             $key = \Mercurio\App::getApp('url');
-            if (!empty($_POST[$key.'-email-url-website'])) return true;
-            if (!empty($_POST[$key.'-comment-name-body'])) return true;
-            if ((time() - $_POST['formGeneratedAt']) < $minTime) return true;
-            return false;
-        } else {
-            return true;
+            if (empty($_POST[$key.'-email-url-website'])
+            && empty($_POST[$key.'-comment-name-body'])
+            && (time() - $_POST['formGeneratedAt']) > $minTime) {
+                $callback(filter_input_array(INPUT_POST));
+            } else {
+                $data['Form'] = filter_input_array(INPUT_POST);
+                $data['Session'] = \Mercurio\Utils\Session::get();
+                $fallback($data);
+            }
         }
     }
 
@@ -66,7 +68,7 @@ class Form {
      */
     private static function honeypot() {
         // antispam honeypot and control
-        $time = time(); $key = \Mercurio\App::getApp('key');
+        $time = time(); $key = \Mercurio\App::getApp('url');
         $pot = "<!--These inputs are not for humans--><!--If you are human do not fill in next inputs--><input type='text' name='$key-email-url-website' style='display:none;'><input type='text' name='$key-comment-name-body' style='display: none;'><input type='text' name='formGeneratedAt' value='$time' style='display:none;'><!--End of non human inputs-->";
         return $pot;
     }
@@ -77,7 +79,7 @@ class Form {
      * @param string $listener Form listener and trigger
      * @param array $given Form properties
      */
-    public static function new(string $method, string $listener, array $given = []) {
+    public static function new(string $listener, string $method = 'POST', array $given = []) {
         $attributes = ''; $honeypot = '';
         foreach ($given as $key => $value) {
             $attributes .= "$key='$value'";
