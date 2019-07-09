@@ -48,7 +48,17 @@ use \Mercurio\App\User;
         # by default Mercurio will only ignore their submissions
         # $data will return array with sanitized form data from submission and session data
         print_r($data);
-    }); ?>
+    }); 
+    
+    $user->getSession(function($data) {
+        print_r($data);
+    });
+
+    if (isset($_GET['logout'])) {
+        $user->logout();
+    }
+
+    ?>
 
     <?php Form::new('login', 'POST'); ?>
         <input type="text" name="login_user" placeholder="Username or email">

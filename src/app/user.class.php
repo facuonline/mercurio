@@ -29,8 +29,8 @@ class User extends \Mercurio\App\Database {
         && \Mercurio\Utils\URL::getURLParams()['Target']) {
             return \Mercurio\Utils\URL::getURLParams()['Target'];
         }
-        if (\Mercurio\Utils\Session::get()['User']) {
-            return \Mercurio\Utils\Session::get()['User']['id'];
+        if (\Mercurio\Utils\Session::get('User')) {
+            return \Mercurio\Utils\Session::get('User')['id'];
         }
         return false;
     }
@@ -39,27 +39,29 @@ class User extends \Mercurio\App\Database {
      * Load an user from database into instance
      * @param string|int $hint User identifier either string handle or integer id
      * @param callback $callback Callback function to manipulate user data without loading class
+     * @param bool $reload Force a reload of user info from database
      * @return array|false User info, false on no user found
      */
-    public function get($hint = false, callable $callback = NULL) {
+    public function get($hint = false, callable $callback = NULL, bool $reload = false) {
         if (!$hint) $hint = $this->findHint();
-        $user = $this->db()->get('mro_users', [
-            'id',
-            'handle',
-            'nickname',
-            'img',
-            'stamp'
-        ], [
-        'OR' => [
-            'id' => $hint,
-            'handle' => $hint,
-            'email' => $hint
-        ]]);
-        if ($user) {
-            if ($callback) return $callback($user);
-            $this->info = $user;
-            return $this->info;
+        $user = false;
+        if ($reload || !$this->info) {
+            $user = $this->db()->get('mro_users', [
+                'id',
+                'handle',
+                'nickname',
+                'img',
+                'stamp'
+            ], [
+            'OR' => [
+                'id' => $hint,
+                'handle' => $hint,
+                'email' => $hint
+            ]]);
         }
+        if ($callback !== NULL) return $callback($user);
+        $this->info = $user;
+        return $this->info;
     }
 
     /**
@@ -128,6 +130,18 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Load user from session into instance
+     * @param callback $callback Callback function to manipulate user data without loading class
+     * @return array|false User info, false on no user found
+     */
+    public function getSession(callable $callback = NULL) {
+        $user = \Mercurio\Utils\Session::get('User', $this->get());
+        if ($callback !== NULL) return $callback($user);
+        $this->info = $user;
+        return $this->info;
+    }
+
+    /**
      * Set a new user and load into instance 
      * @param array $properties Associative array of user properties
      * @param array $required $properties array keys of required content
@@ -183,7 +197,7 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
-     * Perform a login \
+     * Perform a login
      * @param string $credential User identifier: handle or email
      * @param string $password User password
      * @param string $redirect Destination after successful login

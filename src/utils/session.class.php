@@ -20,7 +20,7 @@ class Session {
      * @param mixed $fallback Value to assign to key if key does not exists
      * @return array|mixed Full Mercurio session array or key value
      */
-    public static function get(string $key = '', $fallback = []) {
+    public static function get(string $key = '', $fallback = NULL) {
         if (!isset($_SESSION['Mercurio'])) {
             $_SESSION['Mercurio'] = [
                 'UserAgent' => $_SERVER['HTTP_USER_AGENT'],
@@ -52,8 +52,8 @@ class Session {
         }
         session_start($options);
         // check for expired sessions
-        if (isset($_SESSION['Mercurio']['Session']['Expiry']) 
-        && $_SESSION['Mercurio']['Session']['Expiry'] < time()) {
+        if (isset($_SESSION['Mercurio']['Expiry']) 
+        && $_SESSION['Mercurio']['Expiry'] < time()) {
             self::unset();
         }
         if ($expirancy) {
@@ -128,9 +128,9 @@ class Session {
      * @param string $segment Session key of data
      * @param bool $regenerate Regenerates session id
      */
-    public function unset(string $segment, bool $regenerate = true) {
+    public function unset(string $segment = '', bool $regenerate = true) {
         self::isValid();
-        if ($value) {
+        if (!empty($segment)) {
             unset($_SESSION['Mercurio'][$segment]);
         } else {
             session_unset();
