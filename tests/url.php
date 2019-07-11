@@ -1,8 +1,6 @@
 <?php
 require '../vendor/autoload.php';
-require '../src/app.class.php';
-require '../src/app/database.class.php';
-require '../src/utils/url.class.php';
+require 'autoload.php';
 
 // To run this test configure your APP url and DB, then open this file in your browser
 

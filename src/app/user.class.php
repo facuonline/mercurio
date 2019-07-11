@@ -39,29 +39,31 @@ class User extends \Mercurio\App\Database {
      * Load an user from database into instance
      * @param string|int $hint User identifier either string handle or integer id
      * @param callback $callback Callback function to manipulate user data without loading class
-     * @param bool $reload Force a reload of user info from database
+     * @param callback $fallback Callback function to execute in case of no user found
      * @return array|false User info, false on no user found
      */
-    public function get($hint = false, callable $callback = NULL, bool $reload = false) {
+    public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
         $user = false;
-        if ($reload || !$this->info) {
-            $user = $this->db()->get('mro_users', [
-                'id',
-                'handle',
-                'nickname',
-                'img',
-                'stamp'
-            ], [
-            'OR' => [
-                'id' => $hint,
-                'handle' => $hint,
-                'email' => $hint
-            ]]);
+        $user = $this->db()->get('mro_users', [
+            'id',
+            'handle',
+            'nickname',
+            'img',
+            'stamp'
+        ], [
+        'OR' => [
+            'id' => $hint,
+            'handle' => $hint,
+            'email' => $hint
+        ]]);
+        if ($user) {
+            if ($callback !== NULL) return $callback($user);
+            $this->info = $user;
+            return $this->info;
+        } elseif ($fallback !== NULL) {
+            $fallback();
         }
-        if ($callback !== NULL) return $callback($user);
-        $this->info = $user;
-        return $this->info;
     }
 
     /**
@@ -79,22 +81,31 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Read user meta
-     * @param string $meta Name of meta field, leave blank to get all meta fields
+     * @param string|array $meta Name of meta field, leave blank to get all meta fields
      * @return bool|mixed 
      */
-    public function getMeta(string $meta = '') {
+    public function getMeta($meta = '') {
         return $this->get(false, function($user) use ($meta) {
             if (empty($meta)) {
                 return $this->db()->select('mro_meta', '*', [
                     'target' => $this->info['id']
                 ])[0];
             } else {
-                return $this->db()->get('mro_meta', [
-                    'value'
-                ], [
-                    'target' => $this->info['id'],
-                    'name' => $meta
-                ])['value'];
+                if (is_array($meta)) {
+                    return $this->db()->get('mro_meta', [
+                        'value'
+                    ], [
+                        'target' => $this->info['id'],
+                        'name' => $meta
+                    ]);
+                } else {
+                    return $this->db()->get('mro_meta', [
+                        'value'
+                    ], [
+                        'target' => $this->info['id'],
+                        'name' => $meta
+                    ])['value'];
+                }
             }
         });
     }
@@ -177,6 +188,16 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Get user numeric id
+     * @return int User ID
+     */
+    public function getID() {
+        return $this->get(false, function($user) {
+            return (int) $user['id'];
+        });
+    }
+
+    /**
      * Get user handle
      * @return string User handle with @
      */
@@ -202,10 +223,10 @@ class User extends \Mercurio\App\Database {
      * @param string $password User password
      * @param string $redirect Destination after successful login
      * @return bool
-     * @throws object Exception\User\WrongLoginCredential or Exception\User\EmptyField
+     * @throws object Exception\User\WrongLoginCredential | LoginBlocked or Exception\User\EmptyField
      */
     public function login(string $credential, string $password, string $redirect = '') {
-        if ($this->info) $this->logout();
+        if ($this->getSession()) $this->logout();
         \Mercurio\Utils\System::emptyField(['credential', 'password'], [
             'credential' => $credential,
             'password' => $password
@@ -215,23 +236,35 @@ class User extends \Mercurio\App\Database {
             $attempts = \Mercurio\Utils\Session::get('loginAttempts', 0);
             sleep($attempts++);
             \Mercurio\Utils\Session::set($attempts, 'loginAttempts');
-        // database enforced bruteforce and lock for wrong password
+            throw new \Mercurio\Exception\User\WrongLoginCredential;
+        // database enforced bruteforce protection for wrong password
         } else {
-            $attempts = $this->getMeta('login_attempt');
-            $hash = $this->db()->get('mro_users', [
-                'password'
-            ], [
-                'id' => $this->info['id']
-            ])['password'];
-            if (!password_verify($password, $hash)) {
-                sleep($attempts++);
-                $this->setMeta(['login_attempt' => $attempts]);
-            // Attach session and redirect user
-            } else {
-                \Mercurio\Utils\Session::regenerate(0);
-                \Mercurio\Utils\Session::set($this->info, 'User', true);
-                $this->setMeta(['login_lastin' => time()]);
-                header('Location: '.$redirect);
+            $lock = $this->getMeta('login_blocked');
+            if ($lock !== 0 || $lock === NULL) {
+                $attempts = $this->getMeta('login_attempt');
+                $hash = $this->db()->get('mro_users', [
+                    'password'
+                ], [
+                    'id' => $this->info['id']
+                ])['password'];
+                if (!password_verify($password, $hash)) {
+                    sleep($attempts++);
+                    $this->setMeta(['login_attempt' => $attempts]);
+                    throw new \Mercurio\Exception\User\WrongLoginCredential;
+                    if ($attempts > 9) {
+                        $this->setMeta(['login_blocked' => time() + 300]);
+                        throw new \Mercurio\Exception\User\LoginBlocked;
+                    }
+                // Attach session and redirect user
+                } else {
+                    \Mercurio\Utils\Session::regenerate(0);
+                    \Mercurio\Utils\Session::set($this->info, 'User', true);
+                    $this->setMeta(['login_lastin' => time()]);
+                    header('Location: '.$redirect);
+                }
+            } elseif (time() - $lock > 300) {
+                $this->setMeta(['login_blocked' => 0]);
+                $this->login($credential, $password, $redirect);
             }
         }
 
@@ -239,11 +272,14 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Perform a logout
+     * @param string $redirect Destination after logout
      */
-    public function logout() {
+    public function logout(string $redirect = '') {
         $this->setMeta(['login_lastout' => time()]);
         \Mercurio\Utils\Session::unset('User');
         \Mercurio\Utils\Session::regenerate();
+        if (empty($redirect)) $redirect = getenv('APP_URL');
+        header('Location: '.$redirect);
     }
 
     /**
