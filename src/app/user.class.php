@@ -219,6 +219,16 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Get user img property
+     * @return string User img
+     */
+    public function getImg() {
+        return $this->get(false, function($user) {
+            return $user['img'];
+        });
+    }
+
+    /**
      * Get user email
      * @return string|false User email, false on no email
      */
