@@ -143,13 +143,12 @@ class User extends \Mercurio\App\Database {
     /**
      * Upload and set a file image as user img
      * @param string $file $_FILES array key
-     * @param string $path Desired file destination
      * @param int $width Desired output width of the image
      * @param int|bool $ratio Tells the method wether to calc the output height based on the new width or use the defined height (will crop the image), if left to true will crop the image with an aspect ratio based height
      */
-    public function setImg(string $file, string $path, int $width, $ratio = false) {
+    public function setImg(string $file, int $width, $ratio = false) {
         $image = new \Mercurio\Utils\Img;
-        $this->set(['img' => $image->new($file, $path, $width, $ratio)]);
+        $this->set(['img' => $image->new($file, __DIR__.'/static', $width, $ratio)]);
     }
 
     /**

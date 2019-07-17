@@ -60,10 +60,10 @@ class Img {
 					throw new \Mercurio\Exception\User\ImageMIMEUnknown;
 				}
 			} else {
-				throw new \Mercurio\Exception\User\ImageSizeInvalid;
+				throw new \Mercurio\Exception\User\ImageInvalid;
 			}
 		} else {
-			throw new \Mercurio\Exception\User\ImageSizeInvalid;
+			throw new \Mercurio\Exception\User\ImageInvalid;
 		}
 	}
 
@@ -72,7 +72,7 @@ class Img {
 	 * @param int $width Desired output width of the image
 	 * @param int $height Desired output height of the image
 	 * @param bool $crop Tells the method wether to crop or resize an image inside the new dimensions
-	 * @param int|bool $thumbnail Tells the method wether to create or not a second image with an specified widht as integer and height and crop based on parent image */
+	 */
 	private function canvas($width, $height, $crop = true){
 		$src = $this->ext($this->file);
 		$srcw = imagesx($src);
@@ -92,7 +92,8 @@ class Img {
 		imagecopyresampled($img, $src, 0, 0, 0, 0, $width, $height, $srcw, $srch);
 		imagedestroy($src);
 		/**
-		 * JPEG is chosen because it's more lightweight than other formats and because png allows for exploitation: https://www.idontplaydarts.com/2012/06/encoding-web-shells-in-png-idat-chunks/ */
+		 * JPEG is chosen because it's more lightweight than other formats and because png allows for exploitation
+		 * @see https://www.idontplaydarts.com/2012/06/encoding-web-shells-in-png-idat-chunks/ */
 		imagejpeg($img, $this->path.$this->hash, 95);
 		imagedestroy($img);
 	}

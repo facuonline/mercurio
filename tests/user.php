@@ -25,7 +25,7 @@ require 'autoload.php';
         # You can perform your desired actions here
         # $data will return array with sanitized form data from submission
         # $files will return $_FILES array, raw (you can handle them via the bulletproof class)
-        $user->setImg('user_img', 'static', 600, 600);
+        $user->setImg('user_img', 600, 600);
         print_r($user->info);
     }, function ($data, $session) {
         # You can perform aditional antispam here,
