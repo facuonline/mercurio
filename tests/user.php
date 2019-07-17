@@ -16,31 +16,27 @@ require 'autoload.php';
     // Start user object
     $user = new \Mercurio\App\User;
 
+    $user->get('verano');
+
     echo "<pre>";
 
     // Validate form against spam and sanitize
-    \Mercurio\Utils\Form::submit('login', function($data) use (&$user) {
+    \Mercurio\Utils\Form::submit('login', function($post, $files) use (&$user) {
         # You can perform your desired actions here
         # $data will return array with sanitized form data from submission
-        try {
-            $user->login(
-                $data['login_user'], 
-                $data['login_password'],
-            );
-        } catch (\Mercurio\Exception\User $error) {
-            echo $error->getCode();
-        }
-    }, function ($data) {
+        # $files will return $_FILES array, raw (you can handle them via the bulletproof class)
+        $user->setImg('user_img', 'static', 600, 600);
+        print_r($user->info);
+    }, function ($data, $session) {
         # You can perform aditional antispam here,
         # by default Mercurio will only ignore their submissions
-        # $data will return array with sanitized form data from submission and session data
+        # $data will return array with sanitized form data from submission
+        # $session will return session data
         print_r($data);
-    }); 
-
-    $user->get('vito', function($user) {
-        echo $user['id'];
-    }, function () {
-        echo "NINGUN USUARIO CON ESE NOMBRE";
+        print_r($session);
     });
 
-    ?>
+    \Mercurio\Utils\Form::new('login', 'POST', ['enctype' => 'multipart/form-data']); ?>
+        <input type="file" name="user_img" accept="image/*">
+        <button type="submit">Upload</button>
+    <?php \Mercurio\Utils\Form::end(); ?>

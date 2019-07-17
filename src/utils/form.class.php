@@ -43,6 +43,8 @@ class Form {
     /**
      * Validate submission of form against SPAM
      * @param string $listener Form listener to listen for
+     * @param callback $callback Callback function to access submitted data, returned parameters are: $_POST, $_FILES
+     * @param callback $fallback Callback function to be execute in case of submission being spam, returned parameters are: $_POST, $_SESSION
      * @param string $method Method of form submissions
      * @param int $minTime Minimum number of seconds expected for completion
      */
@@ -53,11 +55,9 @@ class Form {
             if (empty($_POST[$key.'-email-url-website'])
             && empty($_POST[$key.'-comment-name-body'])
             && (time() - $_POST['formGeneratedAt']) > $minTime) {
-                $callback(filter_input_array(INPUT_POST));
+                $callback(filter_input_array(INPUT_POST), $_FILES);
             } else {
-                $data['Form'] = filter_input_array(INPUT_POST);
-                $data['Session'] = \Mercurio\Utils\Session::get();
-                $fallback($data);
+                $fallback(filter_input_array(INPUT_POST), \Mercurio\Utils\Session::get());
             }
         }
     }
