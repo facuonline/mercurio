@@ -1,10 +1,6 @@
 <?php
 require '../vendor/autoload.php';
-require '../src/classes/app.class.php';
-require '../src/classes/app/database.class.php';
-require '../src/classes/utils/url.class.php';
-require '../src/classes/utils/form.class.php';
-require '../src/classes/exception/usage.class.php';
+require 'autoload.php';
 
 // To run this test configure your APP url and DB, then open this file in your browser
 
@@ -19,16 +15,22 @@ require '../src/classes/exception/usage.class.php';
 ]); 
     use \Mercurio\Utils\Form;
 
-    if (Form::spam('myForm')) {
-        // Here you can run some script to punish spam bots
-        echo "It's spam!";
-    } else {
-        // You can also filter non bot received data
-        echo Form::get('example');
-    };
+    Form::submit('myForm', function ($data, $files) {
+        # This was a human generated submission, 
+        # you can access its filtered $data
+        # and the raw $files array
+        print_r($data);
+        # you can also filter specific fields by their names
+        echo Form::get('example', 'string'); 
+        # This method can be accessed globally without using ::submit
+    }, function ($data, $session) {
+        # This submission was more than likely not made by a human
+        # you can also access its filtered $data, without files
+        # and you can read the $session info
+    });
     ?>
 
-    <?php Form::new(['method' => 'POST', 'listener' => 'myForm']); ?>
+    <?php Form::new('myForm', 'POST'); ?>
         <input type="text" name="example" placeholder="Fill me.">
         <p>Check the source code in your browser to see more details about this form.</p>
         <button type="submit">Submit button</button>
