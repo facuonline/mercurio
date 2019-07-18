@@ -13,30 +13,77 @@ require 'autoload.php';
         'NAME' => 'mercurio'
     ]);
 
-    // Start user object
     $user = new \Mercurio\App\User;
+    $user->get('verano'); 
 
-    $user->get('verano');
-
-    echo "<pre>";
-
-    // Validate form against spam and sanitize
-    \Mercurio\Utils\Form::submit('login', function($post, $files) use (&$user) {
-        # You can perform your desired actions here
-        # $data will return array with sanitized form data from submission
-        # $files will return $_FILES array, raw (you can handle them via the bulletproof class)
-        $user->setImg('user_img', 600, 600);
-        print_r($user->info);
-    }, function ($data, $session) {
-        # You can perform aditional antispam here,
-        # by default Mercurio will only ignore their submissions
-        # $data will return array with sanitized form data from submission
-        # $session will return session data
-        print_r($data);
-        print_r($session);
-    });
-
-    \Mercurio\Utils\Form::new('login', 'POST', ['enctype' => 'multipart/form-data']); ?>
-        <input type="file" name="user_img" accept="image/*">
-        <button type="submit">Upload</button>
-    <?php \Mercurio\Utils\Form::end(); ?>
+    ?>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        header {
+            max-width: 80px;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #f99a0550;
+        }
+        header img {
+            width: 60px;
+            border-radius: 100%;
+        }
+        header nav ul {
+            padding: 0;
+            list-style: none;
+            text-align: right;
+        }
+        header nav ul li {
+            padding: 1em 10px;
+        }
+        header nav ul li:hover{
+            background: #fff;
+            color: #333;
+        }
+        .profile {
+            max-width: calc(900px - 2em);
+            margin: auto;
+            padding: 1em;
+        }
+        .profile img {
+            max-width: 200px;
+            margin: 1em;
+            border-radius: 100%;
+            float: left;
+        }
+        .profile .info {
+            display: inline-block;
+        }
+        .profile .info, .profile .info h1{
+            font-weight: 100;
+        }
+    </style>
+    <header>
+        <nav>
+            <ul>
+                <li>
+                <a href="<?php echo $user->getLink(); ?>">
+                    <img src="<?php echo $user->getImg(); ?>">
+                </a>
+                </li>
+                <li>Feed</li>
+                <li>Portada</li>
+                <li>Buscar</li>
+            </ul>
+        </nav>
+    </header>
+    <div class="profile">
+        <img src="<?php echo $user->getImg(); ?>">
+        <div class="info">
+            <h1><?php echo $user->getHandle(); ?></h1>
+            <span><?php echo $user->info['nickname']; ?></span>
+            <?php echo $_SERVER['DOCUMENT_ROOT']; ?>
+        </div>
+    </div>

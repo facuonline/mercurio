@@ -108,7 +108,7 @@ class Img {
 	 */
 	public function new($file, $path, $width, $ratio = false){
 		$this->file = $_FILES[$file]['tmp_name'];
-		$this->path = rtrim($path, '/').'/';
+		$this->path = rtrim($path, '\/').DIRECTORY_SEPARATOR;
 		chmod($this->file, 0666);
 		if (!is_dir($this->path)) mkdir($this->path, 0666);
 		$src = $this->ext();

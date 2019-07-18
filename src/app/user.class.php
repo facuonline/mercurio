@@ -25,9 +25,9 @@ class User extends \Mercurio\App\Database {
      */
     private function findHint() {
         if ($this->info) return $this->info['id'];
-        if (\Mercurio\Utils\URL::getURLParams()['Referrer'] == 'users'
-        && \Mercurio\Utils\URL::getURLParams()['Target']) {
-            return \Mercurio\Utils\URL::getURLParams()['Target'];
+        if (\Mercurio\Utils\URL::getPage() == 'user'
+        && \Mercurio\Utils\URL::getTarget()) {
+            return \Mercurio\Utils\URL::getTarget();
         }
         if (\Mercurio\Utils\Session::get('User')) {
             return \Mercurio\Utils\Session::get('User')['id'];
@@ -148,7 +148,13 @@ class User extends \Mercurio\App\Database {
      */
     public function setImg(string $file, int $width, $ratio = false) {
         $image = new \Mercurio\Utils\Img;
-        $this->set(['img' => $image->new($file, __DIR__.'/static', $width, $ratio)]);
+        $static = $_SERVER['DOCUMENT_ROOT']
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static';
+        $image->new($file, $static, $width, $ratio);
+        $this->set(['img' => $image->hash]);
     }
 
     /**
@@ -224,7 +230,13 @@ class User extends \Mercurio\App\Database {
      */
     public function getImg() {
         return $this->get(false, function($user) {
-            return $user['img'];
+            return dirname(getenv('APP_URL'))
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static'
+            .DIRECTORY_SEPARATOR
+            .$user['img'];
         });
     }
 
@@ -235,6 +247,16 @@ class User extends \Mercurio\App\Database {
     public function getEmail() {
         return $this->get(false, function($user) {
             return $this->email;
+        });
+    }
+
+    /**
+     * Get link to user profile
+     * @return string URL
+     */
+    public function getLink() {
+        return $this->get(false, function($user) {
+            return \Mercurio\Utils\URL::getLink('user', $user['handle']);
         });
     }
 
