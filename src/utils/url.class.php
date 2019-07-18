@@ -139,30 +139,6 @@ class URL extends \Mercurio\App\Database {
     }
 
     /**
-     * Turn a string into something you can use in an URL
-     * @param string $input Initial string
-     * @param bool $sign Add a pseudo unique discriminator
-     * @param array $replace Target characters to be replaced
-     * @param string $delimiter Glue of returned string
-     * @return string
-     */
-    public static function slugify(string $input, bool $sign = false, array $replace = [], $delimiter = ' ') {
-        // Reset the locale
-        $oldLocale = setlocale(LC_ALL, '0');
-        setlocale(LC_ALL, 'en_US.UTF-8');
-        // Make it a valid slug
-        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $input);
-        $clean = strtolower($clean);
-        if (!empty($replace)) $clean = str_replace($replace, $delimiter, $clean);
-        $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
-        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
-        if ($sign) $clean .= '-'.base_convert(time(), 10, 16);
-        $clean = trim($clean, $delimiter);
-        setlocale(LC_ALL, $oldLocale);
-        return urlencode($clean);
-    }
-
-    /**
      * Check if url masking is on or off
      * @return bool
      */
