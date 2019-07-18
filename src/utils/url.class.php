@@ -181,8 +181,9 @@ class URL extends \Mercurio\App\Database {
      */
     public static function setURLMasking(string $htaccess) {
         if (file_exists($htaccess) && !is_readable($htaccess)) throw new \Mercurio\Exception\Runtime("The file located at '$htaccess' could not be accessed or is not readable. URL masking could not be possible.");
-
-        if (array_key_exists('mod_rewrite', apache_get_modules())) {
+        if (!array_key_exists('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Runtime("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
+        
+        if (!self::isMaskingOn()) {
             self::readHtaccess($htaccess);
             if (self::startHtaccess()) {
                 self::referrerHtaccess();
