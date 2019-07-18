@@ -28,11 +28,9 @@ require 'autoload.php';
         # you can also access its filtered $data, without files
         # and you can read the $session info
     });
-    ?>
-
-    <?php Form::new('myForm', 'POST'); ?>
+    
+    Form::new('myForm', 'POST'); ?>
         <input type="text" name="example" placeholder="Fill me.">
         <p>Check the source code in your browser to see more details about this form.</p>
         <button type="submit">Submit button</button>
     </form>
-
