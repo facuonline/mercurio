@@ -39,6 +39,21 @@ class App {
         }
         if (!empty($connection)) self::setDatabase($connection);
 
+        // Define system constants
+        define('APP_STATIC_ABS', dirname(getenv('APP_URL'))
+        .DIRECTORY_SEPARATOR
+        .'mercurio'
+        .DIRECTORY_SEPARATOR
+        .'static'
+        .DIRECTORY_SEPARATOR);
+
+        define('APP_STATIC_REL', $_SERVER['DOCUMENT_ROOT']
+        .DIRECTORY_SEPARATOR
+        .'mercurio'
+        .DIRECTORY_SEPARATOR
+        .'static'
+        .DIRECTORY_SEPARATOR);
+
         // Init Session accross app
         \Mercurio\Utils\Session::start();
     }

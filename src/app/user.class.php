@@ -59,6 +59,7 @@ class User extends \Mercurio\App\Database {
         // Return data or load instance
         if ($user) {
             if ($callback !== NULL) return $callback($user);
+
             $this->info = $user;
             return $this->info;
         } elseif ($fallback !== NULL) {
@@ -81,31 +82,30 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Read user meta
-     * @param string|array $meta Name of meta field, leave blank to get all meta fields
+     * @param string|array $meta Name of meta field or list of, leave blank to get all meta fields
      * @return bool|mixed|array
      */
     public function getMeta($meta = '') {
-        return $this->get(false, function($user) use ($meta) {
-            if (empty($meta)) {
-                return $this->db()->select('mro_meta', '*', [
-                    'target' => $this->info['id']
-                ])[0];
-            } else {
-                // Get from array
-                if (is_array($meta)) return $this->db()->select('mro_meta', [
-                    'value'
-                ], [
-                    'target' => $this->info['id'],
-                    'name' => $meta
-                ]);
-                // Get meta row
-                return $this->db()->get('mro_meta', [
-                    'value'
-                ], [
-                    'target' => $this->info['id'],
-                    'name' => $meta
-                ])['value'];
-            }
+        return $this->get(false, function($user) use (&$meta) {
+            // Get all meta
+            if (empty($meta)) return $this->db()->select('mro_meta', '*', [
+                'target' => $this->info['id']
+            ])[0];
+            // Get specific meta
+            // Get from array
+            if (is_array($meta)) return $this->db()->select('mro_meta', [
+                'value'
+            ], [
+                'target' => $this->info['id'],
+                'name' => $meta
+            ]);
+            // Get meta row
+            return $this->db()->get('mro_meta', [
+                'value'
+            ], [
+                'target' => $this->info['id'],
+                'name' => $meta
+            ])['value'];
         });
     }
 
@@ -141,20 +141,54 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Deletes user meta from database
+     * @param string|array $meta Name of meta field or list of, leave blank to delete all meta
+     */
+    public function unsetMeta($meta = '') {
+        $this->get(false, function ($user) use (&$meta) {
+            // Delete all meta
+            if (empty($meta)) $this->db()->delete('mro_meta', ['target' => $user['id']]);
+            // Delete specific meta
+            $this->db()->delete('mro_meta', [
+                'AND' => [
+                    'target' => $user['id'],
+                    'name' => $meta
+                ]
+            ]);
+        });
+    }
+
+    /**
      * Upload and set a file image as user img
      * @param string $file $_FILES array key
      * @param int $width Desired output width of the image
      * @param int|bool $ratio Tells the method wether to calc the output height based on the new width or use the defined height (will crop the image), if left to true will crop the image with an aspect ratio based height
      */
     public function setImg(string $file, int $width, $ratio = false) {
+        // Delete previous
+        if ($this->getImg()) unlink(
+            APP_STATIC_REL
+            .$this->get(false, function($user) {
+                return $user['img'];
+            })
+        );
+        // Upload new
         $image = new \Mercurio\Utils\Img;
-        $static = $_SERVER['DOCUMENT_ROOT']
-            .DIRECTORY_SEPARATOR
-            .'mercurio'
-            .DIRECTORY_SEPARATOR
-            .'static';
-        $image->new($file, $static, $width, $ratio);
+        $image->new($file, APP_STATIC_REL, $width, $ratio);
         $this->set(['img' => $image->hash]);
+    }
+
+    /**
+     * Deletes user img from database and related file from statics
+     */
+    public function unsetImg() {
+        if ($this->getImg()) unlink(
+            APP_STATIC
+            .$this->get(false, function($user) {
+                return $user['img'];
+            })
+        );
+        $this->set(['img' => '']);
     }
 
     /**
@@ -164,7 +198,9 @@ class User extends \Mercurio\App\Database {
      */
     public function getSession(callable $callback = NULL) {
         $user = \Mercurio\Utils\Session::get('User', $this->get());
+
         if ($callback !== NULL) return $callback($user);
+
         $this->info = $user;
         return $this->info;
     }
@@ -189,7 +225,7 @@ class User extends \Mercurio\App\Database {
         $properties['password'] = password_hash($properties['password'], PASSWORD_DEFAULT);
         // email
         if (array_key_exists('email', $properties)
-        && $this->get('email')) throw new \Mercurio\Exception\User\ExistingEmail;
+        && $this->get($properties['email'])) throw new \Mercurio\Exception\User\ExistingEmail;
 
         // Make user
         $this->db()->insert('mro_users', $properties);
@@ -205,22 +241,51 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
-     * Get user numeric id
-     * @return int User ID
+     * Deletes user from database
+     * @param array $tables List of database tables to delete rows from where user is author
      */
-    public function getID() {
-        return $this->get(false, function($user) {
+    public function unset(array $content = []) {
+        $this->get(false, function ($user) use (&$tables) {
+            $this->unsetImg();
+            $this->db()->delete('mro_users', ['id' => $user['id']]);
+
+            if (!empty($tables)) foreach ($tables as $key => $value) {
+                $this->delete($value, ['author' => $user['id']]);
+            }
+        });
+    }
+
+    /**
+     * Get user numeric id
+     * @param bool $string Return handle as string
+     * @return int|string User ID
+     */
+    public function getID(bool $string = false) {
+        return $this->get(false, function($user) use (&$string) {
+            if ($string) return (string) $user['id'];
             return (int) $user['id'];
         });
     }
 
     /**
      * Get user handle
-     * @return string User handle with @
+     * @param bool $arroba Return handle with or without @
+     * @return string User handle
      */
-    public function getHandle() {
+    public function getHandle(bool $arroba = false) {
+        return $this->get(false, function($user) use (&$arroba) {
+            if ($arroba) return (string) '@'.$user['handle'];
+            return (string) $user['handle'];
+        });
+    }
+
+    /**
+     * Get user public name
+     * @return string User nickname
+     */
+    public function getNickname() {
         return $this->get(false, function($user) {
-            return '@'.$user['handle'];
+            return (string) $user['nickname'];
         });
     }
 
@@ -230,33 +295,32 @@ class User extends \Mercurio\App\Database {
      */
     public function getImg() {
         return $this->get(false, function($user) {
-            return dirname(getenv('APP_URL'))
-            .DIRECTORY_SEPARATOR
-            .'mercurio'
-            .DIRECTORY_SEPARATOR
-            .'static'
-            .DIRECTORY_SEPARATOR
-            .$user['img'];
+            if (!empty($user['img'])) return APP_STATIC_ABS.$user['img'];
+            return false;
         });
     }
 
     /**
      * Get user email
-     * @return string|false User email, false on no email
+     * @return string User email
      */
     public function getEmail() {
         return $this->get(false, function($user) {
-            return $this->email;
+            return (string) $this->db->get('mro_users', 
+                ['email'], 
+                ['id' => $user['id']]
+            )['email'];
         });
     }
 
     /**
      * Get absolute link to user profile
+     * @param string $action Optional user action
      * @return string URL
      */
-    public function getLink() {
-        return $this->get(false, function($user) {
-            return \Mercurio\Utils\URL::getLink('user', $user['handle']);
+    public function getLink(string $action = '') {
+        return $this->get(false, function($user) use (&$action) {
+            return (string) \Mercurio\Utils\URL::getLink('user', $user['handle'], $action);
         });
     }
 
@@ -264,11 +328,11 @@ class User extends \Mercurio\App\Database {
      * Perform a login
      * @param string $credential User identifier: handle or email (also ID will work)
      * @param string $password User password, plain text
-     * @param string $redirect Destination after successful login
-     * @return bool
+     * @param callback $callback Action to perform after successfull login
+     * @param callback $fallback Action to perform after login failure
      * @throws object Exception\User\WrongLoginCredential | LoginBlocked or Exception\User\EmptyField
      */
-    public function login(string $credential, string $password, string $redirect = '') {
+    public function login(string $credential, string $password, callable $callback, callable $fallback = NULL) {
         // ensure environment is ready for a login
         if ($this->getSession()) $this->logout();
         \Mercurio\Utils\System::emptyField(['credential', 'password'], [
@@ -278,6 +342,8 @@ class User extends \Mercurio\App\Database {
 
         // session enforced bruteforce protection for wrong credential
         if (!$this->get($credential)) {
+            if ($fallback !== NULL) $fallback();
+
             $attempts = \Mercurio\Utils\Session::get('loginAttempts', 0);
             sleep($attempts++);
             \Mercurio\Utils\Session::set($attempts, 'loginAttempts');
@@ -287,31 +353,38 @@ class User extends \Mercurio\App\Database {
         } else {
             // Get lock value
             $lock = $this->getMeta('login_blocked');
-            if ($lock !== 0 || $lock === NULL) {
+            if ($lock === NULL) {
                 $attempts = $this->getMeta('login_attempt');
                 $hash = $this->db()->get('mro_users', 
                     ['password'], 
                     ['id' => $this->info['id']]
                 )['password'];
+
                 // Increase lock number and start script delay
                 if (!password_verify($password, $hash)) {
+                    if ($fallback !== NULL) $fallback();
+                    
                     sleep($attempts++);
                     $this->setMeta(['login_attempt' => $attempts]);
                     throw new \Mercurio\Exception\User\WrongLoginCredential;
+
                     if ($attempts > 9) {
                         $this->setMeta(['login_blocked' => time() + 300]);
                         throw new \Mercurio\Exception\User\LoginBlocked;
                     }
+
                 // Attach session, save info and redirect user
                 } else {
                     \Mercurio\Utils\Session::regenerate(0);
                     \Mercurio\Utils\Session::set($this->info, 'User', true);
+
                     $this->setMeta([
                         'login_lastin' => time(),
                         'login_attempt' => 0,
-                        'login_blocked' => 0,
+                        'login_blocked' => NULL,
                     ]);
-                    header('Location: '.$redirect);
+
+                    $callback();
                 }
             // Login is locked
             } elseif (time() - $lock > 300) {
@@ -324,14 +397,15 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Perform a logout
-     * @param string $redirect Destination after logout
+     * @param callback $callback Action to perform after logout
      */
-    public function logout(string $redirect = '') {
+    public function logout(callable $callback = NULL) {
         $this->setMeta(['login_lastout' => time()]);
         \Mercurio\Utils\Session::unset('User');
         \Mercurio\Utils\Session::regenerate();
-        if (empty($redirect)) $redirect = getenv('APP_URL');
-        header('Location: '.$redirect);
+
+        if ($callback == NULL) header('Location: '.getenv('APP_URL'));
+        $callback();
     }
 
     /**
@@ -340,7 +414,10 @@ class User extends \Mercurio\App\Database {
      * @return string Valid handle
      */
     public function validateHandle(string $handle) {
-        if ($this->get($handle)) throw new \Mercurio\Exception\User\ExistingHandle;
+        $this->get($handle, function() {
+            throw new \Mercurio\Exception\User\ExistingHandle;
+        });
+
         $handle = strtolower($handle);
         $handle = preg_replace('/[^a-z0-9_]/', '', $handle);
         return $handle;

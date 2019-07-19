@@ -7,3 +7,6 @@
 # Composer #
 composer.phar
 /vendor/
+
+# Mercurio statics #
+/static/
