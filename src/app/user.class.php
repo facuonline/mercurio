@@ -23,7 +23,7 @@ class User extends \Mercurio\App\Database {
      * Finds an user hint either in $_GET or in $_SESSION
      * @return false|string|int
      */
-    private function findHint() {
+    public function findHint() {
         if ($this->info) return $this->info['id'];
         // Get user hint from URL query
         if (\Mercurio\Utils\URL::getPage() == 'user'
@@ -31,7 +31,7 @@ class User extends \Mercurio\App\Database {
         // Get user hint from session
         if (\Mercurio\Utils\Session::get('User')) return \Mercurio\Utils\Session::get('User')['id'];
         
-        return false;
+        return NULL;
     }
 
     /**
@@ -122,10 +122,8 @@ class User extends \Mercurio\App\Database {
                 $this->db()->update('mro_meta', [
                     'value' => $value
                 ], [
-                    'AND' => [
-                        'target' => $user['id'],
-                        'name' => $key
-                    ]
+                    'target' => $user['id'],
+                    'name' => $key
                 ]);
             } else {
                 $this->db()->insert('mro_meta', [
@@ -150,21 +148,19 @@ class User extends \Mercurio\App\Database {
             if (empty($meta)) $this->db()->delete('mro_meta', ['target' => $user['id']]);
             // Delete specific meta
             $this->db()->delete('mro_meta', [
-                'AND' => [
-                    'target' => $user['id'],
-                    'name' => $meta
-                ]
+                'target' => $user['id'],
+                'name' => $meta
             ]);
         });
     }
 
     /**
      * Upload and set a file image as user img
-     * @param string $file $_FILES array key
+     * @param array $file $_FILES array key
      * @param int $width Desired output width of the image
      * @param int|bool $ratio Tells the method wether to calc the output height based on the new width or use the defined height (will crop the image), if left to true will crop the image with an aspect ratio based height
      */
-    public function setImg(string $file, int $width, $ratio = false) {
+    public function setImg(array $file, int $width, $ratio = false) {
         // Delete previous
         if ($this->getImg()) unlink(
             APP_STATIC_REL
@@ -306,7 +302,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getEmail() {
         return $this->get(false, function($user) {
-            return (string) $this->db->get('mro_users', 
+            return (string) $this->db()->get('mro_users', 
                 ['email'], 
                 ['id' => $user['id']]
             )['email'];

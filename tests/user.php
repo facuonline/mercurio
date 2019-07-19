@@ -14,16 +14,40 @@
     ]);
 
     $user = new \Mercurio\App\User;
-    $user->get('verano');
 
-    \Mercurio\Utils\Form::submit('userForm', function ($data, $image) use (&$user) {
-        $user->setImg('userImg', 600, 600);
+    \Mercurio\Utils\Form::submit('login', function($data) use (&$user) {
+        $user->login($data['username'], $data['password'], function() use (&$user) {
+            echo "HELLO";
+        });
     });
 
-    \Mercurio\Utils\Form::new('userForm', 'POST', ['enctype' => 'multipart/form-data']); ?>
-        <input type="file" name="userImg">
-        <button type="submit">Upload</button>
+    \Mercurio\Utils\Form::submit('logout', function() use (&$user) {
+        $user->logout(function() {
+            echo "BYE";
+        });
+    });
+
+    \Mercurio\Utils\Form::submit('modify', function($data, $files) use (&$user) {
+        $user->set($data);
+        $user->setImg($files['img'], 600, 600);
+    }, function () {
+        echo "SPAM";
+    });
+
+    \Mercurio\Utils\Form::new('login'); ?>
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
+
+    <?php \Mercurio\Utils\Form::new('logout'); ?>
+        <button type="submit">Logout</button>
+    </form>
+
+    <?php \Mercurio\Utils\Form::new('modify', 'POST', ['enctype' => 'multipart/form-data']); ?>
+        <input type="text" name="nickname" value="<?php echo $user->getNickname(); ?>" placeholder="Nickname">
+        <input type="file" name="img">
+        <button type="submit">Update</button>
     </form>
 
     <img src="<?php echo $user->getImg(); ?>">
-    <a href="<?php echo $user->getLink(); ?>"><?php echo $user->getLink(); ?></a>

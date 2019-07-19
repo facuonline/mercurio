@@ -6,7 +6,7 @@
  * 
  * Safe and secure encryption made easy
  */
-namespace \Mercurio\Utils\;
+namespace Mercurio\Utils;
 class Encryption {
 
     /**

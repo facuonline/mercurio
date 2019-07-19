@@ -100,14 +100,14 @@ class Img {
 
 	/**
 	 * Upload image to desired path and with desired dimensions
-	 * @param string $file input file name
+	 * @param array $file $_FILES array key
 	 * @param string $path Desired path of destination
 	 * @param int $width Desired output width of the image
 	 * @param int|bool $ratio Tells the method wether to calc the output height based on the new width or use the defined integer (will crop the image), if left to true will crop the image with an aspect ratio based height
 	 * @return string Image file path
 	 */
 	public function new($file, $path, $width, $ratio = false){
-		$this->file = $_FILES[$file]['tmp_name'];
+		$this->file = $file['tmp_name'];
 		$this->path = rtrim($path, '\/').DIRECTORY_SEPARATOR;
 		chmod($this->file, 0666);
 		if (!is_dir($this->path)) mkdir($this->path, 0666);

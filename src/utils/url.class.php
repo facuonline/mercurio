@@ -72,7 +72,8 @@ class URL extends \Mercurio\App\Database {
             'target' => self::maskTarget($target),
             'action' => self::maskAction($action)
         ];
-        return \Mercurio\App::getApp('URL').urlencode(implode('', $link));
+        return \Mercurio\App::getApp('URL')
+            .str_replace('%3A', ':', str_replace('%2F','/', rawurlencode(implode('', $link))));
     }
 
     /**

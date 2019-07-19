@@ -45,17 +45,27 @@ class Form {
      * @param string $listener Form listener to listen for
      * @param callback $callback Callback function to access submitted data, returned parameters are: $_POST, $_FILES
      * @param callback $fallback Callback function to be execute in case of submission being spam, returned parameters are: $_POST, $_SESSION
-     * @param string $method Method of form submissions
      * @param int $minTime Minimum number of seconds expected for completion
      */
-    public static function submit(string $listener, callable $callback, callable $fallback = NULL, string $method = 'POST', int $minTime = 5) {
-        if ($_SERVER['REQUEST_METHOD'] === $method
+    public static function submit(string $listener, callable $callback, callable $fallback = NULL, int $minTime = 5) {
+        // Listen for submission, only POST as GET is prone to vulnerabilities
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'
         && isset($_POST[$listener])) {
             $key = \Mercurio\App::getApp('url');
+            // Check submission control fields
             if (empty($_POST[$key.'-email-url-website'])
             && empty($_POST[$key.'-comment-name-body'])
             && (time() - $_POST['formGeneratedAt']) > $minTime) {
-                $callback(filter_input_array(INPUT_POST), $_FILES);
+                $_POST = filter_input_array(INPUT_POST);
+                // Unset submission control variables
+                $_POST = array_diff_key($_POST, [
+                    $listener => '',
+                    $key.'-email-url-website' => '',
+                    $key.'-comment-name-body' => '',
+                    'formGeneratedAt' => ''
+                ]);
+                
+                $callback($_POST, $_FILES);
             } else {
                 $fallback(filter_input_array(INPUT_POST), \Mercurio\Utils\Session::get());
             }
