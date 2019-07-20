@@ -7,7 +7,7 @@
  * runtime errors
  * e.g When not being able to return a value via a class method
  */
-namespace Exception;
+namespace Mercurio\Exception;
 use Exception;
 class Runtime extends Exception {
 

@@ -51,6 +51,9 @@ class App {
      * Defines system constants
      */
     private function constants() {
+        /**
+         * Path to mercurio statics
+         */
         define('APP_STATIC', 
             $_SERVER['DOCUMENT_ROOT']
             .DIRECTORY_SEPARATOR
@@ -60,8 +63,11 @@ class App {
             .DIRECTORY_SEPARATOR
         );
 
+        /**
+         * Link to mercurio statics
+         */
         define('APP_STATIC_ABS', 
-            $_SERVER['DOCUMENT_ROOT']
+            dirname(getenv('APP_URL'))
             .DIRECTORY_SEPARATOR
             .'mercurio'
             .DIRECTORY_SEPARATOR
@@ -69,6 +75,9 @@ class App {
             .DIRECTORY_SEPARATOR
         );
 
+        /**
+         * Path to mercurio users statics
+         */
         define('APP_USERSTATIC', 
             $_SERVER['DOCUMENT_ROOT']
             .DIRECTORY_SEPARATOR
@@ -80,6 +89,9 @@ class App {
             .DIRECTORY_SEPARATOR
         );
 
+        /**
+         * Link to mercurio user statics
+         */
         define('APP_USERSTATIC_ABS', 
             dirname(getenv('APP_URL'))
             .DIRECTORY_SEPARATOR

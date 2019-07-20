@@ -15,7 +15,7 @@
 namespace Mercurio\Utils;
 class URL extends \Mercurio\App\Database {
 
-    protected $htaccess, $mod_rewrite;
+    protected static $htaccess, $mod_rewrite;
 
     /**
      * Return proper page query syntax based on state of url masking
@@ -147,92 +147,92 @@ class URL extends \Mercurio\App\Database {
      * @return bool
      */
     protected static function isMaskingOn() {
-        if (self::getConfig('urlmasking')) {
-            return true;
-        } else {
-            return false;
-        }
+        return self::getConfig('urlmasking');
     }
 
     /**
      * Sets up URL masking via .htaccess file
-     * @param string $htaccess Absolute path to htaccess file
      * @throws object Usage exception if no path to htaccess specified
      */
-    public static function setURLMasking(string $htaccess) {
-        if (file_exists($htaccess) && !is_readable($htaccess)) throw new \Mercurio\Exception\Runtime("The file located at '$htaccess' could not be accessed or is not readable. URL masking could not be possible.");
-        if (!array_key_exists('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Runtime("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
-        
+    public static function setURLMasking() {
+        $location = $_SERVER['DOCUMENT_ROOT']
+            .dirname($_SERVER['REQUEST_URI'])
+            .DIRECTORY_SEPARATOR
+            .'.htaccess';
+        if (file_exists($location) && !is_readable($location)) throw new \Mercurio\Exception\Runtime("The file located at '$location' could not be accessed or is not readable. URL masking could not be possible.");
+        if (!in_array('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Runtime("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
+
         if (!self::isMaskingOn()) {
-            self::readHtaccess($htaccess);
-            if (self::startHtaccess()) {
-                self::referrerHtaccess();
-                self::writeHtacess($htaccess);
-            }
+            $htaccess = self::readHtaccess($location);
+            $htaccess = self::startHtaccess($htaccess);
+            $htaccess = self::referrerHtaccess($htaccess);
+            $htaccess = self::endHtaccess($htaccess);
+            self::writeHtacess($location, $htaccess);
         }
     }
 
     /**
      * Reads .htaccess file to allow fancy URL masking
      */
-    private static function readHtaccess(string $htaccess) {
-        if (file_exists($htaccess)) {
-            self::$htaccess = file($htaccess);
+    private static function readHtaccess(string $location) {
+        if (file_exists($location)) {
+            return file($location);
         } else {
-            self::$htaccess = [""];
+            return [""];
         }
     }
 
     /**
      * Starts rewrite engine
      */
-    private static function startHtaccess() {
-        $engine = count(self::$htaccess)+2;
-        foreach (self::$htaccess as $key => $value) {
+    private static function startHtaccess($htaccess) {
+        $engine = count($htaccess)+2;
+        foreach ($htaccess as $key => $value) {
             if (strpos($value, "Mercurio URL masking")) {
                 $engine = false;
             }
         }
         if ($engine) {
-            self::$htaccess[$engine] = "# Mercurio URL masking \n<IfModule mod_rewrite.c>\nRewriteEngine On";
+            $htaccess[$engine] = "# Mercurio URL masking \n<IfModule mod_rewrite.c>\nRewriteEngine On";
         }
-        return $engine;
+        return $htaccess;
     }
 
     /**
      * Stops rewrite engine
      */
-    private static function endHtaccess() {
-        $end = count(self::$htaccess)+1;
-        foreach (self::$htaccess as $key => $value) {
+    private static function endHtaccess($htaccess) {
+        $end = count($htaccess)+1;
+        foreach ($htaccess as $key => $value) {
             if (strpos($value, "</IfModule>\n# URL masking end")) {
                 $start = $key+1;
             }
         }
         if ($end) {
-            self::$htaccess[$end] = "</IfModule>\n# URL masking end";
+            $htaccess[$end] = "</IfModule>\n# URL masking end";
         }
+        return $htaccess;
     }
 
     /**
      * Sets up a rewrite mask for referrers and targets
      */
-    private static function referrerHtaccess() {
-        $cond = count(self::$htaccess);
-        foreach (self::$htaccess as $key => $value) {
+    private static function referrerHtaccess($htaccess) {
+        $cond = count($htaccess);
+        foreach ($htaccess as $key => $value) {
             if (strpos($value, '# Mercurio URL masking ')) {
                 $cond = $key+3;
             }
         }
-        self::$htaccess[$cond] = "\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/(.*)/(.*)$ ?page=$1&target=$2&action=$3\n";
+        $htaccess[$cond] = "\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/(.*)/(.*)$ ?page=$1&target=$2&action=$3\n";
+        return $htaccess;
     }
 
     /**
      * Writes to htacess
      */
-    private static function writeHtacess(string $htaccess) {
-        self::endHtaccess();
-        file_put_contents($htaccess, self::$htaccess);
+    private static function writeHtacess(string $location, $htaccess) {
+        file_put_contents($location, $htaccess);
         self::setConfig('urlmasking', true);
     }
 

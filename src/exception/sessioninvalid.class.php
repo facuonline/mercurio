@@ -5,7 +5,7 @@
  * 
  * These types of exceptions are triggered under suspicion of session hijacking
  */
-namespace Exception;
+namespace Mercurio\Exception;
 use Exception;
 class SessionInvalid extends Exception {
 
