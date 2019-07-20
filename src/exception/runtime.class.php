@@ -9,6 +9,6 @@
  */
 namespace Exception;
 use Exception;
-class Usage extends Exception {
+class Runtime extends Exception {
 
 }
