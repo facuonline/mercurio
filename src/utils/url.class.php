@@ -155,8 +155,7 @@ class URL extends \Mercurio\App\Database {
      * @throws object Usage exception if no path to htaccess specified
      */
     public static function setURLMasking() {
-        $location = $_SERVER['DOCUMENT_ROOT']
-            .dirname($_SERVER['REQUEST_URI'])
+        $location = dirname($_SERVER['SCRIPT_FILENAME'])
             .DIRECTORY_SEPARATOR
             .'.htaccess';
         if (file_exists($location) && !is_readable($location)) throw new \Mercurio\Exception\Runtime("The file located at '$location' could not be accessed or is not readable. URL masking could not be possible.");
