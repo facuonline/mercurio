@@ -22,7 +22,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Mercurio\\": "/src"
+            "Mercurio\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mercurio\\": "src/"
         }
     }
 }
