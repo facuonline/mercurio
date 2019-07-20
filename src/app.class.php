@@ -26,7 +26,8 @@ class App {
 
     /**
      * Set App settings
-     * @param array $settings
+     * @param array $settings App generic settings
+     * @param array $connection Database connection arguments
      * @throws object Usage exception if required setting not present
      */
     public static function setApp(array $settings = [], array $connection = []) {
@@ -40,22 +41,55 @@ class App {
         if (!empty($connection)) self::setDatabase($connection);
 
         // Define system constants
-        define('APP_STATIC_ABS', dirname(getenv('APP_URL'))
-        .DIRECTORY_SEPARATOR
-        .'mercurio'
-        .DIRECTORY_SEPARATOR
-        .'static'
-        .DIRECTORY_SEPARATOR);
-
-        define('APP_STATIC_REL', $_SERVER['DOCUMENT_ROOT']
-        .DIRECTORY_SEPARATOR
-        .'mercurio'
-        .DIRECTORY_SEPARATOR
-        .'static'
-        .DIRECTORY_SEPARATOR);
+        self::constants();
 
         // Init Session accross app
         \Mercurio\Utils\Session::start();
+    }
+
+    /**
+     * Defines system constants
+     */
+    private function constants() {
+        define('APP_STATIC', 
+            $_SERVER['DOCUMENT_ROOT']
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static'
+            .DIRECTORY_SEPARATOR
+        );
+
+        define('APP_STATIC_ABS', 
+            $_SERVER['DOCUMENT_ROOT']
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static'
+            .DIRECTORY_SEPARATOR
+        );
+
+        define('APP_USERSTATIC', 
+            $_SERVER['DOCUMENT_ROOT']
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static'
+            .DIRECTORY_SEPARATOR
+            .'user'
+            .DIRECTORY_SEPARATOR
+        );
+
+        define('APP_USERSTATIC_ABS', 
+            dirname(getenv('APP_URL'))
+            .DIRECTORY_SEPARATOR
+            .'mercurio'
+            .DIRECTORY_SEPARATOR
+            .'static'
+            .DIRECTORY_SEPARATOR
+            .'user'
+            .DIRECTORY_SEPARATOR
+        );
     }
 
     /**

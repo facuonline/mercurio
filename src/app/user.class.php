@@ -163,14 +163,14 @@ class User extends \Mercurio\App\Database {
     public function setImg(array $file, int $width, $ratio = false) {
         // Delete previous
         if ($this->getImg()) unlink(
-            APP_STATIC_REL
+            APP_USERSTATIC
             .$this->get(false, function($user) {
                 return $user['img'];
             })
         );
         // Upload new
         $image = new \Mercurio\Utils\Img;
-        $image->new($file, APP_STATIC_REL, $width, $ratio);
+        $image->new($file, APP_USERSTATIC, $width, $ratio);
         $this->set(['img' => $image->hash]);
     }
 
@@ -179,7 +179,7 @@ class User extends \Mercurio\App\Database {
      */
     public function unsetImg() {
         if ($this->getImg()) unlink(
-            APP_STATIC
+            APP_USERSTATIC
             .$this->get(false, function($user) {
                 return $user['img'];
             })
@@ -291,7 +291,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getImg() {
         return $this->get(false, function($user) {
-            if (!empty($user['img'])) return APP_STATIC_ABS.$user['img'];
+            if (!empty($user['img'])) return APP_USERSTATIC_ABS.$user['img'];
             return false;
         });
     }
