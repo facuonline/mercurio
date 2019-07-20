@@ -265,7 +265,7 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Get user numeric id
-     * @param bool $string Return handle as string
+     * @param bool $string Return id as string
      * @return int|string User ID
      */
     public function getID(bool $string = false) {
