@@ -82,6 +82,7 @@ class URL extends \Mercurio\App\Database {
      */
     public static function getUrlParams() {
         $params = [];
+
         if (isset($_GET['page'])
         && !empty($_GET['page'])) {
             $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
@@ -89,7 +90,7 @@ class URL extends \Mercurio\App\Database {
                 'user' => NULL,
                 'message' => NULL,
                 'media' => NULL,
-                'collection' => NULL,
+                'channel' => NULL,
                 'search' => NULL,
                 'admin' => NULL
             ])) {
@@ -98,6 +99,7 @@ class URL extends \Mercurio\App\Database {
         } else {
             $params['page'] = false;
         }
+
         if (isset($_GET['action'])
         && !empty($_GET['action'])) {
             $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
@@ -105,6 +107,7 @@ class URL extends \Mercurio\App\Database {
         } else {
             $params['action'] = false;
         }
+        
         if (isset($_GET['target'])
         && !empty($_GET['target'])) {
             $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);

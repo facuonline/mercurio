@@ -6,7 +6,6 @@
  * 
  * @var array $info Associative array with general user info
  * @var array $meta Associative array of meta values attached to user
- * 
  */
 namespace Mercurio\App;
 class User extends \Mercurio\App\Database {
@@ -21,7 +20,7 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Finds an user hint either in $_GET or in $_SESSION
-     * @return false|string|int
+     * @return null|string|int
      */
     public function findHint() {
         if ($this->info) return $this->info['id'];
@@ -63,7 +62,7 @@ class User extends \Mercurio\App\Database {
             $this->info = $user;
             return $this->info;
         } elseif ($fallback !== NULL) {
-            $fallback();
+            return $fallback();
         }
     }
 
@@ -81,29 +80,45 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Deletes user from database and it's associated data
+     * @param array $tables Array of database tables to delete rows from where user is author
+     */
+    public function unset(array $tables = []) {
+        $this->get(false, function ($user) use (&$tables) {
+            $this->unsetImg();
+            $this->db()->delete('mro_users', ['id' => $user['id']]);
+            $this->unsetMeta();
+
+            if (!empty($tables)) foreach ($tables as $key => $value) {
+                $this->delete($value, ['author' => $user['id']]);
+            }
+        });
+    }
+
+    /**
      * Read user meta
-     * @param string|array $meta Name of meta field or list of, leave blank to get all meta fields
+     * @param string|array $meta Name of meta field or array of, leave blank to get all meta fields
      * @return bool|mixed|array
      */
     public function getMeta($meta = '') {
         return $this->get(false, function($user) use (&$meta) {
             // Get all meta
             if (empty($meta)) return $this->db()->select('mro_meta', '*', [
-                'target' => $this->info['id']
+                'target' => $user['id']
             ])[0];
             // Get specific meta
             // Get from array
             if (is_array($meta)) return $this->db()->select('mro_meta', [
                 'value'
             ], [
-                'target' => $this->info['id'],
+                'target' => $user['id'],
                 'name' => $meta
             ]);
             // Get meta row
             return $this->db()->get('mro_meta', [
                 'value'
             ], [
-                'target' => $this->info['id'],
+                'target' => $user['id'],
                 'name' => $meta
             ])['value'];
         });
@@ -140,7 +155,7 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Deletes user meta from database
-     * @param string|array $meta Name of meta field or list of, leave blank to delete all meta
+     * @param string|array $meta Name of meta field or array of, leave blank to delete all meta
      */
     public function unsetMeta($meta = '') {
         $this->get(false, function ($user) use (&$meta) {
@@ -151,6 +166,18 @@ class User extends \Mercurio\App\Database {
                 'target' => $user['id'],
                 'name' => $meta
             ]);
+        });
+    }
+
+    /**
+     * Get user img property as a full absolute path
+     * @return string User img
+     */
+    public function getImg() {
+        return $this->get(false, function($user) {
+            if (!empty($user['img'])
+            && file_exists(APP_USERSTATIC.$user['img'])) return APP_USERSTATIC_ABS.$user['img'];
+            return false;
         });
     }
 
@@ -213,7 +240,7 @@ class User extends \Mercurio\App\Database {
         // Ensure user properties are valid
         \Mercurio\Utils\System::required(['handle', 'password'], $properties, 'new');
         \Mercurio\Utils\System::emptyField($required, $properties);
-        $properties = \Mercurio\Utils\System::property(['id', 'timestamp'], $properties);
+        $properties = \Mercurio\Utils\System::property(['id', 'stamp'], $properties);
 
         // handle
         $properties['handle'] = $this->validateHandle($properties['handle']);
@@ -234,21 +261,6 @@ class User extends \Mercurio\App\Database {
             'login_blocked' => 0,
         ]);
         return $this->info;
-    }
-
-    /**
-     * Deletes user from database
-     * @param array $tables List of database tables to delete rows from where user is author
-     */
-    public function unset(array $content = []) {
-        $this->get(false, function ($user) use (&$tables) {
-            $this->unsetImg();
-            $this->db()->delete('mro_users', ['id' => $user['id']]);
-
-            if (!empty($tables)) foreach ($tables as $key => $value) {
-                $this->delete($value, ['author' => $user['id']]);
-            }
-        });
     }
 
     /**
@@ -282,17 +294,6 @@ class User extends \Mercurio\App\Database {
     public function getNickname() {
         return $this->get(false, function($user) {
             return (string) $user['nickname'];
-        });
-    }
-
-    /**
-     * Get user img property as a full absolute path
-     * @return string User img
-     */
-    public function getImg() {
-        return $this->get(false, function($user) {
-            if (!empty($user['img'])) return APP_USERSTATIC_ABS.$user['img'];
-            return false;
         });
     }
 

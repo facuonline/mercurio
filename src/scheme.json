@@ -12,7 +12,7 @@
             }
         },
         "Entities": {
-            "mro_user": {
+            "mro_users": {
                 "id": "integer | GID",
                 "handle": "string",
                 "email": "string",
@@ -24,30 +24,19 @@
             "mro_media": {
                 "id": "integer | GID",
                 "author": "integer | GID",
+                "channel": "integer | GID",
                 "content": "string",
-                "content_type": "integer",
-                "stamp": "integer | timestamp"
-            },
-            "mro_comment": {
-                "id": "integer | GID",
-                "author": "integer | GID",
-                "body": "string",
-                "stamp": "integer | timestamp"
-            },
-            "mro_message": {
-                "id": "integer | GID",
-                "author": "integer | GID",
-                "body": "string",
-                "target": "integer | GID",
                 "stamp": "integer | timestamp"
             }
         },
         "Entities_grouping": {
-            "mro_collection": {
+            "mro_channels": {
                 "id": "integer | GID",
+                "handle": "string",
                 "author": "integer | GID",
+                "channel": "integer | GID",
                 "body": "string",
-                "stamp": "integer | timestamp"
+                "stamp":"integer | timestamp"
             }
         }
     }
