@@ -50,7 +50,6 @@ class URL extends \Mercurio\App\Database {
      * @return string
      */
     private static function maskAction($action) {
-        if (empty($action)) return '';
         if (!self::isMaskingOn()) {
             return '&action='.$action;
         } else {
