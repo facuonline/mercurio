@@ -220,12 +220,23 @@ class User extends \Mercurio\App\Database {
      * @return array|false User info, false on no user found
      */
     public function getSession(callable $callback = NULL) {
-        $user = \Mercurio\Utils\Session::get('User', $this->get());
+        $user = \Mercurio\Utils\Session::get('User', false);
 
         if ($callback !== NULL) return $callback($user);
 
         $this->info = $user;
         return $this->info;
+    }
+
+    /**
+     * Load user from instance to session
+     * @param bool|int|string $hint User hint
+     * @param bool $regenerate Regenerate or not session id
+     */
+    public function setSession($hint = false, bool $regenerate = false) {
+        $this->get($hint, function($user) use (&$regenerate) {
+            \Mercurio\Utils\Session::set('User', $user, $regenerate);
+        });
     }
 
     /**
@@ -373,7 +384,7 @@ class User extends \Mercurio\App\Database {
                 // Attach session, save info and redirect user
                 } else {
                     \Mercurio\Utils\Session::regenerate(0);
-                    \Mercurio\Utils\Session::set($this->info, 'User', true);
+                    $this->setSession($credential, true);
 
                     $this->setMeta([
                         'login_lastin' => time(),
@@ -386,7 +397,7 @@ class User extends \Mercurio\App\Database {
             // Login is locked
             } elseif (time() - $lock > 300) {
                 $this->setMeta(['login_blocked' => 0]);
-                $this->login($credential, $password, $redirect);
+                $this->login($credential, $password, $callback, $fallback);
             }
         }
 

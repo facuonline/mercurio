@@ -38,6 +38,33 @@ class Session {
     }
 
     /**
+     * Store a value inside session
+     * @param string $segment Session key under which to store data
+     * @param mixed $value Data to be stored
+     * @param bool $regenerate Regenerates session id
+     */
+    public static function set(string $segment, $value, bool $regenerate = true) {
+        self::isValid();
+        $_SESSION['Mercurio'][$segment] = $value;
+        if ($regenerate) session_regenerate_id(true);
+    }
+
+    /**
+     * Destroy a session variable or all of them if none specified
+     * @param string $segment Session key of data
+     * @param bool $regenerate Regenerates session id
+     */
+    public function unset(string $segment = '', bool $regenerate = true) {
+        self::isValid();
+        if (!empty($segment)) {
+            unset($_SESSION['Mercurio'][$segment]);
+        } else {
+            session_unset();
+        }
+        if ($regenerate) session_regenerate_id(true);
+    }
+
+    /**
      * Start session
      * @param int $expirancy Numbers of seconds to check for timeout on every session
      * @param array $options Options to be set for session_start
@@ -90,7 +117,7 @@ class Session {
             session_destroy();
             throw new \Mercurio\Exception\SessionInvalid("Session User agent and IP address do not match. Method ended under suspicion of session hijacking.", 1);
         }
-        if ($Session['IPAddress'] !== substr($_SERVER['REMOTE_ADDR'], 0, 7)
+        if ($Session['IPAddress'] !== $_SERVER['REMOTE_ADDR']
         && $Session['UserAgent'] !== $_SERVER['HTTP_USER_AGENT']) {
             session_destroy();
             throw new \Mercurio\Exception\SessionInvalid("Session User agent and IP address do not match. Method ended under suspicion of session hijacking.", 1);
@@ -109,33 +136,6 @@ class Session {
         } else {
             return false;
         }
-    }
-    
-    /**
-     * Store a value inside session
-     * @param mixed $value Data to be stored
-     * @param string $segment Session key under which to store data
-     * @param bool $regenerate Regenerates session id
-     */
-    public static function set($value, string $segment, bool $regenerate = true) {
-        self::isValid();
-        $_SESSION['Mercurio'][$segment] = $value;
-        if ($regenerate) session_regenerate_id(true);
-    }
-
-    /**
-     * Destroy a session variable or all of them if none specified
-     * @param string $segment Session key of data
-     * @param bool $regenerate Regenerates session id
-     */
-    public function unset(string $segment = '', bool $regenerate = true) {
-        self::isValid();
-        if (!empty($segment)) {
-            unset($_SESSION['Mercurio'][$segment]);
-        } else {
-            session_unset();
-        }
-        if ($regenerate) session_regenerate_id(true);
     }
 
 }
