@@ -113,13 +113,11 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain page from URL query
-     * @param string $include Path to page model files
+     * @param callback $callback Callback function to execute on page retrieval
      * @return string|bool Name of called page or false if page does not exist
      */
-    public static function getPage(string $include = '') {
-        if (!empty($include)) include $include
-            .self::getUrlParams()['page']
-            .'.php';
+    public static function getPage(callable $callback = NULL) {
+        if ($callback !== NULL) return $callback(self::getUrlParams()['page']);
         return self::getUrlParams()['page'];
     }
 
