@@ -82,7 +82,11 @@ class URL extends \Mercurio\App\Database {
         && !empty($_GET['page'])) {
             $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
             if (!empty($pages) 
-            && in_array($page, $pages)) $params['page'] = $page;
+            && in_array($page, $pages)) {
+                $params['page'] = $page;
+            } else {
+                $params['page'] = false;
+            }
         } else {
             $params['page'] = false;
         }
