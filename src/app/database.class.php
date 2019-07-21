@@ -44,12 +44,12 @@ class Database {
      * @return array|bool
      */
     public static function getConfig(string $name) {
-        $result = self::staticDB()->select(
+        $result = self::staticDB()->get(
             'mro_conf', 
-            ['value'],
+            '*',
             ['name' => $name]
         );
-        return ($result ? $result[0]['value'] : false);
+        return ($result ? $result['value'] : false);
     }
 
     /**
