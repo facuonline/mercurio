@@ -36,8 +36,10 @@ class User extends \Mercurio\App\Database {
     /**
      * Load an user from database into instance
      * @param string|int $hint User identifier either string handle or integer id
-     * @param callback $callback Callback function to manipulate user data without loading class
-     * @param callback $fallback Callback function to execute in case of no user found
+     * @param callable $callback Callback function to manipulate user data without loading class
+     * function (array $info) :
+     * @param callable $fallback Callback function to execute in case of no user found
+     * function () :
      * @return array|false User info, false on no user found
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
@@ -216,7 +218,8 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Load user from session into instance
-     * @param callback $callback Callback function to manipulate user data without loading class
+     * @param callable $callback Callback function to manipulate user data without loading class
+     * function (array $info) :
      * @return array|false User info, false on no user found
      */
     public function getSession(callable $callback = NULL) {
@@ -336,8 +339,10 @@ class User extends \Mercurio\App\Database {
      * Perform a login
      * @param string $credential User identifier: handle or email (also ID will work)
      * @param string $password User password, plain text
-     * @param callback $callback Action to perform after successfull login
-     * @param callback $fallback Action to perform after login failure
+     * @param callable $callback Action to perform after successfull login
+     * function () :
+     * @param callable $fallback Action to perform after login failure
+     * function () :
      * @throws object Exception\User\WrongLoginCredential | LoginBlocked or Exception\User\EmptyField
      */
     public function login(string $credential, string $password, callable $callback, callable $fallback = NULL) {
@@ -405,7 +410,8 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Perform a logout
-     * @param callback $callback Action to perform after logout
+     * @param callable $callback Action to perform after logout
+     * function () :
      */
     public function logout(callable $callback = NULL) {
         $this->setMeta(['login_lastout' => time()]);

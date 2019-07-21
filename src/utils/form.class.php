@@ -43,8 +43,10 @@ class Form {
     /**
      * Validate submission of form against SPAM
      * @param string $listener Form listener to listen for
-     * @param callback $callback Callback function to access submitted data, returned parameters are: $_POST, $_FILES
-     * @param callback $fallback Callback function to be execute in case of submission being spam, returned parameters are: $_POST, $_SESSION
+     * @param callable $callback Callback function to access submitted data
+     * function (array $_POST, array $_FILES)
+     * @param callable $fallback Callback function to be execute in case of submission being spam
+     * function (array $_POST, array $_SESSION)
      * @param int $minTime Minimum number of seconds expected for completion
      */
     public static function submit(string $listener, callable $callback, callable $fallback = NULL, int $minTime = 5) {

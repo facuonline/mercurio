@@ -33,8 +33,10 @@ class Media extends \Mercurio\App\Database {
     /**
      * Load a media record from database into instance
      * @param int $hint Media id
-     * @param callback $callback Callback function to manipulate media without loading class
-     * @param callback $fallback Callback function to execute in case of no media found
+     * @param callable $callback Callback function to manipulate media without loading class
+     * function (array $info) :
+     * @param callable $fallback Callback function to execute in case of no media found
+     * function () :
      * @return array|false Media info, false on no media found
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
@@ -193,7 +195,8 @@ class Media extends \Mercurio\App\Database {
 
     /**
      * Get media channel info
-     * @param callback $callback Callback function to manipulate channel data
+     * @param callable $callback Callback function to manipulate channel data
+     * function (array $info) :
      * @return array
      */
     public function getChannel(callable $callback = NULL) {

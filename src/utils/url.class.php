@@ -113,12 +113,20 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain page from URL query
-     * @param callback $callback Callback function to execute on page retrieval
+     * @param callable $callback Callback function to execute on page retrieval
+     * function (string $page) :
+     * @param callable $fallback Callback function to execute if no page specified
+     * function () :
      * @return string|bool Name of called page or false if page does not exist
      */
-    public static function getPage(callable $callback = NULL) {
-        if ($callback !== NULL) return $callback(self::getUrlParams()['page']);
-        return self::getUrlParams()['page'];
+    public static function getPage(callable $callback = NULL, callable $fallback = NULL) {
+        $page = self::getUrlParams()['page'];
+        if ($page && $callback !== NULL) {
+            return $callback($page);
+        } elseif ($fallback !== NULL) {
+            return $fallback();
+        }
+        return $page;
     }
 
     /**
@@ -126,6 +134,7 @@ class URL extends \Mercurio\App\Database {
      * @return mixed|bool Target ID or handle or false if target is not specified
      */
     public static function getTarget() {
+        self::getPage();
         return self::getUrlParams()['target'];
     }
 

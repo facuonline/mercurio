@@ -33,8 +33,10 @@ class Channel extends \Mercurio\App\Database {
     /**
      * Load a channel from database into instance
      * @param string|int $hint Channel identifier either string handle or integer id
-     * @param callback $callback Callback function to manipulate channel data without loading class
-     * @param callback $fallback Callback function to execute in case of no channel found
+     * @param callable $callback Callback function to manipulate channel data without loading class
+     * function (array $info) :
+     * @param callable $fallback Callback function to execute in case of no channel found
+     * function () :
      * @return array|false Channel info, false on no user found
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {

@@ -31,7 +31,8 @@ class Messages extends \Mercurio\App\Channel {
 
     /**
      * Get id of all users in the messages channel
-     * @param callback $callback Callback function to manipulate user ids
+     * @param callable $callback Callback function to manipulate user ids
+     * function (array $users) :
      * @return array
      */
     public function getUsers(callable $callback = NULL) {
