@@ -52,6 +52,15 @@ class App {
      */
     private function constants() {
         /**
+         * Link to app root
+         */
+        $APP_URL = parse_url(self::getApp('URL'));
+        $APP_ROOT = $APP_URL['scheme']
+        .'://'
+        .$APP_URL['host'];
+        define('APP_ROOT', $APP_ROOT);
+
+        /**
          * Path to mercurio statics
          */
         define('APP_STATIC', 
@@ -67,7 +76,7 @@ class App {
          * Link to mercurio statics
          */
         define('APP_STATIC_ABS', 
-            dirname(getenv('APP_URL'))
+            $APP_ROOT
             .DIRECTORY_SEPARATOR
             .'mercurio'
             .DIRECTORY_SEPARATOR
@@ -93,7 +102,7 @@ class App {
          * Link to mercurio user statics
          */
         define('APP_USERSTATIC_ABS', 
-            dirname(getenv('APP_URL'))
+            $APP_ROOT
             .DIRECTORY_SEPARATOR
             .'mercurio'
             .DIRECTORY_SEPARATOR
