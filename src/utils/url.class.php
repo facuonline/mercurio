@@ -8,14 +8,9 @@
  * not only does rewrites but also manages paths to things and other cool things \
  * Not to be confused with parse_url()
  * 
- * @var array $htacess .htacesss file into an array
- * @var bool $mod_rewrite State of mod_rewrite module, can't make vanities without it
  */
-
 namespace Mercurio\Utils;
 class URL extends \Mercurio\App\Database {
-
-    protected static $htaccess, $mod_rewrite;
 
     /**
      * Return proper page query syntax based on state of url masking
@@ -66,12 +61,13 @@ class URL extends \Mercurio\App\Database {
      * @return string
      */
     public static function getLink(string $page, $target = '', string $action = '') {
-        $link = [
-            'page' => self::maskPage($page),
-            'target' => self::maskTarget($target),
-            'action' => self::maskAction($action)
-        ];
-        return \Mercurio\App::getApp('URL').implode('', $link);
+        $page = self::maskPage($page);
+        $target = self::maskTarget($target);
+        $action = self::maskAction($action);
+        return \Mercurio\App::getApp('URL')
+            .$page
+            .$target
+            .$action;
     }
 
     /**
@@ -91,9 +87,7 @@ class URL extends \Mercurio\App\Database {
                 'channel' => NULL,
                 'search' => NULL,
                 'admin' => NULL
-            ])) {
-                $params['page'] = $page;
-            }
+            ])) $params['page'] = $page;
         } else {
             $params['page'] = false;
         }
@@ -113,14 +107,19 @@ class URL extends \Mercurio\App\Database {
         } else {
             $params['target'] = false;
         }
+
         return $params;
     }
 
     /**
      * Obtain page from URL query
+     * @param string $include Path to page model files
      * @return string|bool Name of called page or false if page does not exist
      */
-    public static function getPage() {
+    public static function getPage(string $include = '') {
+        if (!empty($include)) include $include
+            .self::getUrlParams()['page']
+            .'.php';
         return self::getUrlParams()['page'];
     }
 
@@ -152,7 +151,7 @@ class URL extends \Mercurio\App\Database {
      * Sets up URL masking via .htaccess file
      * @throws object Usage exception if no path to htaccess specified
      */
-    public static function setURLMasking() {
+    public static function setUrlMasking() {
         $location = dirname($_SERVER['SCRIPT_FILENAME'])
             .DIRECTORY_SEPARATOR
             .'.htaccess';
