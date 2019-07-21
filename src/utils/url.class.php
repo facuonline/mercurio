@@ -72,22 +72,17 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Filter, read and return GET query params
+     * @param array $pages Expected pages, array of values
      * @return array 
      */
-    public static function getUrlParams() {
+    public static function getUrlParams(array $pages = []) {
         $params = [];
 
         if (isset($_GET['page'])
         && !empty($_GET['page'])) {
             $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
-            if (array_key_exists($page, [
-                'user' => NULL,
-                'message' => NULL,
-                'media' => NULL,
-                'channel' => NULL,
-                'search' => NULL,
-                'admin' => NULL
-            ])) $params['page'] = $page;
+            if (!empty($pages) 
+            && in_array($page, $pages)) $params['page'] = $page;
         } else {
             $params['page'] = false;
         }
@@ -101,7 +96,8 @@ class URL extends \Mercurio\App\Database {
         }
         
         if (isset($_GET['target'])
-        && !empty($_GET['target'])) {
+        && !empty($_GET['target'])
+        && $_GET['target'] !== 0) {
             $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
             $params['target'] = $target;
         } else {
@@ -113,14 +109,15 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain page from URL query
+     * @param array $pages Expected pages, array of values
      * @param callable $callback Callback function to execute on page retrieval
      * function (string $page) :
      * @param callable $fallback Callback function to execute if no page specified
      * function () :
      * @return string|bool Name of called page or false if page does not exist
      */
-    public static function getPage(callable $callback = NULL, callable $fallback = NULL) {
-        $page = self::getUrlParams()['page'];
+    public static function getPage(array $pages, callable $callback = NULL, callable $fallback = NULL) {
+        $page = self::getUrlParams($pages)['page'];
         if ($page && $callback !== NULL) {
             return $callback($page);
         } elseif ($fallback !== NULL) {
@@ -134,7 +131,6 @@ class URL extends \Mercurio\App\Database {
      * @return mixed|bool Target ID or handle or false if target is not specified
      */
     public static function getTarget() {
-        self::getPage();
         return self::getUrlParams()['target'];
     }
 

@@ -24,8 +24,7 @@ class Media extends \Mercurio\App\Database {
     protected function findHint() {
         if ($this->info) return $this->info['id'];
         // Get media hint from URL query
-        if (\Mercurio\Utils\URL::getPage() == 'media'
-        && \Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
+        if (\Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
 
         return NULL;
     }
