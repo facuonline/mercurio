@@ -28,7 +28,7 @@ class User extends \Mercurio\App\Database {
         if (\Mercurio\Utils\URL::getPage() == 'user'
         && \Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
         // Get user hint from session
-        if (\Mercurio\Utils\Session::get('User')) return \Mercurio\Utils\Session::get('User')['id'];
+        if (\Mercurio\Utils\Session::get('User', false)) return \Mercurio\Utils\Session::get('User')['id'];
         
         return NULL;
     }
@@ -74,7 +74,7 @@ class User extends \Mercurio\App\Database {
         $this->get(false, function($user) use (&$properties) {
             $this->db()->update('mro_users', 
                 $properties,
-                $user['id']
+                ['id' => $user['id']]
             );
         });
     }
