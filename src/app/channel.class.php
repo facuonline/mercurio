@@ -186,12 +186,13 @@ class Channel extends \Mercurio\App\Database {
 
     /**
      * Get absolute link to channel
+     * @param string $page Channels page
      * @param string $action Optional channel action
      * @return string URL
      */
     public function getLink(string $action = '') {
-        return $this->get(false, function($channel) use (&$action) {
-            return (string) \Mercurio\Utils\URL::getLink('channel', $channel['id'], $action);
+        return $this->get(false, function($channel) use (&$page, &$action) {
+            return (string) \Mercurio\Utils\URL::getLink($page, $channel['id'], $action);
         });
     }
 

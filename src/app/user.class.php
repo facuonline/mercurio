@@ -22,7 +22,7 @@ class User extends \Mercurio\App\Database {
      * Finds an user hint either in $_GET or in $_SESSION
      * @return null|string|int
      */
-    public function findHint() {
+    protected function findHint() {
         if ($this->info) return $this->info['id'];
         // Get user hint from URL query
         if (\Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
@@ -325,12 +325,13 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Get absolute link to user profile
+     * @param string $page Users page
      * @param string $action Optional user action
      * @return string URL
      */
-    public function getLink(string $action = '') {
-        return $this->get(false, function($user) use (&$action) {
-            return (string) \Mercurio\Utils\URL::getLink('user', $user['handle'], $action);
+    public function getLink(string $page, string $action = '') {
+        return $this->get(false, function($user) use (&$page, &$action) {
+            return (string) \Mercurio\Utils\URL::getLink($page, $user['handle'], $action);
         });
     }
 

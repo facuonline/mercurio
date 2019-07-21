@@ -183,12 +183,13 @@ class Media extends \Mercurio\App\Database {
 
     /**
      * Get absolute link to media
+     * @param string $page Media page
      * @param string $action Optional media action
      * @return string URL
      */
-    public function getLink(string $action = '') {
-        return $this->get(false, function($media) use (&$action) {
-            return (string) \Mercurio\Utils\URL::getLink('media', $media['id'], $action);
+    public function getLink(string $page, string $action = '') {
+        return $this->get(false, function($media) use (&$page, &$action) {
+            return (string) \Mercurio\Utils\URL::getLink($page, $media['id'], $action);
         });
     }
 
