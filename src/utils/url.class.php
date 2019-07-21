@@ -23,7 +23,7 @@ class URL extends \Mercurio\App\Database {
      * @return string
      */
     private static function maskPage($page) {
-        if (self::isMaskingOn()) {
+        if (!self::isMaskingOn()) {
             return '?page='.$page;
         } else {
             return $page;
@@ -37,7 +37,7 @@ class URL extends \Mercurio\App\Database {
      */
     private static function maskTarget($target) {
         if (empty($target)) return '';
-        if (self::isMaskingOn()) {
+        if (!self::isMaskingOn()) {
             return '&target='.$target;
         } else {
             return '/'.$target;
@@ -51,7 +51,7 @@ class URL extends \Mercurio\App\Database {
      */
     private static function maskAction($action) {
         if (empty($action)) return '';
-        if (self::isMaskingOn()) {
+        if (!self::isMaskingOn()) {
             return '&action='.$action;
         } else {
             return '/'.$action;
@@ -61,9 +61,9 @@ class URL extends \Mercurio\App\Database {
     /**
      * Builds and return links for specified targets
      * @param string $page Page name
-     * @param mixed $target Target entity identifier, either handle or id
-     * @param string $action Target action name \ 
-     * Specify '+' as a target for page specific actions
+     * @param mixed $target Target entity identifier, either handle or id\ 
+     * Specify '0' as a target for no target declared
+     * @param string $action Target action name 
      * @return string
      */
     public static function getLink(string $page, $target = '', string $action = '') {
@@ -72,8 +72,7 @@ class URL extends \Mercurio\App\Database {
             'target' => self::maskTarget($target),
             'action' => self::maskAction($action)
         ];
-        return \Mercurio\App::getApp('URL')
-            .str_replace('%3A', ':', str_replace('%2F','/', rawurlencode(implode('', $link))));
+        return \Mercurio\App::getApp('URL').implode('', $link);
     }
 
     /**
