@@ -8,7 +8,7 @@
  * 
  * @param string $property Property name
  */
-namespace Exception\Usage;
+namespace Mercurio\Exception\Usage;
 use Exception;
 class SystemProperty extends Exception {
     public function __construct(string $property) {

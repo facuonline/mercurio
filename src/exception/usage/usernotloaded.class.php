@@ -6,7 +6,7 @@
  * These types of exceptions are triggered on third party developers failure
  * e.g When not calling User->get before using another method
  */
-namespace Exception\Usage;
+namespace Mercurio\Exception\Usage;
 use Exception;
 class UserNotLoaded extends Exception{
     public function __construct() {

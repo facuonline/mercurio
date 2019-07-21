@@ -6,7 +6,7 @@
  * These types of exceptions are triggered on user failures
  * e.g When an email to be submitted already exists
  */
-namespace Exception\User;
+namespace Mercurio\Exception\User;
 use Exception;
 class ExistingEmail extends Exception {
     

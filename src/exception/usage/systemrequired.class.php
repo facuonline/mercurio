@@ -10,7 +10,7 @@
  * @param string $property Property name
  * @param string $array Array name
  */
-namespace Exception\Usage;
+namespace Mercurio\Exception\Usage;
 use Exception;
 class SystemRequired extends Exception {
     public function __construct(string $method, string $array, string $property = '') {

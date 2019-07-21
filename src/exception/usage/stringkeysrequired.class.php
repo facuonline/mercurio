@@ -6,7 +6,7 @@
  * These types of exceptions are triggered on third party developers failure
  * e.g When not specifying a string type key for an array index
  */
-namespace Exception\Usage;
+namespace Mercurio\Exception\Usage;
 use Exception;
 class StringKeysRequired extends Exception{
     public function __construct(string $method) {
