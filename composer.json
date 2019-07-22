@@ -12,7 +12,8 @@
         "ezyang/htmlpurifier": "^4.10",
         "owasp/csrf-protector-php": "^1.0",
         "catfan/medoo": "1.6",
-        "samayo/bulletproof": "4.0.*"
+        "samayo/bulletproof": "4.0.*",
+        "nette/forms": "^3.0.1"
     },
     "license": "GPL-3.0-or-later",
     "version": "0.41.1-dev",

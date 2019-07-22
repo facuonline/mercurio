@@ -16,7 +16,7 @@ class Database {
      */
     protected static function staticDB() {
         return new \Medoo\Medoo([
-            'database_type' => 'mysql',
+            'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
             'username' => getenv('DB_USER'),
@@ -30,7 +30,7 @@ class Database {
      */
     protected function db() {
         return new \Medoo\Medoo([
-            'database_type' => 'mysql',
+            'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
             'username' => getenv('DB_USER'),
@@ -44,11 +44,7 @@ class Database {
      * @return array|bool
      */
     public static function getConfig(string $name) {
-        $result = self::staticDB()->get(
-            'mro_conf', 
-            '*',
-            ['name' => $name]
-        );
+        $result = self::staticDB()->get('mro_conf', '*', ['name' => $name]);
         return ($result ? $result['value'] : false);
     }
 
@@ -60,14 +56,12 @@ class Database {
      */
     public static function setConfig(string $name, $value) {
         if (self::getConfig($name)) {
-            return self::staticDB()->update(
-                'mro_conf',
+            self::staticDB()->update('mro_conf', 
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
-            return self::staticDB()->insert(
-                'mro_conf',
+            self::staticDB()->insert('mro_conf',
                 [
                     'name' => $name,
                     'value' => $value
