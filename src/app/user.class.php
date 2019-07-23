@@ -253,7 +253,7 @@ class User extends \Mercurio\App\Database {
         // Ensure user properties are valid
         \Mercurio\Utils\System::required(['handle', 'password'], $properties, 'new');
         \Mercurio\Utils\System::emptyField($required, $properties);
-        $properties = \Mercurio\Utils\System::property(['id', 'stamp'], $properties);
+        $properties = \Mercurio\Utils\System::property($properties);
 
         // handle
         $properties['handle'] = $this->validateHandle($properties['handle']);

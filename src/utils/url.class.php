@@ -151,9 +151,20 @@ class URL extends \Mercurio\App\Database {
      * @return bool
      */
     protected static function isMaskingOn() {
-        if (!getenv('DB_NAME')) return file_exists(dirname($_SERVER['SCRIPT_FILENAME'])
-        .DIRECTORY_SEPARATOR
-        .'.htaccess');
+        /**
+         * Solution for non database using cases
+         */
+        if (!getenv('DB_NAME')) {
+            $location = dirname($_SERVER['SCRIPT_FILENAME'])
+                .DIRECTORY_SEPARATOR
+                .'.htaccess';
+            $htaccess = self::readHtaccess();
+            foreach ($htaccess as $key => $value) {
+                if (strpos($value, "Mercurio URL masking")) return true;
+            }
+            return false;
+        }
+
         return self::getConfig('urlmasking');
     }
 

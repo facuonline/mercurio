@@ -47,7 +47,5 @@ Mercurio is a personal project of me, born out of my desire to learn backend web
 However due to the early phase in which it is, there won't be pull requests reviewed and/or merged since the system still lacks most of the future planned features.
 
 ## TODOs
-1. Polish **Utils\URL**. Build a stable, understandable set of methods to easily manage urls.
-2. Improve **App\User** behaviour around user retrieval and session read.
-3. Improve **Utils\Session** segmentation.
-4. Finish **App\Messages**
+1. Finish tests for existing code and fully adopt TDD.
+2. Start documentation

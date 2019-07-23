@@ -161,7 +161,7 @@ class Media extends \Mercurio\App\Database {
     public function new(array $properties, array $required = []) {
         // Ensure media properties are valid
         \Mercurio\Utils\System::emptyField($required, $properties);
-        $properties = \Mercurio\Utils\System::property(['id', 'stamp'], $properties);
+        $properties = \Mercurio\Utils\System::property($properties);
 
         // Make media
         $this->db()->insert('mro_media', $properties);
