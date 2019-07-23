@@ -5,6 +5,12 @@ namespace Mercurio;
     'KEY' => 'test',
     'URL' => 'http://localhost/mercurio/tests',
     'CUSTOM' => 'customEnvironmentalVariable'
+], [
+    'TYPE' => 'mysql',
+    'HOST' => 'localhost',
+    'USER' => 'root',
+    'PASS' => '',
+    'NAME' => 'mercurio'
 ]);
 
 class AppTest extends \PHPUnit\Framework\TestCase {

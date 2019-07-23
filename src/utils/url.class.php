@@ -150,7 +150,7 @@ class URL extends \Mercurio\App\Database {
      * Check if url masking is on or off
      * @return bool
      */
-    protected static function isMaskingOn() {
+    public static function isMaskingOn() : bool{
         /**
          * Solution for non database using cases
          */

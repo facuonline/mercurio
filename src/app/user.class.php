@@ -106,12 +106,10 @@ class User extends \Mercurio\App\Database {
             // Get all meta
             if (empty($meta)) return $this->db()->select('mro_meta', '*', [
                 'target' => $user['id']
-            ])[0];
+            ]);
             // Get specific meta
             // Get from array
-            if (is_array($meta)) return $this->db()->select('mro_meta', [
-                'value'
-            ], [
+            if (is_array($meta)) return $this->db()->select('mro_meta', '*', [
                 'target' => $user['id'],
                 'name' => $meta
             ]);
@@ -345,7 +343,7 @@ class User extends \Mercurio\App\Database {
      * function () :
      * @throws object Exception\User\WrongLoginCredential | LoginBlocked or Exception\User\EmptyField
      */
-    public function login(string $credential, string $password, callable $callback, callable $fallback = NULL) {
+    public function login(string $credential, string $password, callable $callback = NULL, callable $fallback = NULL) {
         // ensure environment is ready for a login
         if ($this->getSession()) $this->logout();
         \Mercurio\Utils\System::emptyField(['credential', 'password'], [
@@ -397,7 +395,7 @@ class User extends \Mercurio\App\Database {
                         'login_blocked' => NULL,
                     ]);
 
-                    $callback();
+                    if ($callback !== NULL) $callback();
                 }
             // Login is locked
             } elseif (time() - $lock > 300) {
@@ -427,11 +425,13 @@ class User extends \Mercurio\App\Database {
      * @param string $handle
      * @return string Valid handle
      */
-    public function validateHandle(string $handle) {
+    public function validateHandle(string $handle) : string {
         $this->get($handle, function() {
             throw new \Mercurio\Exception\User\ExistingHandle;
         });
+        if (ctype_digit($handle)) throw new \Mercurio\Exception\User\InvalidHandle;
 
+        $handle = trim($handle);
         $handle = strtolower($handle);
         $handle = preg_replace('/[^a-z0-9_]/', '', $handle);
         return $handle;

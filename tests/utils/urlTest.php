@@ -2,9 +2,19 @@
 namespace Mercurio;
 class UrlTest extends \PHPUnit\Framework\TestCase {
 
+    public function testIsMaskingOnReturnsBool() {
+        $bool = \Mercurio\Utils\URL::isMaskingOn();
+
+        $this->assertIsBool($bool);
+    }
+
     public function testGetLinkMatchesPattern() {
         $url = \Mercurio\Utils\URL::getLink('testPage', 'testTarget', 'testAction');
-        $expected = 'http://localhost/mercurio/tests/?page=testPage&target=testTarget&action=testAction';
+        if (\Mercurio\Utils\URL::isMaskingOn()) {
+            $expected = 'http://localhost/mercurio/tests/testPage/testTarget/testAction';
+        } else {
+            $expected = 'http://localhost/mercurio/tests/?page=testPage&target=testTarget&action=testAction';
+        }
         $this->assertEquals($expected, $url);
     }
 
