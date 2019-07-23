@@ -10,14 +10,14 @@ class System {
 
     /**
      * Ensures that system defined properties of entities are not in an array
-     * @param array $keys
      * @param array $array
+     * @return array Input array with system properties added
      * @throws object Exception\Usage\SystemProperty 
      */
-    public static function property(array $keys, array $array) {
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $array)) throw new \Mercurio\Exception\Usage\SystemProperty($key);
-        }
+    public static function property(array $array) {
+        if (array_key_exists('id', $array)
+        && array_key_exists('stamp', $array)) throw new \Mercurio\Exception\Usage\SystemProperty('id or stamp');
+
         $array['id'] = \Mercurio\Utils\ID::new();
         $array['stamp'] = time();
         return $array;

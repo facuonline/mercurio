@@ -151,6 +151,9 @@ class URL extends \Mercurio\App\Database {
      * @return bool
      */
     protected static function isMaskingOn() {
+        if (!getenv('DB_NAME')) return file_exists(dirname($_SERVER['SCRIPT_FILENAME'])
+        .DIRECTORY_SEPARATOR
+        .'.htaccess');
         return self::getConfig('urlmasking');
     }
 
@@ -163,7 +166,8 @@ class URL extends \Mercurio\App\Database {
             .DIRECTORY_SEPARATOR
             .'.htaccess';
         if (file_exists($location) && !is_readable($location)) throw new \Mercurio\Exception\Runtime("The file located at '$location' could not be accessed or is not readable. URL masking could not be possible.");
-        if (!in_array('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Runtime("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
+        if (!function_exists('apache_get_modules')) throw new \Mercurio\Exception\Environment("Apache seems to not be running or active on this server. URL masking is not possible without Apache.");
+        if (!in_array('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Environment("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
 
         if (!self::isMaskingOn()) {
             $htaccess = self::readHtaccess($location);

@@ -19,21 +19,31 @@ class ID {
 	 * Create new int ID
 	 * 
 	 * Timestamp base with custom epoch.\  
+	 * 2 digit miliseconds.\
 	 * 1 digit server ip based discriminator.\
 	 * 1 digit connection port based discriminator.\
 	 * 1 digit client ip based discriminator.\
 	 * 1 digit random entropic discriminator.
 	 * @return int */
-	public static function new(){
+	public static function new() : int {
 		// Custom epoch from the january 1st 2019
 		$time = time() - 1546300800;
+
+		$miliseconds = gettimeofday()['usec'];
+		$mili = substr($miliseconds, 0, 2);
+
 		$serveraddress = base_convert(gethostbyname(gethostname()), 10, 10);
 		$server = $serveraddress[random_int(0, strlen($serveraddress))-1];
-		$port = substr($_SERVER['REMOTE_PORT'], -1);
+		
+		$portaddress = $_SERVER['REMOTE_PORT'];
+		$port = $portaddress[random_int(0, strlen($portaddress))-1];
+		
 		$clientaddress = base_convert($_SERVER['REMOTE_ADDR'], 10, 10);
 		$client = $clientaddress[random_int(0, strlen($clientaddress) -1)];
+		
 		$entropy = random_int(0, 9);
-		return $time.$server.$port.$client.$entropy;
+		
+		return $time.$mili.$server.$port.$client.$entropy;
 	}
 
 	/**
