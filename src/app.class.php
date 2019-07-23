@@ -76,8 +76,6 @@ class App {
         // Define system constants
         self::constants();
 
-        // Init Session accross app
-        \Mercurio\Utils\Session::start();
     }
 
     /**
