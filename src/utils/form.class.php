@@ -8,7 +8,7 @@
  * @see https://doc.nette.org/en/3.0/forms
  */
 namespace Mercurio\Utils;
-class Form {
+class Form extends \Nette\Forms\Form {
 
     public $form;
 
@@ -16,10 +16,13 @@ class Form {
      * Build new form with auto anti spam
      */
     public function __construct() {
-        $this->form = new \Nette\Forms\Form;
-        $this->form->addHidden('url-website')
-            ->addRule(Form::BLANK);
-        return $this->$form;
+        $this->form = $this;
+        $this->form->addHidden('url_website')
+            ->addRule(\Nette\Forms\Form::BLANK);
+        $this->form->addHidden('form_stamp')
+            ->setDefaultValue(time() + 3)
+            ->addRule(\Nette\Forms\Form::MIN, 'Please try again.', time());
+        return $this->form;
     }
 
 }
