@@ -107,6 +107,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $email = $user->getEmail();
 
         $this->assertIsString($email);
+        $this->assertEquals('', $email);
     }
 
     public function testGetLinkReturnsString() {
@@ -118,8 +119,26 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * For some reason login seems to break PHPUnit, but it works on the browser
+     * For some reason login seems to break PHPUnit and populates db with meta fields non stop
+     * but it works on the browser
      */
+
+    public function testUnsetMetaDeletesSingleMetaFromDatabase() {
+        $user = new \Mercurio\App\User;
+        $user->get('test_handle');
+        $user->unsetMeta('login_lastin');
+        $meta = $user->getMeta('login_lastin');
+
+        $this->assertNull($meta);
+    }
+
+    public function testUnsetDeletesUserFromDatabase() {
+        $user = new \Mercurio\App\User;
+        $user->get('test_handle');
+        $user->unset();
+
+        $this->assertNull($user->get());
+    }
 
     public function testValidateHandleReturnsValidStringHandle() {
         $user = new \Mercurio\App\User;

@@ -87,8 +87,8 @@ class User extends \Mercurio\App\Database {
     public function unset(array $tables = []) {
         $this->get(false, function ($user) use (&$tables) {
             $this->unsetImg();
-            $this->db()->delete('mro_users', ['id' => $user['id']]);
             $this->unsetMeta();
+            $this->db()->delete('mro_users', ['id' => $user['id']]);
 
             if (!empty($tables)) foreach ($tables as $key => $value) {
                 $this->delete($value, ['author' => $user['id']]);
@@ -159,12 +159,17 @@ class User extends \Mercurio\App\Database {
     public function unsetMeta($meta = '') {
         $this->get(false, function ($user) use (&$meta) {
             // Delete all meta
-            if (empty($meta)) $this->db()->delete('mro_meta', ['target' => $user['id']]);
+            if (empty($meta)) {
+                $this->db()->delete('mro_meta', [
+                    'target' => $user['id']
+                ]);
             // Delete specific meta
-            $this->db()->delete('mro_meta', [
-                'target' => $user['id'],
-                'name' => $meta
-            ]);
+            } else {
+                $this->db()->delete('mro_meta', [
+                    'target' => $user['id'],
+                    'name' => $meta
+                ]);
+            }
         });
     }
 
