@@ -355,6 +355,7 @@ class User extends \Mercurio\App\Database {
             'credential' => $credential,
             'password' => $password
         ]);
+        $credential = ltrim($credential, '@');
 
         // session enforced bruteforce protection for wrong credential
         if (!$this->get($credential)) {
@@ -437,6 +438,7 @@ class User extends \Mercurio\App\Database {
         if (ctype_digit($handle)) throw new \Mercurio\Exception\User\InvalidHandle;
 
         $handle = trim($handle);
+        $handle = ltrim($handle, '@');
         $handle = strtolower($handle);
         $handle = preg_replace('/[^a-z0-9_]/', '', $handle);
         return $handle;
