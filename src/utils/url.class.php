@@ -54,13 +54,16 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Builds and return links for specified targets
-     * @param string $page Page name
+     * @param string $page Page name 
+     * Specify '/' as a page for main page
      * @param mixed $target Target entity identifier, either handle or id
      * Specify '0' as a target for no target declared
      * @param string $action Target action name 
      * @return string
      */
     public static function getLink(string $page, $target = '', string $action = '') {
+        if ($page === '/') return \Mercurio\App::getApp('URL');
+
         $page = self::maskPage($page);
         $target = self::maskTarget($target);
         $action = self::maskAction($action);
@@ -83,7 +86,7 @@ class URL extends \Mercurio\App\Database {
             $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
             if (!empty($pages) 
             && in_array($page, $pages)) {
-                $params['page'] = $page;
+                $params['page'] = trim($page);
             } else {
                 $params['page'] = false;
             }
@@ -94,7 +97,7 @@ class URL extends \Mercurio\App\Database {
         if (isset($_GET['action'])
         && !empty($_GET['action'])) {
             $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
-            $params['action'] = $action;
+            $params['action'] = trim($action);
         } else {
             $params['action'] = false;
         }
@@ -103,7 +106,7 @@ class URL extends \Mercurio\App\Database {
         && !empty($_GET['target'])
         && $_GET['target'] !== '0') {
             $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
-            $params['target'] = $target;
+            $params['target'] = trim($target);
         } else {
             $params['target'] = false;
         }
@@ -150,10 +153,8 @@ class URL extends \Mercurio\App\Database {
      * Check if url masking is on or off
      * @return bool
      */
-    public static function isMaskingOn() : bool{
-        /**
-         * Solution for non database using cases
-         */
+    public static function isMaskingOn() : bool {
+        // Solution for non database cases
         if (!getenv('DB_NAME')) {
             $location = dirname($_SERVER['SCRIPT_FILENAME'])
                 .DIRECTORY_SEPARATOR
