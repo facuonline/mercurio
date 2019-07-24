@@ -31,7 +31,7 @@ class URL extends \Mercurio\App\Database {
      * @return string
      */
     private static function maskTarget($target) {
-        if (empty($target)) return '';
+        if (empty($target)) $target = '0';
         if (!self::isMaskingOn()) {
             return '&target='.$target;
         } else {
@@ -55,7 +55,7 @@ class URL extends \Mercurio\App\Database {
     /**
      * Builds and return links for specified targets
      * @param string $page Page name
-     * @param mixed $target Target entity identifier, either handle or id\ 
+     * @param mixed $target Target entity identifier, either handle or id
      * Specify '0' as a target for no target declared
      * @param string $action Target action name 
      * @return string
@@ -101,7 +101,7 @@ class URL extends \Mercurio\App\Database {
         
         if (isset($_GET['target'])
         && !empty($_GET['target'])
-        && $_GET['target'] !== 0) {
+        && $_GET['target'] !== '0') {
             $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
             $params['target'] = $target;
         } else {
