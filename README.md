@@ -7,8 +7,9 @@ Comprehensive library to help you develop safer, better web apps in PHP.
 [TODOs](#TODOs)
 
 ## Installation
+```
     composer require mercurio/mercurio
-
+```
 ## Usage
 Once installed you must start Mercurio with some basic configurations.
 
@@ -41,9 +42,9 @@ Mercurio is divided in two sets of classes.
 
 **`Utils`** is a list of microservices both for the system and for the developer. These classes are mostly static so their methods can be accessed on the go and for the most part don't require a database to work. Their importance varies, sometimes they'll be at the very core of our App and sometimes they won't be called once.
 
-**`App`** classes are the main App controller services. They encapsulate Mercurio entities and their behaviour under simple and easy to use objects and methods.
+**`App`** classes are the main App model services. They encapsulate Mercurio entities and their behaviour under simple and easy to use objects and methods.
 
-Utils and App are both part of the controller in the Model-View-Controller design pattern.
+>**Utils** are part of the **Controller** and **App** are the **Model** in the Model-View-Controller design pattern. So all is left to you after glueing these bricks as you wish, is to develop a nice **View** template.
 
 # Contributing
 
