@@ -97,7 +97,7 @@ class URL extends \Mercurio\App\Database {
             
             if (empty($page)) $params['page'] = trim($pageQuery);
         } else {
-            $params['page'] = false;
+            $params['page'] = 'main';
         }
 
         if (isset($_GET['action'])
@@ -132,20 +132,11 @@ class URL extends \Mercurio\App\Database {
      * Specify '/' as a page for main page
      * @param callable $callback Callback function to execute on page retrieval
      * function (string $page) :
-     * @param callable $fallback Callback function to execute if no page specified
-     * function () :
-     * If no fallback specified Mercurio will try to default to a function named 'mainpage'
-     * @return callable $callback or $fallback function
+     * @return callable $callback
      */
-    public static function getPage(string $page, callable $callback, callable $fallback = NULL) {
-        if (function_exists('mainpage')) $fallback = mainpage();
-
+    public static function getPage(string $page, callable $callback) {
         $page = self::getUrlParams($page)['page'];
-        if ($page) {
-            return $callback($page);
-        } elseif ($fallback !== NULL) {
-            return $fallback();
-        }
+        if ($page) return $callback($page);
     }
 
     /**
@@ -161,17 +152,11 @@ class URL extends \Mercurio\App\Database {
      * @param string $action Action keyword
      * @param callable $callback Callback function to execute on action retrieval
      * function (string $action) :
-     * @param callable $fallback Callback function to execute if no action specified
-     * function () :
-     * @return callable $callback or $fallback function
+     * @return callable $callback
      */
-    public static function getAction(string $action, callable $callback, callable $fallback = NULL) {
+    public static function getAction(string $action, callable $callback) {
         $action = self::getUrlParams('', $action)['action'];
-        if ($action) {
-            return $callback($action);
-        } elseif ($fallback !== NULL) {
-            return $fallback();
-        }
+        if ($action) return $callback($action);
     }
 
     /**
