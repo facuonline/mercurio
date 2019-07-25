@@ -129,13 +129,17 @@ class URL extends \Mercurio\App\Database {
     /**
      * Obtain page from URL query
      * @param string $page Page keyword
+     * Specify '/' as a page for main page
      * @param callable $callback Callback function to execute on page retrieval
      * function (string $page) :
      * @param callable $fallback Callback function to execute if no page specified
      * function () :
+     * If no fallback specified Mercurio will try to default to a function named 'mainpage'
      * @return callable $callback or $fallback function
      */
     public static function getPage(string $page, callable $callback, callable $fallback = NULL) {
+        if (function_exists('mainpage')) $fallback = mainpage();
+
         $page = self::getUrlParams($page)['page'];
         if ($page) {
             return $callback($page);
