@@ -75,29 +75,37 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Filter, read and return GET query params
-     * @param array $pages Expected pages, array of values
+     * @param string $page Expected page keyword
+     * @param string $action Expected action keyword
      * @return array 
      */
-    public static function getUrlParams(array $pages = []) {
+    public static function getUrlParams(string $page = '', string $action = '') {
         $params = [];
 
         if (isset($_GET['page'])
         && !empty($_GET['page'])) {
-            $page = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
-            if (!empty($pages) 
-            && in_array($page, $pages)) {
-                $params['page'] = trim($page);
+            $pageQuery = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
+            if (!empty($page)
+            && $page === $pageQuery) {
+                $params['page'] = $page;
             } else {
                 $params['page'] = false;
             }
+            if (empty($page)) $params['page'] = trim($pageQuery);
         } else {
             $params['page'] = false;
         }
 
         if (isset($_GET['action'])
         && !empty($_GET['action'])) {
-            $action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
-            $params['action'] = trim($action);
+            $actionQuery = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+            if (!empty($action) 
+            && $action === $actionQuery) {
+                $params['action'] = $action;
+            } else {
+                $params['action'] = false;
+            }
+            if (empty($action)) $params['action'] = trim($actionQuery);
         } else {
             $params['action'] = false;
         }
@@ -116,21 +124,20 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain page from URL query
-     * @param array $pages Expected pages, array of values
+     * @param string $page Page keyword
      * @param callable $callback Callback function to execute on page retrieval
      * function (string $page) :
      * @param callable $fallback Callback function to execute if no page specified
      * function () :
-     * @return string|bool Name of called page or false if page does not exist
+     * @return callable $callback or $fallback function
      */
-    public static function getPage(array $pages, callable $callback = NULL, callable $fallback = NULL) {
-        $page = self::getUrlParams($pages)['page'];
-        if ($page && $callback !== NULL) {
+    public static function getPage(string $page, callable $callback, callable $fallback = NULL) {
+        $page = self::getUrlParams($page)['page'];
+        if ($page) {
             return $callback($page);
         } elseif ($fallback !== NULL) {
             return $fallback();
         }
-        return $page;
     }
 
     /**
@@ -143,10 +150,20 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain action from URL query
-     * @return string|bool Action name or false if no action specified
+     * @param string $action Action keyword
+     * @param callable $callback Callback function to execute on action retrieval
+     * function (string $action) :
+     * @param callable $fallback Callback function to execute if no action specified
+     * function () :
+     * @return callable $callback or $fallback function
      */
-    public static function getAction() {
-        return self::getUrlParams()['action'];
+    public static function getAction(string $action, callable $callback, callable $fallback = NULL) {
+        $action = self::getUrlParams('', $action)['action'];
+        if ($action) {
+            return $callback($action);
+        } elseif ($fallback !== NULL) {
+            return $fallback();
+        }
     }
 
     /**
