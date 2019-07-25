@@ -76,21 +76,25 @@ class URL extends \Mercurio\App\Database {
     /**
      * Filter, read and return GET query params
      * @param string $page Expected page keyword
+     * Specify '/' as a page for main page
      * @param string $action Expected action keyword
      * @return array 
      */
     public static function getUrlParams(string $page = '', string $action = '') {
         $params = [];
 
-        if (isset($_GET['page'])
-        && !empty($_GET['page'])) {
+        if (isset($_GET['page'])) {
             $pageQuery = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
             if (!empty($page)
             && $page === $pageQuery) {
                 $params['page'] = $page;
+            } elseif ($page === '/'
+            && empty($pageQuery)) {
+                $params['page'] = 'main';
             } else {
                 $params['page'] = false;
             }
+            
             if (empty($page)) $params['page'] = trim($pageQuery);
         } else {
             $params['page'] = false;
