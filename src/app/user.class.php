@@ -43,7 +43,7 @@ class User extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $user = $this->db()->get('mro_users', [
+        $user = $this->db()->get(DB_USERS, [
             'id',
             'handle',
             'nickname',
@@ -73,7 +73,7 @@ class User extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function($user) use (&$properties) {
-            $this->db()->update('mro_users', 
+            $this->db()->update(DB_USERS, 
                 $properties,
                 ['id' => $user['id']]
             );
@@ -88,7 +88,7 @@ class User extends \Mercurio\App\Database {
         $this->get(false, function ($user) use (&$tables) {
             $this->unsetImg();
             $this->unsetMeta();
-            $this->db()->delete('mro_users', ['id' => $user['id']]);
+            $this->db()->delete(DB_USERS, ['id' => $user['id']]);
 
             if (!empty($tables)) foreach ($tables as $key => $value) {
                 $this->delete($value, ['author' => $user['id']]);
@@ -104,17 +104,17 @@ class User extends \Mercurio\App\Database {
     public function getMeta($meta = '') {
         return $this->get(false, function($user) use (&$meta) {
             // Get all meta
-            if (empty($meta)) return $this->db()->select('mro_meta', '*', [
+            if (empty($meta)) return $this->db()->select(DB_META, '*', [
                 'target' => $user['id']
             ]);
             // Get specific meta
             // Get from array
-            if (is_array($meta)) return $this->db()->select('mro_meta', '*', [
+            if (is_array($meta)) return $this->db()->select(DB_META, '*', [
                 'target' => $user['id'],
                 'name' => $meta
             ]);
             // Get meta row
-            return $this->db()->get('mro_meta', [
+            return $this->db()->get(DB_META, [
                 'value'
             ], [
                 'target' => $user['id'],
@@ -133,14 +133,14 @@ class User extends \Mercurio\App\Database {
 
             $this->get(false, function($user) use ($key, $value) {
             if ($this->getMeta($key)) {
-                $this->db()->update('mro_meta', [
+                $this->db()->update(DB_META, [
                     'value' => $value
                 ], [
                     'target' => $user['id'],
                     'name' => $key
                 ]);
             } else {
-                $this->db()->insert('mro_meta', [
+                $this->db()->insert(DB_META, [
                     'id' => \Mercurio\Utils\ID::new(),
                     'name' => $key,
                     'value' => $value,
@@ -160,12 +160,12 @@ class User extends \Mercurio\App\Database {
         $this->get(false, function ($user) use (&$meta) {
             // Delete all meta
             if (empty($meta)) {
-                $this->db()->delete('mro_meta', [
+                $this->db()->delete(DB_META, [
                     'target' => $user['id']
                 ]);
             // Delete specific meta
             } else {
-                $this->db()->delete('mro_meta', [
+                $this->db()->delete(DB_META, [
                     'target' => $user['id'],
                     'name' => $meta
                 ]);
@@ -267,7 +267,7 @@ class User extends \Mercurio\App\Database {
         && $this->get($properties['email'])) throw new \Mercurio\Exception\User\ExistingEmail;
 
         // Make user
-        $this->db()->insert('mro_users', $properties);
+        $this->db()->insert(DB_USERS, $properties);
         $this->get($properties['id']);
         // Make basic meta
         $this->setMeta([
@@ -319,7 +319,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getEmail() {
         return $this->get(false, function($user) {
-            return (string) $this->db()->get('mro_users', 
+            return (string) $this->db()->get(DB_USERS, 
                 ['email'], 
                 ['id' => $user['id']]
             )['email'];
@@ -372,7 +372,7 @@ class User extends \Mercurio\App\Database {
             $lock = $this->getMeta('login_blocked');
             if ($lock === NULL) {
                 $attempts = $this->getMeta('login_attempt');
-                $hash = $this->db()->get('mro_users', 
+                $hash = $this->db()->get(DB_USERS, 
                     ['password'], 
                     ['id' => $this->info['id']]
                 )['password'];

@@ -40,7 +40,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $channel = $this->db()->get('mro_channels', '*', [
+        $channel = $this->db()->get(DB_CHANNELS, '*', [
             'OR' => [
                 'id' => $hint,
                 'handle' => $hint
@@ -63,7 +63,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function ($channel) use (&$properties) {
-            $this->db()->update('mro_channels',
+            $this->db()->update(DB_CHANNELS,
                 $properties,
                 $channel['id']
             );
@@ -75,7 +75,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function unset() {
         $this->get(false, function ($channel) {
-            $this->db()->delete('mro_channels', ['id' => $channel['id']]);
+            $this->db()->delete(DB_CHANNELS, ['id' => $channel['id']]);
             $this->unsetMeta();
         });
     }
@@ -88,19 +88,19 @@ class Channel extends \Mercurio\App\Database {
     public function getMeta($meta = '') {
         return $this->get(false, function($channel) use (&$meta) {
             // Get all meta
-            if (empty($meta)) return $this->db()->select('mro_meta', '*', [
+            if (empty($meta)) return $this->db()->select(DB_META, '*', [
                 'target' => $channel['id']
             ])[0];
             // Get specific meta
             // Get from array
-            if (is_array($meta)) return $this->db()->select('mro_meta', [
+            if (is_array($meta)) return $this->db()->select(DB_META, [
                 'value'
             ], [
                 'target' => $channel['id'],
                 'name' => $meta
             ]);
             // Get meta row
-            return $this->db()->get('mro_meta', [
+            return $this->db()->get(DB_META, [
                 'value'
             ], [
                 'target' => $channel['id'],
@@ -119,14 +119,14 @@ class Channel extends \Mercurio\App\Database {
 
             $this->get(false, function($channel) use ($key, $value) {
             if ($this->getMeta($key)) {
-                $this->db()->update('mro_meta', [
+                $this->db()->update(DB_META, [
                     'value' => $value
                 ], [
                     'target' => $channel['id'],
                     'name' => $key
                 ]);
             } else {
-                $this->db()->insert('mro_meta', [
+                $this->db()->insert(DB_META, [
                     'id' => \Mercurio\Utils\ID::new(),
                     'name' => $key,
                     'value' => $value,
@@ -145,12 +145,17 @@ class Channel extends \Mercurio\App\Database {
     public function unsetMeta($meta = '') {
         $this->get(false, function ($channel) use (&$meta) {
             // Delete all meta
-            if (empty($meta)) $this->db()->delete('mro_meta', ['target' => $channel['id']]);
+            if (empty($meta)) {
+                $this->db()->delete(DB_META, [
+                    'target' => $channel['id']
+                ]);
             // Delete specific meta
-            $this->db()->delete('mro_meta', [
-                'target' => $channel['id'],
-                'name' => $meta
-            ]);
+            } else {
+                $this->db()->delete(DB_META, [
+                    'target' => $channel['id'],
+                    'name' => $meta
+                ]);
+            }
         });
     }
 
@@ -167,7 +172,7 @@ class Channel extends \Mercurio\App\Database {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make channel
-        $this->db()->insert('mro_channels', $properties);
+        $this->db()->insert(DB_CHANNELS, $properties);
         $this->get($properties['id']);
         return $this->info;
     }

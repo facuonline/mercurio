@@ -14,7 +14,7 @@ class Database {
      * Make a database connection, static
      * @return object Medoo instance
      */
-    protected static function staticDB() {
+    public static function staticDB() {
         return new \Medoo\Medoo([
             'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
@@ -28,7 +28,7 @@ class Database {
      * Make a database connection, non static
      * @return object Medoo instance
      */
-    protected function db() {
+    public function db() {
         return new \Medoo\Medoo([
             'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
@@ -52,7 +52,6 @@ class Database {
      * Set or update a configuration
      * @param string $name Config name
      * @param mixed $value Config value
-     * @return object PDOStatement
      */
     public static function setConfig(string $name, $value) {
         if (self::getConfig($name)) {
@@ -69,4 +68,15 @@ class Database {
             );
         }
     }
+
+    /**
+     * Delete a configuration row from database
+     * @param string $name Name of configuration to be deleted
+     */
+    public static function unsetConfig(string $name) {
+        self::staticDB()->delete('mro_conf',
+            ['name' => $name]
+        );
+    }
+
 }

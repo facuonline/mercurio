@@ -23,9 +23,14 @@ class UrlTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsIterable($url);
     }
 
+    public function testGetUrlParamsReturnMainPageOnEmptyQuery() {
+        $page = \Mercurio\Utils\URL::getUrlParams()['page'];
+
+        $this->assertEquals('main', $page);
+    }
+
     public function testGetUrlParamsReturnsFalseOnEmptyQueries() {
         $url = \Mercurio\Utils\URL::getUrlParams();
-        $this->assertFalse($url['page']);
         $this->assertFalse($url['target']);
         $this->assertFalse($url['action']);
     }

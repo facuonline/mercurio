@@ -40,7 +40,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $media = $this->db()->get('mro_media', '*', [
+        $media = $this->db()->get(DB_MEDIA, '*', [
             'id' => $hint
         ]);
         // Return data or load instance
@@ -60,7 +60,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function ($media) use (&$properties) {
-            $this->db()->update('mro_media',
+            $this->db()->update(DB_MEDIA,
                 $properties,
                 $media['id']
             );
@@ -72,7 +72,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function unset() {
         $this->get(false, function ($media) {
-            $this->db()->delete('mro_users', ['id' => $media['id']]);
+            $this->db()->delete(DB_MEDIA, ['id' => $media['id']]);
             $this->unsetMeta();
         });
     }
@@ -85,19 +85,19 @@ class Media extends \Mercurio\App\Database {
     public function getMeta($meta = '') {
         return $this->get(false, function($media) use (&$meta) {
             // Get all meta
-            if (empty($meta)) return $this->db()->select('mro_meta', '*', [
+            if (empty($meta)) return $this->db()->select(DB_META, '*', [
                 'target' => $media['id']
             ])[0];
             // Get specific meta
             // Get from array
-            if (is_array($meta)) return $this->db()->select('mro_meta', [
+            if (is_array($meta)) return $this->db()->select(DB_META, [
                 'value'
             ], [
                 'target' => $media['id'],
                 'name' => $meta
             ]);
             // Get meta row
-            return $this->db()->get('mro_meta', [
+            return $this->db()->get(DB_META, [
                 'value'
             ], [
                 'target' => $media['id'],
@@ -116,14 +116,14 @@ class Media extends \Mercurio\App\Database {
 
             $this->get(false, function($media) use ($key, $value) {
             if ($this->getMeta($key)) {
-                $this->db()->update('mro_meta', [
+                $this->db()->update(DB_META, [
                     'value' => $value
                 ], [
                     'target' => $media['id'],
                     'name' => $key
                 ]);
             } else {
-                $this->db()->insert('mro_meta', [
+                $this->db()->insert(DB_META, [
                     'id' => \Mercurio\Utils\ID::new(),
                     'name' => $key,
                     'value' => $value,
@@ -142,12 +142,17 @@ class Media extends \Mercurio\App\Database {
     public function unsetMeta($meta = '') {
         $this->get(false, function ($media) use (&$meta) {
             // Delete all meta
-            if (empty($meta)) $this->db()->delete('mro_meta', ['target' => $media['id']]);
+            if (empty($meta)) {
+                $this->db()->delete(DB_META, [
+                    'target' => $media['id']
+                ]);
             // Delete specific meta
-            $this->db()->delete('mro_meta', [
-                'target' => $media['id'],
-                'name' => $meta
-            ]);
+            } else {
+                $this->db()->delete(DB_META, [
+                    'target' => $media['id'],
+                    'name' => $meta
+                ]);
+            }
         });
     }
 
@@ -165,7 +170,7 @@ class Media extends \Mercurio\App\Database {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make media
-        $this->db()->insert('mro_media', $properties);
+        $this->db()->insert(DB_MEDIA, $properties);
         $this->get($properties['id']);
         return $this->info;
     }
@@ -202,7 +207,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function getChannel(callable $callback = NULL) {
         $this->get(false, function($media) use (&$callback) {
-            $channel = $this->db()->select('mro_channels', '*', [
+            $channel = $this->db()->select(DB_CHANNELS, '*', [
                 'id' => $media['channel']
             ]);
             if ($callback !== NULL) return $callback($channel);
