@@ -25,7 +25,7 @@ class User extends \Mercurio\App\Database {
     protected function findHint() {
         if ($this->info) return $this->info['id'];
         // Get user hint from URL query
-        if (\Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
+        if (\Mercurio\Utils\URL::getTarget()) return ltrim(\Mercurio\Utils\URL::getTarget(), '@');
         // Get user hint from session
         if (\Mercurio\Utils\Session::get('User', false)) return \Mercurio\Utils\Session::get('User')['id'];
         

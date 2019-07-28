@@ -60,7 +60,7 @@ After installing mercurio your project folder sure looks something like this:
 Our example app will now include an index.php file where we'll start our Mercurio app as seen above. And a /views/ folder where we will be storing our different view templates.
 
 #### Single page application schema
-Mercurio is build with a single page application in mind. I know what I just said, you can read it again if you want. I lied. Mercurio forces you to work with a single page schema and use 3 predefined query components.
+Mercurio is built with a single page application in mind. I know what I just said, you can read it again if you want. I lied. Mercurio forces you to work with a single page schema and use 3 predefined query components.
 
 We will be using `\Mercurio\Utils\URL` to sort user query requests, serve the correct view template and in the end, just organize our app out.
 
@@ -109,7 +109,7 @@ To organize our app view we will define some pages.
 ```
 By defining pages this way we actually define what the sections of our app will be and what templates we'll use.
 
-And that's pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will conduct requests their designated paths. **Actually our whole app will happen inside index.php** much like a React.js app, just in PHP, so you can add your header, footer and other page classic and universalr elements in your index.php.
+And that's pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will route requests to their designated paths. **Actually our whole app will happen inside index.php** much like a React.js app, just in PHP, so you can add your header, footer and other page classic and universal elements in your index.php.
 
 ##### main.php
 Our main.php file will be simple. Only a simple landing in HTML. (Your file still needs to be .php in order to be included by the PHP engine)
@@ -134,12 +134,12 @@ if ($user->get()) {
 ```
 This code first instantiates the `App\User` model. With the `get` method we can automatically load an user from the **database** into instance. Mercurio will try to find an user in the following order:
 1. User at self instance.
-2. User hint at Target query.
+2. User by hint at Target query.
 3. User in session. (Logged in)
 
 >Alternatively you can directly provide an user hint (user string handle, email or numeric id) to bypass this list.
 
-If get does not find an user for us to work with it will return **false**, either it will return an array with user's info and load the instance.
+If get does not find an user for us to work with it will return **false**, else it will return an array with user's info and load the instance.
 >Alternatively you can provide a function as second argument to directly access user data without loading instance.
 
 ##### user_profile.php
@@ -152,7 +152,8 @@ If get does not find an user for us to work with it will return **false**, eithe
 You've already seen how Mercurio makes handling and retrieving users an easy task. But Mercurio does not stop there.
 ```php
     $form = new \Mercurio\Utils\Form;
-    // Mercurio form objects are based on Nette\Forms, they only add an extra layer of security against SPAM 
+    // Mercurio form objects are an extension of Nette\Forms
+    // they only add an extra layer of security against SPAM 
 
     $form->addText('username', 'Username or email:')
         ->setRequired(true);
@@ -169,7 +170,8 @@ We can process this form like following:
         $user = new \Mercurio\App\User;
 
         try {
-            $user->login($values['username'], $values['password'], function() {
+            $user->login($values['username'], $values['password'], 
+            function() {
                 header('Location:');
             });
         } catch (\Mercurio\Exception\User\WrongLoginCredential $e) {
@@ -179,7 +181,7 @@ We can process this form like following:
         }
     }
 ```
-And that's really it. We've sucessfully built an app with users that is secure, fast and easy to develop and extend.
+And thats really it. We've sucessfully built an app with users that is secure, fast and easy to develop and extend.
 
 # Contributing
 
