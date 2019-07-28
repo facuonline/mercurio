@@ -97,7 +97,8 @@ class URL extends \Mercurio\App\Database {
             
             if (empty($page)) $params['page'] = trim($pageQuery);
         } else {
-            $params['page'] = 'main';
+            $params['page'] = false;
+            if ($page === '/') $params['page'] = 'main';
         }
 
         if (isset($_GET['action'])
