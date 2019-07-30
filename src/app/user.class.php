@@ -98,78 +98,35 @@ class User extends \Mercurio\App\Database {
 
     /**
      * Read user meta
-     * @param string|array $meta Name of meta field or array of, leave blank to get all meta fields
+     * @param string $meta Name of meta field or array of, leave blank to get all meta fields
+     * @param string $grouping Name of meta group
      * @return bool|mixed|array
      */
-    public function getMeta($meta = '') {
-        return $this->get(false, function($user) use (&$meta) {
-            // Get all meta
-            if (empty($meta)) return $this->db()->select(DB_META, '*', [
-                'target' => $user['id']
-            ]);
-            // Get specific meta
-            // Get from array
-            if (is_array($meta)) return $this->db()->select(DB_META, '*', [
-                'target' => $user['id'],
-                'name' => $meta
-            ]);
-            // Get meta row
-            return $this->db()->get(DB_META, [
-                'value'
-            ], [
-                'target' => $user['id'],
-                'name' => $meta
-            ])['value'];
+    public function getMeta($meta = '', string $grouping = '') {
+        return $this->get(false, function($user) use (&$meta, $grouping) {
+            return $this->dbGetMeta($user['id'], $meta, $grouping);
         });
     }
 
     /**
      * Set and update user meta
      * @param array $meta Associative array of meta names and values
+     * @param string $grouping Name of meta group
      */
-    public function setMeta(array $meta) {
-        foreach ($meta as $key => $value) {
-            if (!is_string($key)) throw new \Mercurio\Exception\Usage\StringKeysRequired('setMeta');
-
-            $this->get(false, function($user) use ($key, $value) {
-            if ($this->getMeta($key)) {
-                $this->db()->update(DB_META, [
-                    'value' => $value
-                ], [
-                    'target' => $user['id'],
-                    'name' => $key
-                ]);
-            } else {
-                $this->db()->insert(DB_META, [
-                    'id' => \Mercurio\Utils\ID::new(),
-                    'name' => $key,
-                    'value' => $value,
-                    'target' => $user['id'],
-                    'stamp' => time() 
-                ]);
-            }
-            });
-        }
+    public function setMeta(array $meta, string $grouping = '') {
+        $this->get(false, function($user) use (&$meta, $grouping) {
+            $this->dbSetMeta($user['id'], $meta, $grouping);
+        });
     }
 
     /**
-     * Deletes user meta from database
+     * Deletes user media from database
      * @param string|array $meta Name of meta field or array of, leave blank to delete all meta
+     * @param string $grouping Name of meta group
      */
-    public function unsetMeta($meta = '') {
-        $this->get(false, function ($user) use (&$meta) {
-            // Delete all meta
-            if (empty($meta)) {
-                $this->db()->delete(DB_META, [
-                    'target' => $user['id']
-                ]);
-            // Delete specific meta
-            } else {
-                $this->db()->delete(DB_META, [
-                    'target' => $user['id'],
-                    'name' => $meta
-                ]);
-            }
+    public function unsetMeta($meta = '', string $grouping = '') {
+        $this->get(false, function ($user) use (&$meta, $grouping) {
+            $this->dbUnsetMeta($user['id'], $meta, $grouping);
         });
     }
 
@@ -275,7 +232,7 @@ class User extends \Mercurio\App\Database {
             'login_lastin' => time(),
             'login_lastout' => '',
             'login_blocked' => 0,
-        ]);
+        ], 'mrologin');
         return $this->info;
     }
 

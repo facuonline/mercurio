@@ -73,6 +73,9 @@ class App {
                     'VARCHAR(30)',
                     'NOT NULL'
                 ],
+                'grouping' => [
+                    'VARCHAR(30)',
+                ],
                 'value' => [
                     'VARCHAR(255)',
                     'NOT NULL'

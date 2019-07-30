@@ -41,32 +41,6 @@ class UserTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals('test Nickname', $user->getNickname());
     }
 
-    public function testGetMetaReturnsArrayOnEmpty() {
-        $user = new \Mercurio\App\User;
-        $user->get('test_handle');
-        $meta = $user->getMeta();
-
-        $this->assertIsIterable($meta);
-    }
-
-    public function testGetMetaReturnsSingleValueOnKey() {
-        $user = new \Mercurio\App\User;
-        $user->get('test_handle');
-        $meta = $user->getMeta('login_lastin');
-
-        $this->assertNotEmpty($meta);
-    }
-
-    public function testGetMetaReturnsArrayOnArray() {
-        $user = new \Mercurio\App\User;
-        $user->get('test_handle');
-        $meta = $user->getMeta(['login_lastin']);
-
-        $this->assertIsIterable($meta);
-        $this->assertArrayHasKey('value', $meta[0]);
-        $this->assertEquals('login_lastin', $meta[0]['name']);
-    }
-
     public function testGetImgReturnsFalse() {
         $user = new \Mercurio\App\User;
         $user->get('test_handle');
@@ -123,21 +97,12 @@ class UserTest extends \PHPUnit\Framework\TestCase {
      * but it works on the browser
      */
 
-    public function testUnsetMetaDeletesSingleMetaFromDatabase() {
-        $user = new \Mercurio\App\User;
-        $user->get('test_handle');
-        $user->unsetMeta('login_lastin');
-        $meta = $user->getMeta('login_lastin');
-
-        $this->assertNull($meta);
-    }
-
     public function testUnsetDeletesUserFromDatabase() {
         $user = new \Mercurio\App\User;
         $user->get('test_handle');
         $user->unset();
 
-        $this->assertNull($user->get());
+        $this->assertNull($user->get('test_handle'));
     }
 
     public function testValidateHandleReturnsValidStringHandle() {

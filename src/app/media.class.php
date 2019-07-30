@@ -80,79 +80,34 @@ class Media extends \Mercurio\App\Database {
     /**
      * Read media meta
      * @param string $meta Name of meta field or array of, leave blank to get all meta fields
+     * @param string $grouping Name of meta group
      * @return bool|mixed|array
      */
-    public function getMeta($meta = '') {
-        return $this->get(false, function($media) use (&$meta) {
-            // Get all meta
-            if (empty($meta)) return $this->db()->select(DB_META, '*', [
-                'target' => $media['id']
-            ])[0];
-            // Get specific meta
-            // Get from array
-            if (is_array($meta)) return $this->db()->select(DB_META, [
-                'value'
-            ], [
-                'target' => $media['id'],
-                'name' => $meta
-            ]);
-            // Get meta row
-            return $this->db()->get(DB_META, [
-                'value'
-            ], [
-                'target' => $media['id'],
-                'name' => $meta
-            ])['value'];
+    public function getMeta($meta = '', string $grouping = '') {
+        return $this->get(false, function($media) use (&$meta, $grouping) {
+            return $this->dbGetMeta($media['id'], $meta, $grouping);
         });
     }
 
     /**
      * Set and update media meta
      * @param array $meta Associative array of meta names and values
+     * @param string $grouping Name of meta group
      */
-    public function setMeta(array $meta) {
-        foreach ($meta as $key => $value) {
-            if (!is_string($key)) throw new \Mercurio\Exception\Usage\StringKeysRequired('setMeta');
-
-            $this->get(false, function($media) use ($key, $value) {
-            if ($this->getMeta($key)) {
-                $this->db()->update(DB_META, [
-                    'value' => $value
-                ], [
-                    'target' => $media['id'],
-                    'name' => $key
-                ]);
-            } else {
-                $this->db()->insert(DB_META, [
-                    'id' => \Mercurio\Utils\ID::new(),
-                    'name' => $key,
-                    'value' => $value,
-                    'target' => $media['id'],
-                    'stamp' => time() 
-                ]);
-            }
-            });
-        }
+    public function setMeta(array $meta, string $grouping = '') {
+        $this->get(false, function($media) use ($key, $value, $grouping) {
+            $this->dbSetMeta($media['id'], [$key => $value], $grouping);
+        });
     }
 
     /**
      * Deletes media meta from database
      * @param string|array $meta Name of meta field or array of, leave blank to delete all meta
+     * @param string $grouping Name of meta group
      */
-    public function unsetMeta($meta = '') {
-        $this->get(false, function ($media) use (&$meta) {
-            // Delete all meta
-            if (empty($meta)) {
-                $this->db()->delete(DB_META, [
-                    'target' => $media['id']
-                ]);
-            // Delete specific meta
-            } else {
-                $this->db()->delete(DB_META, [
-                    'target' => $media['id'],
-                    'name' => $meta
-                ]);
-            }
+    public function unsetMeta($meta = '', string $grouping = '') {
+        $this->get(false, function ($media) use (&$meta, $grouping) {
+            $this->dbUnsetMeta($media['id'], $meta, $grouping);
         });
     }
 

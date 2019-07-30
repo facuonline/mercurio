@@ -83,79 +83,34 @@ class Channel extends \Mercurio\App\Database {
     /**
      * Read channel meta
      * @param string $meta Name of meta field or array of, leave blank to get all meta fields
+     * @param string $grouping Name of meta group
      * @return bool|mixed|array
      */
-    public function getMeta($meta = '') {
-        return $this->get(false, function($channel) use (&$meta) {
-            // Get all meta
-            if (empty($meta)) return $this->db()->select(DB_META, '*', [
-                'target' => $channel['id']
-            ])[0];
-            // Get specific meta
-            // Get from array
-            if (is_array($meta)) return $this->db()->select(DB_META, [
-                'value'
-            ], [
-                'target' => $channel['id'],
-                'name' => $meta
-            ]);
-            // Get meta row
-            return $this->db()->get(DB_META, [
-                'value'
-            ], [
-                'target' => $channel['id'],
-                'name' => $meta
-            ])['value'];
+    public function getMeta($meta = '', string $grouping = '') {
+        return $this->get(false, function($channel) use (&$meta, $grouping) {
+            return $this->dbGetMeta($channel['id'], $meta, $grouping);
         });
     }
 
     /**
-     * Set and update channel meta
+     * Set and update media meta
      * @param array $meta Associative array of meta names and values
+     * @param string $grouping Name of meta group
      */
-    public function setMeta(array $meta) {
-        foreach ($meta as $key => $value) {
-            if (!is_string($key)) throw new \Mercurio\Exception\Usage\StringKeysRequired('setMeta');
-
-            $this->get(false, function($channel) use ($key, $value) {
-            if ($this->getMeta($key)) {
-                $this->db()->update(DB_META, [
-                    'value' => $value
-                ], [
-                    'target' => $channel['id'],
-                    'name' => $key
-                ]);
-            } else {
-                $this->db()->insert(DB_META, [
-                    'id' => \Mercurio\Utils\ID::new(),
-                    'name' => $key,
-                    'value' => $value,
-                    'target' => $channel['id'],
-                    'stamp' => time() 
-                ]);
-            }
-            });
-        }
+    public function setMeta(array $meta, string $grouping = '') {
+        $this->get(false, function($channel) use ($key, $value, $grouping) {
+            $this->dbSetMeta($channel['id'], [$key => $value], $grouping);
+        });
     }
 
     /**
-     * Deletes channel meta from database
+     * Deletes media meta from database
      * @param string|array $meta Name of meta field or array of, leave blank to delete all meta
+     * @param string $grouping Name of meta group
      */
-    public function unsetMeta($meta = '') {
-        $this->get(false, function ($channel) use (&$meta) {
-            // Delete all meta
-            if (empty($meta)) {
-                $this->db()->delete(DB_META, [
-                    'target' => $channel['id']
-                ]);
-            // Delete specific meta
-            } else {
-                $this->db()->delete(DB_META, [
-                    'target' => $channel['id'],
-                    'name' => $meta
-                ]);
-            }
+    public function unsetMeta($meta = '', string $grouping = '') {
+        $this->get(false, function ($channel) use (&$meta, $grouping) {
+            $this->dbUnsetMeta($channel['id'], $meta, $grouping);
         });
     }
 
