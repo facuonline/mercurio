@@ -95,8 +95,8 @@ class Media extends \Mercurio\App\Database {
      * @param string $grouping Name of meta group
      */
     public function setMeta(array $meta, string $grouping = '') {
-        $this->get(false, function($media) use ($key, $value, $grouping) {
-            $this->dbSetMeta($media['id'], [$key => $value], $grouping);
+        $this->get(false, function($media) use (&$meta, $grouping) {
+            $this->dbSetMeta($media['id'], $meta, $grouping);
         });
     }
 

@@ -98,8 +98,8 @@ class Channel extends \Mercurio\App\Database {
      * @param string $grouping Name of meta group
      */
     public function setMeta(array $meta, string $grouping = '') {
-        $this->get(false, function($channel) use ($key, $value, $grouping) {
-            $this->dbSetMeta($channel['id'], [$key => $value], $grouping);
+        $this->get(false, function($channel) use (&$meta, $grouping) {
+            $this->dbSetMeta($channel['id'], $meta, $grouping);
         });
     }
 
