@@ -296,6 +296,22 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Get channel elements by user
+     * @param callable $callback Callback function to manipulate channel
+     * function (array $channels) :
+     * @return array
+     */
+    public function getChannels(callable $callback = NULL) {
+        return $this->get(false, function($user) use (&$callback) {
+            $channels = $this->db()->select(DB_CHANNELS, '*', [
+                'author' => $user['id']
+            ]);
+            if ($callback !== NULL) return $callback($channels);
+            return $channels;
+        });
+    }
+
+    /**
      * Perform a login
      * @param string $credential User identifier: handle or email (also ID will work)
      * @param string $password User password, plain text

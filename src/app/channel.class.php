@@ -152,7 +152,23 @@ class Channel extends \Mercurio\App\Database {
      */
     public function getLink(string $action = '') {
         return $this->get(false, function($channel) use (&$page, &$action) {
-            return (string) \Mercurio\Utils\URL::getLink($page, $channel['id'], $action);
+            return (string) \Mercurio\Utils\URL::getLink($page, $channel['handle'], $action);
+        });
+    }
+
+    /**
+     * Get channel media elements
+     * @param callable $callback Callback function to manipulate media elements
+     * function (array $media) :
+     * @return array Array of media elements id
+     */
+    public function getMedia(callable $callback = NULL) {
+        return $this->get(false, function($channel) use ($callback) {
+            $media = $this->db()->select(DB_MEDIA, '*', [
+                'channel' => $channel['id']
+            ]);
+            if ($callback !== NULL) return $callback($media);
+            return $media;
         });
     }
 

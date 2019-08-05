@@ -157,7 +157,7 @@ class Media extends \Mercurio\App\Database {
     /**
      * Get media channel info
      * @param callable $callback Callback function to manipulate channel data
-     * function (array $info) :
+     * function (array $channel) :
      * @return array
      */
     public function getChannel(callable $callback = NULL) {
