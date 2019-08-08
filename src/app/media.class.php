@@ -143,6 +143,16 @@ class Media extends \Mercurio\App\Database {
     }
 
     /**
+     * Get media content
+     * @return mixed Media content
+     */
+    public function getContent() {
+        return $this->get(false, function($media) {
+            return $media['content'];
+        });
+    }
+
+    /**
      * Get absolute link to media
      * @param string $page Media page
      * @param string $action Optional media action
@@ -155,18 +165,26 @@ class Media extends \Mercurio\App\Database {
     }
 
     /**
-     * Get media channel info
-     * @param callable $callback Callback function to manipulate channel data
-     * function (array $channel) :
-     * @return array
+     * Get media channel
+     * @return object Channel object instance loaded with media channel
      */
-    public function getChannel(callable $callback = NULL) {
-        $this->get(false, function($media) use (&$callback) {
-            $channel = $this->db()->select(DB_CHANNELS, '*', [
-                'id' => $media['channel']
-            ]);
-            if ($callback !== NULL) return $callback($channel);
+    public function getChannel() {
+        return $this->get(false, function($media) {
+            $channel = new \Mercurio\App\Channel;
+            $channel->get($media['channel']);
             return $channel;
+        });
+    }
+
+    /**
+     * Get media author
+     * @return object User object instance loaded with media author
+     */
+    public function getAuthor() {
+        return $this->get(false, function($media) {
+            $author = new \Mercurio\App\User;
+            $author->get($media['author']);
+            return $author;
         });
     }
 

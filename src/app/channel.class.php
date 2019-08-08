@@ -157,12 +157,24 @@ class Channel extends \Mercurio\App\Database {
     }
 
     /**
+     * Get channel author
+     * @return object User object instance loaded with channel author
+     */
+    public function getAuthor() {
+        return $this->get(false, function($channel) {
+            $author = new \Mercurio\App\User;
+            $author->get($channel['author']);
+            return $author;
+        });
+    }
+
+    /**
      * Get channel media elements
      * @param callable $callback Callback function to manipulate media elements
      * function (array $media) :
      * @return array Array of media elements id
      */
-    public function getMedia(callable $callback = NULL) {
+    public function getMedias(callable $callback = NULL) {
         return $this->get(false, function($channel) use ($callback) {
             $media = $this->db()->select(DB_MEDIA, '*', [
                 'channel' => $channel['id']

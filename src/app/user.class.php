@@ -312,6 +312,22 @@ class User extends \Mercurio\App\Database {
     }
 
     /**
+     * Get media elements by user
+     * @param callable $callback Callback function to manipulate media
+     * function (array $medias) :
+     * @return array
+     */
+    public function getMedias(callable $callback = NULL) {
+        return $this->get(false, function($user) use (&$media) {
+            $medias = $this->db()->select(DB_MEDIA, '*', [
+                'author' => $user['id']
+            ]);
+            if ($callback !== NULL) return $callback($medias);
+            return $medias;
+        });
+    }
+
+    /**
      * Perform a login
      * @param string $credential User identifier: handle or email (also ID will work)
      * @param string $password User password, plain text
@@ -342,9 +358,9 @@ class User extends \Mercurio\App\Database {
         // database enforced bruteforce protection for wrong password
         } else {
             // Get lock value
-            $lock = $this->getMeta('login_blocked');
+            $lock = $this->getMeta('login_blocked')['value'];
             if ($lock === NULL) {
-                $attempts = $this->getMeta('login_attempt');
+                $attempts = $this->getMeta('login_attempt')['value'];
                 $hash = $this->db()->get(DB_USERS, 
                     ['password'], 
                     ['id' => $this->info['id']]
