@@ -24,7 +24,7 @@ class Channel extends \Mercurio\App\Database {
     protected function findHint() {
         if ($this->info) return $this->info['id'];
         // Get media hint from URL query
-        if (\Mercurio\Utils\URL::getTarget()) return \Mercurio\Utils\URL::getTarget();
+        if (\Mercurio\Utils\Router::getTarget()) return \Mercurio\Utils\Router::getTarget();
 
         return NULL;
     }
@@ -152,7 +152,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function getLink(string $action = '') {
         return $this->get(false, function($channel) use (&$page, &$action) {
-            return (string) \Mercurio\Utils\URL::getLink($page, $channel['handle'], $action);
+            return (string) \Mercurio\Utils\Router::getLink($page, $channel['handle'], $action);
         });
     }
 

@@ -1,16 +1,16 @@
 <?php
 namespace Mercurio;
-class UrlTest extends \PHPUnit\Framework\TestCase {
+class RouterTest extends \PHPUnit\Framework\TestCase {
 
     public function testIsMaskingOnReturnsBool() {
-        $bool = \Mercurio\Utils\URL::isMaskingOn();
+        $bool = \Mercurio\Utils\Router::isMaskingOn();
 
         $this->assertIsBool($bool);
     }
 
     public function testGetLinkMatchesPattern() {
-        $url = \Mercurio\Utils\URL::getLink('testPage', 'testTarget', 'testAction');
-        if (\Mercurio\Utils\URL::isMaskingOn()) {
+        $url = \Mercurio\Utils\Router::getLink('testPage', 'testTarget', 'testAction');
+        if (\Mercurio\Utils\Router::isMaskingOn()) {
             $expected = 'http://localhost/mercurio/tests/testPage/testTarget/testAction';
         } else {
             $expected = 'http://localhost/mercurio/tests/?page=testPage&target=testTarget&action=testAction';
@@ -20,44 +20,49 @@ class UrlTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetUrlParamsReturnsArray() {
-        $url = \Mercurio\Utils\URL::getUrlParams();
+        $url = \Mercurio\Utils\Router::getUrlParams();
         
         $this->assertIsIterable($url);
     }
 
     public function testGetUrlParamsReturnsMainPageOnEmptyQuery() {
-        $page = \Mercurio\Utils\URL::getUrlParams('/')['page'];
+        $page = \Mercurio\Utils\Router::getUrlParams('/')['page'];
 
         $this->assertEquals('main', $page);
     }
 
     public function testGetUrlParamsReturnsFalseOnEmptyQueries() {
-        $url = \Mercurio\Utils\URL::getUrlParams();
+        $url = \Mercurio\Utils\Router::getUrlParams();
 
         $this->assertFalse($url['page']);
         $this->assertFalse($url['target']);
         $this->assertFalse($url['action']);
     }
 
+    /**
+     * Utils\Router::setRoute() must successfully route 100 requests in less than a second
+     */
     public function testSetRouteSpeed() {
         $start = time();
         $end = time();
         $i = 0;
         while ($i < 99) {
-            \Mercurio\Utils\URL::setRoute('/', '', function() use (&$end){
+            \Mercurio\Utils\Router::setRoute('/', '', function() use (&$end){
                $end = time();
             });
             $i++;
         }
 
-        $result = $start - $end;
+        if ($i == 99) {
+            $result = $start - $end;
 
-        $this->assertEquals('0', $result);
+            $this->assertEquals(0, $result);
+        }
     }
 
     public function testSetUrlMaskingCreatesHtaccess() {
         try {
-            \Mercurio\Utils\URL::setUrlMasking();
+            \Mercurio\Utils\Router::setUrlMasking();
 
             $this->expectException(\Mercurio\Exception\Environment::class);
 

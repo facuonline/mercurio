@@ -191,7 +191,7 @@ If you have significative input to add, *Pull Requests* are open, however consid
 
 ## TODOs
 1. Implement dependency injection on App classes
-2. Work `Utils\URL` as a well optimized Router and request handler.
+2. Work `Utils\Router` as a well optimized Router and request handler.
 3. Finish tests for existing code and fully adopt TDD.
 4. Conduct tests asserting file related tasks.
 5. Conduct tests asserting database related tasks.

@@ -1,16 +1,13 @@
 <?php
 /**
- * URL
+ * Router
  * @package Mercurio
  * @package Utilitary classes
  * 
- * URL handler and worker \
- * not only does rewrites but also manages paths to things and other cool things \
- * Not to be confused with parse_url()
- * 
+ * Requests router
  */
 namespace Mercurio\Utils;
-class URL {
+class Router {
 
     /**
      * Return proper page query syntax based on state of url masking
@@ -140,6 +137,26 @@ class URL {
     public static function setRoute(string $page, string $action = '', callable $callback) {
         $page = self::getUrlParams($page, $action)['page'];
         if ($page) return $callback($page);
+    }
+
+    /**
+     * Route page queries \
+     * POST requests only
+     * @param string $page Page keyword
+     * Specify '/' as a page for main page
+     * @param callable $callback Callback function to execute on page retrieval
+     * function (array $request) :
+     * @return callable $callback
+     */
+    public static function setRoutePost(string $page, callable $callback) {
+        if (isset($_SERVER['REQUEST_METHOD'])
+        && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            foreach($_POST as $key => $value) {
+                $request[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
+        }
+
+        return $callback($request);
     }
 
     /**
