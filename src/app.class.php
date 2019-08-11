@@ -27,8 +27,9 @@ class App {
 
         // Set up db
         $dbName = getenv('DB_NAME');
-        \Mercurio\App\Database::staticDB()
-            ->query("CREATE DATABASE $dbName");
+        $DB = new \Mercurio\App\Database;
+        $DB = $DB->getSQL();
+        $DB->query("CREATE DATABASE $dbName");
 
         /**
          * App database name
@@ -45,151 +46,146 @@ class App {
         define('DB_PREFIX', $dbPrefix);
 
         // Set up tables
-        \Mercurio\App\Database::staticDB()
-            ->create(DB_PREFIX.'conf', [
-                'name' => [
-                    'VARCHAR(30)',
-                    'NOT NULL'
-                ],
-                'value' => [
-                    'VARCHAR(255)',
-                    'NOT NULL'
-                ]
-            ]);
+        $DB->create(DB_PREFIX.'conf', [
+            'name' => [
+                'VARCHAR(30)',
+                'NOT NULL'
+            ],
+            'value' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ]
+        ]);
 
         /**
          * App database configuration table
          */
         define('DB_CONF', $dbPrefix.'conf');
 
-        \Mercurio\App\Database::staticDB()
-            ->create(DB_PREFIX.'meta', [
-                'id' => [
-                    'BIGINT',
-                    'NOT NULL',
-                    'PRIMARY_KEY'
-                ],
-                'name' => [
-                    'VARCHAR(30)',
-                    'NOT NULL'
-                ],
-                'grouping' => [
-                    'VARCHAR(30)',
-                ],
-                'value' => [
-                    'VARCHAR(255)',
-                    'NOT NULL'
-                ],
-                'target' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ],
-                'stamp' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ]
-            ]);
+        $DB->create(DB_PREFIX.'meta', [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY_KEY'
+            ],
+            'name' => [
+                'VARCHAR(30)',
+                'NOT NULL'
+            ],
+            'grouping' => [
+                'VARCHAR(30)',
+            ],
+            'value' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'target' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ]);
 
         /**
          * App database meta table
          */
         define('DB_META', $dbPrefix.'meta');
 
-        \Mercurio\App\Database::staticDB()
-            ->create(DB_PREFIX.'users', [
-                'id' => [
-                    'BIGINT',
-                    'NOT NULL',
-                    'PRIMARY_KEY'
-                ],
-                'handle' => [
-                    'VARCHAR(26)',
-                    'NOT NULL'
-                ],
-                'email' => [
-                    'VARCHAR(255)'
-                ],
-                'nickname' => [
-                    'VARCHAR(255)'
-                ],
-                'password' => [
-                    'VARCHAR(255)',
-                    'NOT NULL'
-                ],
-                'img' => [
-                    'VARCHAR(255)'
-                ],
-                'token' => [
-                    'VARCHAR(255)'
-                ],
-                'stamp' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ]
-            ]);
+        $DB->create(DB_PREFIX.'users', [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY_KEY'
+            ],
+            'handle' => [
+                'VARCHAR(26)',
+                'NOT NULL'
+            ],
+            'email' => [
+                'VARCHAR(255)'
+            ],
+            'nickname' => [
+                'VARCHAR(255)'
+            ],
+            'password' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'img' => [
+                'VARCHAR(255)'
+            ],
+            'token' => [
+                'VARCHAR(255)'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ]);
 
         /**
          * App database users table
          */
         define('DB_USERS', $dbPrefix.'users');
 
-        \Mercurio\App\Database::staticDB()
-            ->create(DB_PREFIX.'channels', [
-                'id' => [
-                    'BIGINT',
-                    'NOT NULL',
-                    'PRIMARY_KEY'
-                ],
-                'handle' => [
-                    'VARCHAR(26)',
-                    'NOT NULL'
-                ],
-                'author' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ],
-                'channel' => [
-                    'BIGINT'
-                ],
-                'body' => [
-                    'VARCHAR(4000)',
-                    'FULL TEXT'
-                ],
-                'stamp' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ]
-            ]);
+        $DB->create(DB_PREFIX.'channels', [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY_KEY'
+            ],
+            'handle' => [
+                'VARCHAR(26)',
+                'NOT NULL'
+            ],
+            'author' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'channel' => [
+                'BIGINT'
+            ],
+            'body' => [
+                'VARCHAR(4000)',
+                'FULL TEXT'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ]);
 
         /**
          * App database channels table
          */
         define('DB_CHANNELS', $dbPrefix.'channels');
 
-        \Mercurio\App\Database::staticDB()
-            ->create(DB_PREFIX.'media', [
-                'id' => [
-                    'BIGINT',
-                    'NOT NULL',
-                    'PRIMARY_KEY'
-                ],
-                'author' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ],
-                'channel' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ],
-                'content' => [
-                    'TEXT',
-                    'FULL TEXT'
-                ],
-                'stamp' => [
-                    'BIGINT',
-                    'NOT NULL'
-                ]
-            ]);
+        $DB->create(DB_PREFIX.'media', [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY_KEY'
+            ],
+            'author' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'channel' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'content' => [
+                'TEXT',
+                'FULL TEXT'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ]);
 
         /**
          * App database media table

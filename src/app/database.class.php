@@ -4,25 +4,40 @@
  * @package Mercurio
  * @subpackage Included classes
  * 
- * @var object $DB Medoo instance
  */
 
 namespace Mercurio\App;
 class Database {
 
     /**
-     * Medoo instance
+     * Instance of SQL middleware Medoo
      */
-    private $DB;
+    public $DB;
 
     public function __construct() {
-        $this->DB = new \Medoo\Medoo([
+        $this->DB = new \Medoo\Medoo($this->getDatabaseParams());
+    }
+
+    /**
+     * Get SQL builder instance 
+     * @return object instance of SQL builder Medoo
+     */
+    public function getSQL() {
+        return $this->DB;
+    }
+
+    /**
+     * Get database connection parameters
+     * @return array
+     */
+    public function getDatabaseParams() {
+        return [
             'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
             'username' => getenv('DB_USER'),
             'password' => getenv('DB_PASS')
-        ]);
+        ];
     }
     
     /**

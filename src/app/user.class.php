@@ -27,11 +27,17 @@ class User {
      * Instance of dependency injected Database class
      */
     protected $DB;
+
+    /**
+     * SQL query builder
+     */
+    private $SQL;
     
     public function __construct(\Mercurio\App\Database $db) {
         $this->info = false;
         $this->meta = [];
         $this->DB = $db;
+        $this->SQL = $db->getSQL();
     }
 
     /**
@@ -59,7 +65,7 @@ class User {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $user = $this->DB->get(DB_USERS, [
+        $user = $this->SQL->get(DB_USERS, [
             'id',
             'handle',
             'nickname',
@@ -89,7 +95,7 @@ class User {
      */
     public function set(array $properties) {
         $this->get(false, function($user) use (&$properties) {
-            $this->DB->update(DB_USERS, 
+            $this->SQL->update(DB_USERS, 
                 $properties,
                 ['id' => $user['id']]
             );
@@ -104,10 +110,10 @@ class User {
         $this->get(false, function ($user) use (&$tables) {
             $this->unsetImg();
             $this->unsetMeta();
-            $this->DB->delete(DB_USERS, ['id' => $user['id']]);
+            $this->SQL->delete(DB_USERS, ['id' => $user['id']]);
 
             if (!empty($tables)) foreach ($tables as $key => $value) {
-                $this->delete($value, ['author' => $user['id']]);
+                $this->SQL->delete($value, ['author' => $user['id']]);
             }
         });
     }
@@ -120,7 +126,7 @@ class User {
      */
     public function getMeta($meta = '', string $grouping = '') {
         return $this->get(false, function($user) use (&$meta, $grouping) {
-            return $this->dbGetMeta($user['id'], $meta, $grouping);
+            return $this->DB->dbGetMeta($user['id'], $meta, $grouping);
         });
     }
 
@@ -131,7 +137,7 @@ class User {
      */
     public function setMeta(array $meta, string $grouping = '') {
         $this->get(false, function($user) use (&$meta, $grouping) {
-            $this->dbSetMeta($user['id'], $meta, $grouping);
+            $this->DB->dbSetMeta($user['id'], $meta, $grouping);
         });
     }
 
@@ -142,7 +148,7 @@ class User {
      */
     public function unsetMeta($meta = '', string $grouping = '') {
         $this->get(false, function ($user) use (&$meta, $grouping) {
-            $this->dbUnsetMeta($user['id'], $meta, $grouping);
+            $this->DB->dbUnsetMeta($user['id'], $meta, $grouping);
         });
     }
 
@@ -240,7 +246,7 @@ class User {
         && $this->get($properties['email'])) throw new \Mercurio\Exception\User\ExistingEmail;
 
         // Make user
-        $this->DB->insert(DB_USERS, $properties);
+        $this->SQL->insert(DB_USERS, $properties);
         $this->get($properties['id']);
         // Make basic meta
         $this->setMeta([
@@ -292,7 +298,7 @@ class User {
      */
     public function getEmail() {
         return $this->get(false, function($user) {
-            return (string) $this->DB->get(DB_USERS, 
+            return (string) $this->SQL->get(DB_USERS, 
                 ['email'], 
                 ['id' => $user['id']]
             )['email'];
@@ -319,7 +325,7 @@ class User {
      */
     public function getChannels(callable $callback = NULL) {
         return $this->get(false, function($user) use (&$callback) {
-            $channels = $this->DB->select(DB_CHANNELS, '*', [
+            $channels = $this->SQL->select(DB_CHANNELS, '*', [
                 'author' => $user['id']
             ]);
             if ($callback !== NULL) return $callback($channels);
@@ -335,7 +341,7 @@ class User {
      */
     public function getMedias(callable $callback = NULL) {
         return $this->get(false, function($user) use (&$media) {
-            $medias = $this->DB->select(DB_MEDIA, '*', [
+            $medias = $this->SQL->select(DB_MEDIA, '*', [
                 'author' => $user['id']
             ]);
             if ($callback !== NULL) return $callback($medias);
@@ -377,7 +383,7 @@ class User {
             $lock = $this->getMeta('login_blocked')['value'];
             if ($lock === NULL) {
                 $attempts = $this->getMeta('login_attempt')['value'];
-                $hash = $this->DB->get(DB_USERS, 
+                $hash = $this->SQL->get(DB_USERS, 
                     ['password'], 
                     ['id' => $this->info['id']]
                 )['password'];

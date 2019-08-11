@@ -4,14 +4,14 @@ namespace Mercurio;
 class UserTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetReturnsNULLOnNoUserHint() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $get = $user->get();
 
         $this->assertNull($get);
     }
 
     public function testNewCreatesDatabaseRecord() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         if ($user->get('test_handle')) $user->unset();
         $new = $user->new([
             'handle' => 'test_handle',
@@ -25,14 +25,14 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetReturnsUserInfoArray() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $info = $user->get('test_handle');
 
         $this->assertIsIterable($info);
     }
 
     public function testSetUpdatesDatabaseAndGetNicknameReturnsNickname() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $user->set([
             'nickname' => 'test Nickname',
@@ -42,7 +42,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetImgReturnsFalse() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $false = $user->getImg();
 
@@ -54,7 +54,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
      */
 
     public function testGetIDReturnsIntegerAndString() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $int = $user->getID();
         $string = $user->getID(true);
@@ -64,7 +64,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetHandleReturnsWithAndWithoutArroba() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $handle = $user->getHandle();
         $arroba = $user->getHandle(true);
@@ -76,7 +76,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetEmailReturnsString() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $email = $user->getEmail();
 
@@ -85,7 +85,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testGetLinkReturnsString() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $link = $user->getLink('user', 'action');
 
@@ -98,7 +98,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
      */
 
     public function testUnsetDeletesUserFromDatabase() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $user->get('test_handle');
         $user->unset();
 
@@ -106,7 +106,7 @@ class UserTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testValidateHandleReturnsValidStringHandle() {
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
         $handle = $user->validateHandle('Not a valid handle. ');
 
         $this->assertIsString($handle);
