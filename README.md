@@ -36,6 +36,7 @@ Alternatively if you have a database:
 ```
 
 This will prepare your environment to work with Mercurio. To work with all of the `App` classes and most `Utils` it's necessary that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e just some Utils).
+>You can obtain a random, safe key using **`Mercurio\App:randomKey()`** (without directly passing it in the array, the app key needs to remain consistent trough the App's life)
 
 ### Utils and App
 Mercurio is divided in two sets of classes. 
@@ -59,24 +60,22 @@ After installing mercurio your project folder sure looks something like this:
 
 Our example app will now include an index.php file where we'll start our Mercurio app as seen above. And a /views/ folder where we will be storing our different view templates.
 
-#### Single page application schema
-Mercurio is built with a single page application in mind. I know what I just said, you can read it again if you want. I lied. Mercurio forces you to work with a single page schema and use 3 predefined query components.
-
-We will be using `\Mercurio\Utils\URL` to sort user query requests, serve the correct view template and in the end, just organize our app out.
+#### Routing
+We will be using `\Mercurio\Utils\Router` to sort user query requests, serve the correct view template and in the end, just organize our app out. 
 
 ##### URL masking
 
 ```php
-    \Mercurio\Utils\URL::setUrlMasking();
+    \Mercurio\Utils\Router::setUrlMasking();
 ```
-This method will set up, if possible, URL masking via apache mod_rewrite. Just write it in your **index.php** and run the page in your browser. Nothing will happen in your screen but Mercurio will silently set up the URL masking in your app folder.
+This method will set up, if possible, URL masking via apache's mod_rewrite. Just write it in your **index.php** and run the page in your browser. Nothing will happen in your screen but Mercurio will silently set up the URL masking in your app folder.
 
 After running it you can delete that line to avoid calling the same method over and over. It will not perform a new masking, but it will consume some resources on every request just by having to check if it needs to do the masking.
 
 >**It is not necessary** that you run this method. If you skip this step your app will still work, just not with nice URLs.
 
 ##### Templating
-Now we will be defining what pages our app will have. There are 3 URL query components in Mercurio:
+Now we will be defining what pages our app will have. `Utils\Router` takes 3 different query components:
 1. Pages
 2. Targets
 3. Actions
@@ -98,18 +97,18 @@ Or if you didn't set up URL masking:
 To organize our app view we will define some pages.
 
 ```php 
-    \Mercurio\Utils\URL::getPage('/', function() {
+    \Mercurio\Utils\Router::setRoute('/', '', function() {
         include 'views/pages/main.php';
     });
     // '/' is an alias for the main page, i.e an empty page query.
 
-    \Mercurio\Utils\URL::getPage('user', function() {
+    \Mercurio\Utils\Router::setRouter('user', '', function() {
         include 'views/pages/users.php';
     });
 ```
 By defining pages this way we actually define what the sections of our app will be and what templates we'll use.
 
-And that's pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will route requests to their designated paths. **Actually our whole app will happen inside index.php** much like a React.js app, just in PHP, so you can add your header, footer and other page classic and universal elements in your index.php.
+This is pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will route requests to their designated paths. **Actually our whole app will happen inside index.php** much like a React.js app, just in PHP, so you can add your header, footer and other page classic and universal elements in your index.php.
 
 ##### main.php
 Our main.php file will be simple. Only a simple landing in HTML. (Your file still needs to be .php in order to be included by the PHP engine)
@@ -124,7 +123,7 @@ If you wish you can use any templating language you want. Like [Twig](https://tw
 Now here comes the fun and where Mercurio will really excel at. Our example app will only have basic support for simple users, but you'll still be able to see the perks of Mercurio.
 
 ```php
-$user = new \Mercurio\App\User;
+$user = new \Mercurio\App\User(new \Mercurio\App\Database);
 
 if ($user->get()) {
     include 'user_profile.php';
@@ -132,7 +131,9 @@ if ($user->get()) {
     include 'user_login.php';
 }
 ```
-This code first instantiates the `App\User` model. With the `get` method we can automatically load an user from the **database** into instance. Mercurio will try to find an user in the following order:
+This code first instantiates the `App\User` model. The `App\Database` class does not require configuration and will take the connection parameters from the defined ones when setting up the Mercurio App. Still it needs to be injected on every `App` model.
+
+With the **`get`** method we can automatically load an user from the **database** into instance. Mercurio will try to find an user in the following order:
 1. User at self instance.
 2. User by hint at Target query.
 3. User in session. (Logged in)
@@ -140,7 +141,7 @@ This code first instantiates the `App\User` model. With the `get` method we can 
 >Alternatively you can directly provide an user hint (user string handle, email or numeric id) to bypass this list.
 
 If get does not find an user for us to work with it will return **false**, else it will return an array with user's info and load the instance.
->Alternatively you can provide a function as second argument to directly access user data without loading instance.
+>Alternatively you can provide a closure function as second argument to directly access user data without loading instance.
 
 ##### user_profile.php
 ```php
@@ -167,7 +168,7 @@ We can process this form like following:
 ```php
     if ($form->isSuccess()) {
         $values = $form->getValues();
-        $user = new \Mercurio\App\User;
+        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
 
         try {
             $user->login($values['username'], $values['password'], 
