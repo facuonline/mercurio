@@ -190,8 +190,8 @@ Mercurio is a personal project of me, born out of my desire to learn backend web
 If you have significative input to add, *Pull Requests* are open, however consider the following TODOs before submitting any changes or additions to the existing codebase:
 
 ## TODOs
-1. Finish tests for existing code and fully adopt TDD.
-2. Conduct tests asserting file related tasks.
-4. Conduct tests asserting database related tasks.
-5. Improve **Mercurio\App** and **Mercurio\App\Database** to automatically create database tables instead of depending on existing tables.
-6. Review and extend developer documentation.
+1. Implement dependency injection on App classes
+2. Work `Utils\URL` as a well optimized Router and request handler.
+3. Finish tests for existing code and fully adopt TDD.
+4. Conduct tests asserting file related tasks.
+5. Conduct tests asserting database related tasks.
