@@ -60,7 +60,7 @@ class Channel {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $channel = $this->DB->get(DB_CHANNELS, '*', [
+        $channel = $this->SQL->get(DB_CHANNELS, '*', [
             'OR' => [
                 'id' => $hint,
                 'handle' => $hint
@@ -83,7 +83,7 @@ class Channel {
      */
     public function set(array $properties) {
         $this->get(false, function ($channel) use (&$properties) {
-            $this->DB->update(DB_CHANNELS,
+            $this->SQL->update(DB_CHANNELS,
                 $properties,
                 $channel['id']
             );
@@ -95,7 +95,7 @@ class Channel {
      */
     public function unset() {
         $this->get(false, function ($channel) {
-            $this->DB->delete(DB_CHANNELS, ['id' => $channel['id']]);
+            $this->SQL->delete(DB_CHANNELS, ['id' => $channel['id']]);
             $this->unsetMeta();
         });
     }
@@ -108,7 +108,7 @@ class Channel {
      */
     public function getMeta($meta = '', string $grouping = '') {
         return $this->get(false, function($channel) use (&$meta, $grouping) {
-            return $this->dbGetMeta($channel['id'], $meta, $grouping);
+            return $this->DB->dbGetMeta($channel['id'], $meta, $grouping);
         });
     }
 
@@ -119,7 +119,7 @@ class Channel {
      */
     public function setMeta(array $meta, string $grouping = '') {
         $this->get(false, function($channel) use (&$meta, $grouping) {
-            $this->dbSetMeta($channel['id'], $meta, $grouping);
+            $this->DB->dbSetMeta($channel['id'], $meta, $grouping);
         });
     }
 
@@ -130,7 +130,7 @@ class Channel {
      */
     public function unsetMeta($meta = '', string $grouping = '') {
         $this->get(false, function ($channel) use (&$meta, $grouping) {
-            $this->dbUnsetMeta($channel['id'], $meta, $grouping);
+            $this->DB->dbUnsetMeta($channel['id'], $meta, $grouping);
         });
     }
 
@@ -147,7 +147,7 @@ class Channel {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make channel
-        $this->DB->insert(DB_CHANNELS, $properties);
+        $this->SQL->insert(DB_CHANNELS, $properties);
         $this->get($properties['id']);
         return $this->info;
     }
@@ -182,7 +182,7 @@ class Channel {
      */
     public function getAuthor() {
         return $this->get(false, function($channel) {
-            $author = new \Mercurio\App\User;
+            $author = new \Mercurio\App\User(new \Mercurio\App\Database);
             $author->get($channel['author']);
             return $author;
         });
@@ -196,7 +196,7 @@ class Channel {
      */
     public function getMedias(callable $callback = NULL) {
         return $this->get(false, function($channel) use ($callback) {
-            $media = $this->DB->select(DB_MEDIA, '*', [
+            $media = $this->SQL->select(DB_MEDIA, '*', [
                 'channel' => $channel['id']
             ]);
             if ($callback !== NULL) return $callback($media);

@@ -58,7 +58,7 @@ class Media {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $media = $this->DB->get(DB_MEDIA, '*', [
+        $media = $this->SQL->get(DB_MEDIA, '*', [
             'id' => $hint
         ]);
         // Return data or load instance
@@ -78,7 +78,7 @@ class Media {
      */
     public function set(array $properties) {
         $this->get(false, function ($media) use (&$properties) {
-            $this->DB->update(DB_MEDIA,
+            $this->SQL->update(DB_MEDIA,
                 $properties,
                 $media['id']
             );
@@ -90,7 +90,7 @@ class Media {
      */
     public function unset() {
         $this->get(false, function ($media) {
-            $this->DB->delete(DB_MEDIA, ['id' => $media['id']]);
+            $this->SQL->delete(DB_MEDIA, ['id' => $media['id']]);
             $this->unsetMeta();
         });
     }
@@ -103,7 +103,7 @@ class Media {
      */
     public function getMeta($meta = '', string $grouping = '') {
         return $this->get(false, function($media) use (&$meta, $grouping) {
-            return $this->dbGetMeta($media['id'], $meta, $grouping);
+            return $this->DB->dbGetMeta($media['id'], $meta, $grouping);
         });
     }
 
@@ -114,7 +114,7 @@ class Media {
      */
     public function setMeta(array $meta, string $grouping = '') {
         $this->get(false, function($media) use (&$meta, $grouping) {
-            $this->dbSetMeta($media['id'], $meta, $grouping);
+            $this->DB->dbSetMeta($media['id'], $meta, $grouping);
         });
     }
 
@@ -125,7 +125,7 @@ class Media {
      */
     public function unsetMeta($meta = '', string $grouping = '') {
         $this->get(false, function ($media) use (&$meta, $grouping) {
-            $this->dbUnsetMeta($media['id'], $meta, $grouping);
+            $this->DB->dbUnsetMeta($media['id'], $meta, $grouping);
         });
     }
 
@@ -143,7 +143,7 @@ class Media {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make media
-        $this->DB->insert(DB_MEDIA, $properties);
+        $this->SQL->insert(DB_MEDIA, $properties);
         $this->get($properties['id']);
         return $this->info;
     }
@@ -188,7 +188,7 @@ class Media {
      */
     public function getChannel() {
         return $this->get(false, function($media) {
-            $channel = new \Mercurio\App\Channel;
+            $channel = new \Mercurio\App\Channel(new \Mercurio\App\Database);
             $channel->get($media['channel']);
             return $channel;
         });
@@ -200,7 +200,7 @@ class Media {
      */
     public function getAuthor() {
         return $this->get(false, function($media) {
-            $author = new \Mercurio\App\User;
+            $author = new \Mercurio\App\User(new \Mercurio\App\Database);
             $author->get($media['author']);
             return $author;
         });
