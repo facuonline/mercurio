@@ -8,13 +8,27 @@
  * @var array $meta Associative array of meta values attached to channel
  */
 namespace Mercurio\App;
-class Channel extends \Mercurio\App\Database {
+class Channel {
 
-    public $info, $meta;
+    /**
+     * Associative array of general channel info
+     */
+    public $info;
 
-    public function __construct() {
+    /**
+     * Associative array of channel meta properties and values
+     */
+    public $meta;
+
+    /**
+     * Instance of dependency injected Database class
+     */
+    protected $DB;
+
+    public function __construct(\Mercurio\App\Database $db) {
         $this->info = false;
         $this->meta = [];
+        $this->DB = $db;
     }
 
     /**
@@ -40,7 +54,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $channel = $this->db()->get(DB_CHANNELS, '*', [
+        $channel = $this->DB->get(DB_CHANNELS, '*', [
             'OR' => [
                 'id' => $hint,
                 'handle' => $hint
@@ -63,7 +77,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function ($channel) use (&$properties) {
-            $this->db()->update(DB_CHANNELS,
+            $this->DB->update(DB_CHANNELS,
                 $properties,
                 $channel['id']
             );
@@ -75,7 +89,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function unset() {
         $this->get(false, function ($channel) {
-            $this->db()->delete(DB_CHANNELS, ['id' => $channel['id']]);
+            $this->DB->delete(DB_CHANNELS, ['id' => $channel['id']]);
             $this->unsetMeta();
         });
     }
@@ -127,7 +141,7 @@ class Channel extends \Mercurio\App\Database {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make channel
-        $this->db()->insert(DB_CHANNELS, $properties);
+        $this->DB->insert(DB_CHANNELS, $properties);
         $this->get($properties['id']);
         return $this->info;
     }
@@ -176,7 +190,7 @@ class Channel extends \Mercurio\App\Database {
      */
     public function getMedias(callable $callback = NULL) {
         return $this->get(false, function($channel) use ($callback) {
-            $media = $this->db()->select(DB_MEDIA, '*', [
+            $media = $this->DB->select(DB_MEDIA, '*', [
                 'channel' => $channel['id']
             ]);
             if ($callback !== NULL) return $callback($media);

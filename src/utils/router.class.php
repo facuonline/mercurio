@@ -202,7 +202,8 @@ class Router {
             return false;
         }
 
-        return \Mercurio\App\Database::getConfig('urlmasking');
+        $DB = new \Mercurio\App\Database;
+        return $DB->getConfig('urlmasking');
     }
 
     /**

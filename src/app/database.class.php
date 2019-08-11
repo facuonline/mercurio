@@ -11,25 +11,12 @@ namespace Mercurio\App;
 class Database {
 
     /**
-     * Make a database connection, static
-     * @return object Medoo instance
+     * Medoo instance
      */
-    public static function staticDB() {
-        return new \Medoo\Medoo([
-            'database_type' => getenv('DB_TYPE'),
-            'database_name' => getenv('DB_NAME'),
-            'server' => getenv('DB_HOST'),
-            'username' => getenv('DB_USER'),
-            'password' => getenv('DB_PASS')
-        ]);
-    }
+    private $DB;
 
-    /**
-     * Make a database connection, non static
-     * @return object Medoo instance
-     */
-    public function db() {
-        return new \Medoo\Medoo([
+    public function __construct() {
+        $this->DB = new \Medoo\Medoo([
             'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
             'server' => getenv('DB_HOST'),
@@ -43,8 +30,8 @@ class Database {
      * @param string $name Config name
      * @return array|bool
      */
-    public static function getConfig(string $name) {
-        $result = self::staticDB()->get('mro_conf', '*', ['name' => $name]);
+    public function getConfig(string $name) {
+        $result = $this->DB->get('mro_conf', '*', ['name' => $name]);
         return ($result ? $result['value'] : false);
     }
 
@@ -53,14 +40,14 @@ class Database {
      * @param string $name Config name
      * @param mixed $value Config value
      */
-    public static function setConfig(string $name, $value) {
-        if (self::getConfig($name)) {
-            self::staticDB()->update('mro_conf', 
+    public function setConfig(string $name, $value) {
+        if ($this->getConfig($name)) {
+            $this->DB->update('mro_conf', 
                 ['value' => $value],
                 ['name' => $name]
             );
         } else {
-            self::staticDB()->insert('mro_conf',
+            $this->DB->insert('mro_conf',
                 [
                     'name' => $name,
                     'value' => $value
@@ -73,8 +60,8 @@ class Database {
      * Delete a configuration row from database
      * @param string $name Name of configuration to be deleted
      */
-    public static function unsetConfig(string $name) {
-        self::staticDB()->delete('mro_conf',
+    public function unsetConfig(string $name) {
+        $this->DB->delete('mro_conf',
             ['name' => $name]
         );
     }
@@ -89,22 +76,22 @@ class Database {
     public function dbGetMeta(int $target, $meta = '', string $grouping = '') {
         // Get all meta
         if (empty($meta)
-        && empty($grouping)) return $this->db()->select(DB_META, '*', [
+        && empty($grouping)) return $this->DB->select(DB_META, '*', [
             'target' => $target
         ]);
         // Get by group
         if (empty ($meta)
-        && !empty($grouping)) return $this->db()->select(DB_META, '*', [
+        && !empty($grouping)) return $this->DB->select(DB_META, '*', [
             'target' => $target,
             'grouping' => $grouping
         ]);
         // Get by array
-        if (is_array($meta)) return $this->db()->select(DB_META, '*', [
+        if (is_array($meta)) return $this->DB->select(DB_META, '*', [
             'target' => $target,
             'name' => $meta
         ]);
         // Get by name
-        return $this->db()->get(DB_META, '*', [
+        return $this->DB->get(DB_META, '*', [
             'target' => $target,
             'name' => $meta
         ]);
@@ -123,7 +110,7 @@ class Database {
             if (!is_null($this->dbGetMeta($target, $key, $grouping))) {
                 if (empty($grouping)) $grouping = $this->dbGetMeta($target, $key)['grouping'];
     
-                $this->db()->update(DB_META, [
+                $this->DB->update(DB_META, [
                     'grouping' => $grouping,
                     'value' => $value
                 ], [
@@ -131,7 +118,7 @@ class Database {
                     'name' => $key
                 ]);
             } else {
-                $this->db()->insert(DB_META, [
+                $this->DB->insert(DB_META, [
                     'id' => \Mercurio\Utils\ID::new(),
                     'name' => $key,
                     'grouping' => $grouping,
@@ -153,19 +140,19 @@ class Database {
         // Delete all meta
         if (empty($meta)
         && empty($grouping)) {
-            $this->db()->delete(DB_META, [
+            $this->DB->delete(DB_META, [
                 'target' => $target
             ]);
         // Delete specific meta
         // Delete by group
         } elseif (!empty($grouping)) {
-            $this->db()->delete(DB_META, [
+            $this->DB->delete(DB_META, [
                 'target' => $target,
                 'grouping' => $grouping
             ]);
         // Delete by name
         } else {
-            $this->db()->delete(DB_META, [
+            $this->DB->delete(DB_META, [
                 'target' => $target,
                 'name' => $meta
             ]);

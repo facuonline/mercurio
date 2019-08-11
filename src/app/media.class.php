@@ -4,17 +4,29 @@
  * @package Mercurio
  * @subpackage Included classes
  * 
- * @var array $info Associative array with general media info
- * @var array $meta Associative array of meta values attached to media
  */
 namespace Mercurio\App;
-class Media extends \Mercurio\App\Database {
+class Media {
 
-    public $info, $meta;
+    /**
+     * Associative array of general media info
+     */
+    public $info;
+    
+    /**
+     * Associative array of media meta properties and values
+     */
+    public $meta;
 
-    public function __construct() {
+    /**
+     * Instance of dependency injected Database class
+     */
+    protected $DB;
+
+    public function __construct(\Mercurio\App\Database $db) {
         $this->info = false;
         $this->meta = [];
+        $this->DB = $db;
     }
 
     /**
@@ -40,7 +52,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $media = $this->db()->get(DB_MEDIA, '*', [
+        $media = $this->DB->get(DB_MEDIA, '*', [
             'id' => $hint
         ]);
         // Return data or load instance
@@ -60,7 +72,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function ($media) use (&$properties) {
-            $this->db()->update(DB_MEDIA,
+            $this->DB->update(DB_MEDIA,
                 $properties,
                 $media['id']
             );
@@ -72,7 +84,7 @@ class Media extends \Mercurio\App\Database {
      */
     public function unset() {
         $this->get(false, function ($media) {
-            $this->db()->delete(DB_MEDIA, ['id' => $media['id']]);
+            $this->DB->delete(DB_MEDIA, ['id' => $media['id']]);
             $this->unsetMeta();
         });
     }
@@ -125,7 +137,7 @@ class Media extends \Mercurio\App\Database {
         $properties = \Mercurio\Utils\System::property($properties);
 
         // Make media
-        $this->db()->insert(DB_MEDIA, $properties);
+        $this->DB->insert(DB_MEDIA, $properties);
         $this->get($properties['id']);
         return $this->info;
     }

@@ -4,18 +4,34 @@
  * @package Mercurio
  * @subpackage Included classes
  * 
- * @var array $info Associative array with general user info
- * @var array $meta Associative array of meta values attached to user
  */
 namespace Mercurio\App;
-class User extends \Mercurio\App\Database {
+class User {
 
-    public $info, $meta;
+    /**
+     * Associative array with general user info
+     */
+    public $info;
+
+    /**
+     * Associative array with user meta properties and values
+     */
+    public $meta;
+
+    /**
+     * User private email, use method getEmail
+     */
     private $email;
-
-    public function __construct() {
+    
+    /**
+     * Instance of dependency injected Database class
+     */
+    protected $DB;
+    
+    public function __construct(\Mercurio\App\Database $db) {
         $this->info = false;
         $this->meta = [];
+        $this->DB = $db;
     }
 
     /**
@@ -43,7 +59,7 @@ class User extends \Mercurio\App\Database {
      */
     public function get($hint = false, callable $callback = NULL, callable $fallback = NULL) {
         if (!$hint) $hint = $this->findHint();
-        $user = $this->db()->get(DB_USERS, [
+        $user = $this->DB->get(DB_USERS, [
             'id',
             'handle',
             'nickname',
@@ -73,7 +89,7 @@ class User extends \Mercurio\App\Database {
      */
     public function set(array $properties) {
         $this->get(false, function($user) use (&$properties) {
-            $this->db()->update(DB_USERS, 
+            $this->DB->update(DB_USERS, 
                 $properties,
                 ['id' => $user['id']]
             );
@@ -88,7 +104,7 @@ class User extends \Mercurio\App\Database {
         $this->get(false, function ($user) use (&$tables) {
             $this->unsetImg();
             $this->unsetMeta();
-            $this->db()->delete(DB_USERS, ['id' => $user['id']]);
+            $this->DB->delete(DB_USERS, ['id' => $user['id']]);
 
             if (!empty($tables)) foreach ($tables as $key => $value) {
                 $this->delete($value, ['author' => $user['id']]);
@@ -224,7 +240,7 @@ class User extends \Mercurio\App\Database {
         && $this->get($properties['email'])) throw new \Mercurio\Exception\User\ExistingEmail;
 
         // Make user
-        $this->db()->insert(DB_USERS, $properties);
+        $this->DB->insert(DB_USERS, $properties);
         $this->get($properties['id']);
         // Make basic meta
         $this->setMeta([
@@ -276,7 +292,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getEmail() {
         return $this->get(false, function($user) {
-            return (string) $this->db()->get(DB_USERS, 
+            return (string) $this->DB->get(DB_USERS, 
                 ['email'], 
                 ['id' => $user['id']]
             )['email'];
@@ -303,7 +319,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getChannels(callable $callback = NULL) {
         return $this->get(false, function($user) use (&$callback) {
-            $channels = $this->db()->select(DB_CHANNELS, '*', [
+            $channels = $this->DB->select(DB_CHANNELS, '*', [
                 'author' => $user['id']
             ]);
             if ($callback !== NULL) return $callback($channels);
@@ -319,7 +335,7 @@ class User extends \Mercurio\App\Database {
      */
     public function getMedias(callable $callback = NULL) {
         return $this->get(false, function($user) use (&$media) {
-            $medias = $this->db()->select(DB_MEDIA, '*', [
+            $medias = $this->DB->select(DB_MEDIA, '*', [
                 'author' => $user['id']
             ]);
             if ($callback !== NULL) return $callback($medias);
@@ -361,7 +377,7 @@ class User extends \Mercurio\App\Database {
             $lock = $this->getMeta('login_blocked')['value'];
             if ($lock === NULL) {
                 $attempts = $this->getMeta('login_attempt')['value'];
-                $hash = $this->db()->get(DB_USERS, 
+                $hash = $this->DB->get(DB_USERS, 
                     ['password'], 
                     ['id' => $this->info['id']]
                 )['password'];
