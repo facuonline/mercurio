@@ -15,11 +15,13 @@ class UrlTest extends \PHPUnit\Framework\TestCase {
         } else {
             $expected = 'http://localhost/mercurio/tests/?page=testPage&target=testTarget&action=testAction';
         }
+
         $this->assertEquals($expected, $url);
     }
 
     public function testGetUrlParamsReturnsArray() {
         $url = \Mercurio\Utils\URL::getUrlParams();
+        
         $this->assertIsIterable($url);
     }
 
@@ -31,8 +33,26 @@ class UrlTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetUrlParamsReturnsFalseOnEmptyQueries() {
         $url = \Mercurio\Utils\URL::getUrlParams();
+
+        $this->assertFalse($url['page']);
         $this->assertFalse($url['target']);
         $this->assertFalse($url['action']);
+    }
+
+    public function testSetRouteSpeed() {
+        $start = time();
+        $end = time();
+        $i = 0;
+        while ($i < 99) {
+            \Mercurio\Utils\URL::setRoute('/', '', function() use (&$end){
+               $end = time();
+            });
+            $i++;
+        }
+
+        $result = $start - $end;
+
+        $this->assertEquals('0', $result);
     }
 
     public function testSetUrlMaskingCreatesHtaccess() {
@@ -44,7 +64,6 @@ class UrlTest extends \PHPUnit\Framework\TestCase {
             $this->assertFileExists('.htaccess');
             unlink('.htaccess');
         } catch (\Mercurio\Exception\Environment $e) {
-            # expectException seems to be not working so by now this will be in a try catch
             $this->assertIsObject($e);
         }
     }

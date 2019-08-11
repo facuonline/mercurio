@@ -10,7 +10,7 @@
  * 
  */
 namespace Mercurio\Utils;
-class URL extends \Mercurio\App\Database {
+class URL {
 
     /**
      * Return proper page query syntax based on state of url masking
@@ -128,20 +128,32 @@ class URL extends \Mercurio\App\Database {
     }
 
     /**
-     * Obtain page from URL query
+     * Route page query and action \
+     * GET requests only
      * @param string $page Page keyword
      * Specify '/' as a page for main page
+     * @param string $action Page action
      * @param callable $callback Callback function to execute on page retrieval
      * function (string $page) :
      * @return callable $callback
      */
-    public static function getPage(string $page, callable $callback) {
-        $page = self::getUrlParams($page)['page'];
+    public static function setRoute(string $page, string $action = '', callable $callback) {
+        $page = self::getUrlParams($page, $action)['page'];
         if ($page) return $callback($page);
     }
 
     /**
-     * Obtain target from URL query
+     * Obtain page from URL query \
+     * GET requests only
+     * @return string|false Page name or false if no page specified
+     */
+    public static function getPage() {
+        return self::getUrlParams()['page'];
+    }
+
+    /**
+     * Obtain target from URL query \
+     * GET requests only
      * @return mixed|bool Target ID or handle or false if target is not specified
      */
     public static function getTarget() {
@@ -150,14 +162,10 @@ class URL extends \Mercurio\App\Database {
 
     /**
      * Obtain action from URL query
-     * @param string $action Action keyword
-     * @param callable $callback Callback function to execute on action retrieval
-     * function (string $action) :
-     * @return callable $callback
+     * @return mixed|bool Target ID or handle or false if target is not specified
      */
-    public static function getAction(string $action, callable $callback) {
-        $action = self::getUrlParams('', $action)['action'];
-        if ($action) return $callback($action);
+    public static function getAction() {
+        return self::getUrlParams()['action'];
     }
 
     /**
@@ -177,7 +185,7 @@ class URL extends \Mercurio\App\Database {
             return false;
         }
 
-        return self::getConfig('urlmasking');
+        return \Mercurio\App\Database::getConfig('urlmasking');
     }
 
     /**
