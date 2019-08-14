@@ -80,45 +80,38 @@ class Router {
     public static function getUrlParams(string $page = '', string $action = '') {
         $params = [];
 
-        if (isset($_GET['page'])) {
-            $pageQuery = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
-            if (!empty($page)
-            && $page === $pageQuery) {
-                $params['page'] = $page;
-            } elseif ($page === '/'
-            && empty($pageQuery)) {
-                $params['page'] = 'main';
-            } else {
-                $params['page'] = false;
-            }
-            
-            if (empty($page)) $params['page'] = trim($pageQuery);
+        if (!isset($_GET['page'])
+        || isset($_GET['page'])
+        && empty($_GET['page'])) {
+            $_GET['page'] = '/';
         } else {
-            $params['page'] = false;
-            if ($page === '/') $params['page'] = 'main';
+            $_GET['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
         }
 
-        if (isset($_GET['action'])
-        && !empty($_GET['action'])) {
-            $actionQuery = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
-            if (!empty($action) 
-            && $action === $actionQuery) {
-                $params['action'] = $action;
-            } else {
-                $params['action'] = false;
-            }
-            if (empty($action)) $params['action'] = trim($actionQuery);
+        if ($page == $_GET['page']) {
+            $params['page'] = true;
+        } else {
+            $params['page'] = false;
+        }
+
+        if (!isset($_GET['action'])) {
+            $_GET['action'] = '';
+        } else {
+            $_GET['action'] = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+        }
+
+        if ($action == $_GET['action']) {
+            $params['action'] = true;
         } else {
             $params['action'] = false;
         }
-        
+ 
         if (isset($_GET['target'])
         && !empty($_GET['target'])
         && $_GET['target'] !== '0') {
-            $target = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
-            $params['target'] = trim($target);
+            $params['target'] = filter_input(INPUT_GET, 'target', FILTER_SANITIZE_STRING);
         } else {
-            $params['target'] = false;
+            $params['target'] = NULL;
         }
 
         return $params;
@@ -131,12 +124,13 @@ class Router {
      * Specify '/' as a page for main page
      * @param string $action Page action
      * @param callable $callback Callback function to execute on page retrieval
-     * function (string $page) :
+     * function (string $params) :
      * @return callable $callback
      */
     public static function setRoute(string $page, string $action = '', callable $callback) {
-        $page = self::getUrlParams($page, $action)['page'];
-        if ($page) return $callback($page);
+        $params = self::getUrlParams($page, $action);
+        if ($params['page']
+        && $params['action']) return $callback($params);
     }
 
     /**
@@ -249,7 +243,7 @@ class Router {
             }
         }
         if ($engine) {
-            $htaccess[$engine] = "# Mercurio URL masking \n<IfModule mod_rewrite.c>\nRewriteEngine On";
+            $htaccess[$engine] = "# Mercurio URL masking\n<IfModule mod_rewrite.c>\nRewriteEngine On";
         }
         return $htaccess;
     }
@@ -261,7 +255,7 @@ class Router {
         $end = count($htaccess)+1;
         foreach ($htaccess as $key => $value) {
             if (strpos($value, "</IfModule>\n# URL masking end")) {
-                $start = $key+1;
+                $end = false;
             }
         }
         if ($end) {
@@ -274,13 +268,26 @@ class Router {
      * Sets up a rewrite mask for referrers and targets
      */
     private static function referrerHtaccess($htaccess) {
-        $cond = count($htaccess);
+        $conditions = false;
         foreach ($htaccess as $key => $value) {
-            if (strpos($value, '# Mercurio URL masking ')) {
-                $cond = $key+3;
+            if (strpos($value, "# Mercurio URL masking")) {
+                $conditions = $key+3;
             }
         }
-        $htaccess[$cond] = "\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/(.*)/(.*)$ ?page=$1&target=$2&action=$3\n";
+        if ($conditions) {
+            $htaccess[$conditions] = "
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^(.*)/(.*)/(.*)$ ?page=$1&target=$2&action=$3
+            
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^(.*)/(.*)$ ?page=$1&target=$2
+            
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^(.*)$ ?page=$1\n";
+        }
         return $htaccess;
     }
 
@@ -289,7 +296,9 @@ class Router {
      */
     private static function writeHtacess(string $location, $htaccess) {
         file_put_contents($location, $htaccess);
-        self::setConfig('urlmasking', true);
+        
+        $DB = new \Mercurio\App\Database;
+        $DB->setConfig('urlmasking', 1);
     }
 
 }
