@@ -83,9 +83,9 @@ class Channel {
      */
     public function set(array $properties) {
         $this->get(false, function ($channel) use (&$properties) {
-            $this->SQL->update(DB_CHANNELS,
-                $properties,
-                $channel['id']
+            $this->SQL->update(DB_CHANNELS, 
+                $properties, 
+                ['id' => $channel['id']]
             );
         });
     }

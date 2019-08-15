@@ -78,9 +78,9 @@ class Media {
      */
     public function set(array $properties) {
         $this->get(false, function ($media) use (&$properties) {
-            $this->SQL->update(DB_MEDIA,
-                $properties,
-                $media['id']
+            $this->SQL->update(DB_MEDIA, 
+                $properties, 
+                ['id' => $media['id']]
             );
         });
     }
