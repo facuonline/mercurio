@@ -88,7 +88,7 @@ class Router {
             $_GET['page'] = filter_input(INPUT_GET, 'page', FILTER_SANITIZE_STRING);
         }
 
-        if ($page == $_GET['page']) {
+        if ($page === $_GET['page']) {
             $params['page'] = true;
         } else {
             $params['page'] = false;

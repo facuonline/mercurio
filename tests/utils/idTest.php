@@ -32,7 +32,7 @@ class IdTest extends \PHPUnit\Framework\TestCase {
             $end = time();
             $result = $end - $start;
 
-            $this->assertEquals(1, $result);
+            $this->assertLessThanOrEqual(2, $result);
         }
     }
     
