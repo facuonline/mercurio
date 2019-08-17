@@ -7,7 +7,6 @@
  * e.g When a file can't be read as image
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class ImageInvalid extends Exception {
+class ImageInvalid extends \Mercurio\Exception\Model {
     
 }

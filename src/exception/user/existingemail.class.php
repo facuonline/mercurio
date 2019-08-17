@@ -7,7 +7,6 @@
  * e.g When an email to be submitted already exists
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class ExistingEmail extends Exception {
+class ExistingEmail extends \Mercurio\Exception\Model {
     
 }

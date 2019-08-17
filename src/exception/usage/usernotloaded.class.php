@@ -7,8 +7,7 @@
  * e.g When not calling User->get before using another method
  */
 namespace Mercurio\Exception\Usage;
-use Exception;
-class UserNotLoaded extends Exception{
+class UserNotLoaded extends \Mercurio\Exception\Model {
     public function __construct() {
         $message = "Class method can only be called on instances loaded with an existing user data. Use method <strong>get</strong> to load an user into instance.";
         return parent::__construct($message);

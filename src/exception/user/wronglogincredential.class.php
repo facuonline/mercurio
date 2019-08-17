@@ -7,7 +7,6 @@
  * e.g When a login credential value is incorrect
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class WrongLoginCredential extends Exception {
+class WrongLoginCredential extends \Mercurio\Exception\Model {
     
 }

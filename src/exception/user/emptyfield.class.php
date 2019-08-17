@@ -7,7 +7,6 @@
  * e.g When an important form field is missing
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class EmptyField extends Exception {
+class EmptyField extends \Mercurio\Exception\Model {
     
 }

@@ -7,7 +7,6 @@
  * e.g When an image has an unknown MIME type
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class ImageMIMEUnknown extends Exception {
+class ImageMIMEUnknown extends \Mercurio\Exception\Model {
     
 }

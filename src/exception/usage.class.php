@@ -7,7 +7,6 @@
  * e.g When not properly using a class method
  */
 namespace Mercurio\Exception;
-use Exception;
-class Usage extends Exception {
+class Usage extends \Mercurio\Exception\Model {
 
 }

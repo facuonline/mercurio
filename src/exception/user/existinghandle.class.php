@@ -7,7 +7,6 @@
  * e.g When a a handle to be submitted already exists
  */
 namespace Mercurio\Exception\User;
-use Exception;
-class ExistingHandle extends Exception {
+class ExistingHandle extends \Mercurio\Exception\Model {
     
 }

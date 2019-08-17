@@ -7,7 +7,6 @@
  * e.g When an important app file or config is missing
  */
 namespace Mercurio\Exception;
-use Exception;
-class Environment extends Exception {
+class Environment extends \Mercurio\Exception\Model {
     
 }

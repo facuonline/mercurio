@@ -9,8 +9,7 @@
  * @param string $property Property name
  */
 namespace Mercurio\Exception\Usage;
-use Exception;
-class SystemProperty extends Exception {
+class SystemProperty extends \Mercurio\Exception\Model {
     public function __construct(string $property) {
         $message = "Property <strong>'$property'</strong> can't be manipulated by other than the system.";
         return parent::__construct($message);

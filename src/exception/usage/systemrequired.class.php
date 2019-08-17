@@ -11,8 +11,7 @@
  * @param string $array Array name
  */
 namespace Mercurio\Exception\Usage;
-use Exception;
-class SystemRequired extends Exception {
+class SystemRequired extends \Mercurio\Exception\Model {
     public function __construct(string $method, string $array, string $property = '') {
         $message = "Class method <strong>$method</strong> expects a <strong>$property</strong> array key in $array";
         return parent::__construct($message);

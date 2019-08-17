@@ -8,7 +8,6 @@
  * e.g When not being able to return a value via a class method
  */
 namespace Mercurio\Exception;
-use Exception;
-class Runtime extends Exception {
+class Runtime extends \Mercurio\Exception\Model {
 
 }

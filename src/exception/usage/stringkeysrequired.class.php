@@ -7,8 +7,7 @@
  * e.g When not specifying a string type key for an array index
  */
 namespace Mercurio\Exception\Usage;
-use Exception;
-class StringKeysRequired extends Exception{
+class StringKeysRequired extends \Mercurio\Exception\Model{
     public function __construct(string $method) {
         $message = "Class method <strong>'$method'</strong> requires an associative array of all string keys.";
         return parent::__construct($message);
