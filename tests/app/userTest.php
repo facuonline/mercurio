@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 
 class UserTest extends \PHPUnit\Framework\TestCase {
 

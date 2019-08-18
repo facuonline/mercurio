@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 
 $_SERVER['REMOTE_PORT'] = 0120;
 

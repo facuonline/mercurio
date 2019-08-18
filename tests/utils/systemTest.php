@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 
 class SystemTest extends \PHPUnit\Framework\TestCase {
 

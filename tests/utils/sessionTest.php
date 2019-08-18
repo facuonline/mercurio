@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 /**
  * We'll be mocking apache $_SERVER and $_SESSION, shhh, this test does not aim to probe how well does Apache work anyways
  */

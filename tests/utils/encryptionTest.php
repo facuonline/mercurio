@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 
 class EncryptionTest extends \PHPUnit\Framework\TestCase {
 

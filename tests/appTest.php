@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 
 \Mercurio\App::setApp([
     'KEY' => 'test',

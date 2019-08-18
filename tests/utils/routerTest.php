@@ -1,5 +1,5 @@
 <?php
-namespace Mercurio;
+namespace Mercurio\Test;
 class RouterTest extends \PHPUnit\Framework\TestCase {
 
     public function testIsMaskingOnReturnsBool() {
