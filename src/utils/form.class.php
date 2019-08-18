@@ -1,13 +1,15 @@
 <?php
+
+namespace Mercurio\Utils;
+
 /**
- * Form class
+ * Form creator
+ * 
+ * Extended from  nette/forms
+ * @see https://doc.nette.org/en/3.0/forms
  * @package Mercurio
  * @subpackage Utilitary classes
- * 
- * Extended \Nette\Forms
- * @see https://doc.nette.org/en/3.0/forms
  */
-namespace Mercurio\Utils;
 class Form extends \Nette\Forms\Form {
 
     /**

@@ -1,10 +1,12 @@
 <?php
+
+namespace Mercurio\Utils;
+
 /**
- * IMG class
+ * Image management and generation
  * @package Mercurio
  * @subpackage Utilitary Classes
  *
- * Image Management and Generation
  * Since uploading and storing user submited files is insecure
  * Mercurio should never allow it, instead use this class to create new, jpeg compressed and safe files. Alternatively you can use included samayo/bulletproof package.
  * 
@@ -22,9 +24,7 @@
  * @see https://github.com/samayo/bulletproof
  *
  */
-
-namespace Mercurio\Utils;
-class Img {
+class Image {
 	
 	public $hash, $maxfilesize;
 	private $file, $path;

@@ -1,11 +1,12 @@
 <?php 
+
+namespace Mercurio\Utils;
+
 /**
+ * System tools and fallback
  * @package Mercurio
  * @subpackage Utilitary classes
- * 
- * System tools
  */
-namespace Mercurio\Utils;
 class System {
 
     /**

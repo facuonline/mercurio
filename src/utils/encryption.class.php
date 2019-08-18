@@ -1,12 +1,13 @@
 <?php
+
+namespace Mercurio\Utils;
+
 /**
- * Encryption class
+ * Strong, app wide encryption using OpenSSL
  * @package Mercurio
  * @subpackage Utilitary classes
- * 
  * Safe and secure encryption made easy
  */
-namespace Mercurio\Utils;
 class Encryption {
 
     /**

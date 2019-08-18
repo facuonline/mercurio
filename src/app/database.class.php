@@ -1,12 +1,14 @@
 <?php
-/**
- * Database connection and utils
- * @package Mercurio
- * @subpackage Included classes
- * 
- */
 
 namespace Mercurio\App;
+
+/**
+ * Database connection \
+ * This class must be injected into App models \
+ * To configure your database use `\Mercurio\App::setDatabase()`
+ * @package Mercurio
+ * @subpackage Included classes
+ */
 class Database {
 
     /**

@@ -1,12 +1,12 @@
 <?php
+
+namespace Mercurio\Utils;
+
 /**
- * Router
+ * Simple HTTP requests router and URL middleware
  * @package Mercurio
  * @package Utilitary classes
- * 
- * Requests router
  */
-namespace Mercurio\Utils;
 class Router {
 
     /**

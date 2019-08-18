@@ -1,11 +1,12 @@
 <?php
+
+namespace Mercurio\App;
+
 /**
- * User class
+ * User entity class
  * @package Mercurio
  * @subpackage Included classes
- * 
  */
-namespace Mercurio\App;
 class User {
 
     /**

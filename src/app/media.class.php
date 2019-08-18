@@ -1,11 +1,12 @@
 <?php
+
+namespace Mercurio\App;
+
 /**
- * Media class
+ * Media entity class
  * @package Mercurio
  * @subpackage Included classes
- * 
  */
-namespace Mercurio\App;
 class Media {
 
     /**

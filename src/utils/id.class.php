@@ -1,18 +1,19 @@
 <?php
+
+namespace Mercurio\Utils;
+
+
 /** 
- * ID class
+ * ID generation and obfuscation
  * @package Mercurio
  * @subpackage Included Classes
  * 
- * ID generation and obfuscation
  * Inspired by Snowflake by Twitter, this class allows for decentralized, independent, meaningful id generation. 
  * Simpler, not as consuming as other implementations. 
  * _Not collision free_ but extremely unlikely to happen.
  * 
  * Not fixed length, with enough (a lot of years) time IDs will overflow 64 bits
  */
-
-namespace Mercurio\Utils;
 class ID {
 
 	/**

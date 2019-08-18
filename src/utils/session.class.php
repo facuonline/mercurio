@@ -1,17 +1,15 @@
 <?php
+
+namespace Mercurio\Utils;
+
 /**
- * Session
+ * Session manager
  * @package Mercurio
  * @subpackage Utilitary classes
  * 
  * Improved Session management
  * Not as improved as other solutions out there
- * 
- * @var array $session
- * @var array $segment
- * 
  */
-namespace Mercurio\Utils;
 class Session {
 
     /**

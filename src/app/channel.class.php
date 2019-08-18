@@ -1,13 +1,12 @@
 <?php
+
+namespace Mercurio\App;
+
 /**
- * Channel class
+ * Channel entity class
  * @package Mercurio
  * @subpackage Included classes
- * 
- * @var array $info Associative array with general channel info
- * @var array $meta Associative array of meta values attached to channel
  */
-namespace Mercurio\App;
 class Channel {
 
     /**

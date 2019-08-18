@@ -1,10 +1,13 @@
 <?php
+
+namespace Mercurio;
+
 /**
- * App *Mercurio main class*
+ * Mercurio main class \
+ * **Must** instantiate to be able to use Mercurio
  * @package Mercurio
  * @subpackage App class
  */
-namespace Mercurio;
 class App {
 
     /**
