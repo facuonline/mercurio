@@ -91,8 +91,8 @@ class Media {
      */
     public function unset() {
         $this->get(false, function ($media) {
-            $this->SQL->delete(DB_MEDIA, ['id' => $media['id']]);
             $this->unsetMeta();
+            $this->SQL->delete(DB_MEDIA, ['id' => $media['id']]);
         });
     }
 

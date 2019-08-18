@@ -94,8 +94,8 @@ class Channel {
      */
     public function unset() {
         $this->get(false, function ($channel) {
-            $this->SQL->delete(DB_CHANNELS, ['id' => $channel['id']]);
             $this->unsetMeta();
+            $this->SQL->delete(DB_CHANNELS, ['id' => $channel['id']]);
         });
     }
 
