@@ -11,25 +11,43 @@ class SessionTest extends \PHPUnit\Framework\TestCase {
 
     public function testGetReturnsArray() {
         $session = \Mercurio\Utils\Session::get();
+
         $this->assertIsIterable($session);
     }
 
     public function testSessionArrayHasControlKeys() {
         $session = \Mercurio\Utils\Session::get();
+
         $this->assertArrayHasKey('UserAgent', $session);
         $this->assertArrayHasKey('IPAddress', $session);
         $this->assertArrayHasKey('CreatedAt', $session);
     }
 
+    public function testGetReturnsValueOnString() {
+        $session = \Mercurio\Utils\Session::get('UserAgent');
+
+        $this->assertIsString($session);
+    }
+
     public function testGetAssignsFallback() {
         $fallback = \Mercurio\Utils\Session::get('testFallback', 'fallbackDefaultAssigned');
+
         $this->assertSame('fallbackDefaultAssigned', $fallback);
     }
 
     public function testSetAssignsValues() {
         \Mercurio\Utils\Session::set('test', ['testKey' => 'testKeyValue'], false);
         $setted = \Mercurio\Utils\Session::get('test');
-        $this->assertIsArray($setted);
+
+        $this->assertIsIterable($setted);
+        $this->assertArrayHasKey('testKey', $setted);
+    }
+
+    public function testUnsetUnsets() {
+        \Mercurio\Utils\Session::unset('test', false);
+        $unsetted = \Mercurio\Utils\Session::get('test');
+
+        $this->assertNull($unsetted);
     }
 
     public function testIsValidThrowsException() {

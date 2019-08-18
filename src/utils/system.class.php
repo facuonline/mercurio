@@ -33,7 +33,7 @@ class System {
      */
     public static function required(array $keys, array $array, string $classmethod) {
         foreach ($keys as $key) {
-            if (!array_key_exists($key, $array)) throw new \Mercurio\Exception\Usage\SystemRequired($classmethod, $$array, $key);
+            if (!array_key_exists($key, $array)) throw new \Mercurio\Exception\Usage\SystemRequired($classmethod, $array,  $key);
         }
     }
 

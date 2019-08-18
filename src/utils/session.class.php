@@ -49,16 +49,17 @@ class Session {
 
     /**
      * Destroy a session variable or all of them if none specified
-     * @param string $segment Session key of data
+     * @param string $key Session key of data
      * @param bool $regenerate Regenerates session id
      */
-    public function unset(string $segment = '', bool $regenerate = true) {
+    public function unset(string $key = '', bool $regenerate = true) {
         self::isValid();
         if (!empty($segment)) {
-            unset($_SESSION['Mercurio'][$segment]);
+            unset($_SESSION['Mercurio'][$key]);
         } else {
             session_unset();
         }
+        
         if ($regenerate) session_regenerate_id(true);
     }
 

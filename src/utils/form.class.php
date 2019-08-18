@@ -16,13 +16,14 @@ class Form extends \Nette\Forms\Form {
      * Build new form with auto anti spam
      */
     public function __construct() {
-        $form = new \Nette\Forms\Form;
-        $form->addHidden('url_website')
+        parent::__construct();
+        $this->addHidden('url_website_pot')
             ->addRule(\Nette\Forms\Form::BLANK);
-        $form->addHidden('form_stamp')
+        $this->addHidden('name_title_pot')
+            ->addRule(\Nette\Forms\Form::BLANK);
+        $this->addHidden('form_stamp')
             ->setDefaultValue(time() + 3)
             ->addRule(\Nette\Forms\Form::MIN, 'Please try again.', time());
-        return $form;
     }
 
 }

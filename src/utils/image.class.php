@@ -8,7 +8,8 @@ namespace Mercurio\Utils;
  * @subpackage Utilitary Classes
  *
  * Since uploading and storing user submited files is insecure
- * Mercurio should never allow it, instead use this class to create new, jpeg compressed and safe files. Alternatively you can use included samayo/bulletproof package.
+ * Mercurio should never allow it, instead use this class to create new, jpeg compressed and safe files.
+ * Alternatively you can use included samayo/bulletproof package.
  * 
  * To avoid using insecure $_FILES array info 
  * this class only accepts an input name and searches for the tmp_ file in it.
