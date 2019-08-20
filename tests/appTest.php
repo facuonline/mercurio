@@ -16,7 +16,6 @@ namespace Mercurio\Test;
 class AppTest extends \PHPUnit\Framework\TestCase {
 
     public function testSetAppDefinesEnvironmentalVariables() {
-        $this->assertIsString(getenv('APP_KEY'));
         $this->assertEquals('test', getenv('APP_KEY'));
         $this->assertEquals('customEnvironmentalVariable', getenv('APP_CUSTOM'));
     }
@@ -31,12 +30,21 @@ class AppTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsString(APP_CSRFPHP);
     }
 
+    public function testSetAppDefinesDatabaseConstants() {
+        $this->assertIsString(DB_PREFIX);
+        $this->assertIsString(DB_CONF);
+        $this->assertIsString(DB_META);
+        $this->assertIsString(DB_USERS);
+        $this->assertIsString(DB_CHANNELS);
+        $this->assertIsString(DB_MEDIA);
+    }
+
     public function testGetAppTrimsUrl() {
         $this->assertStringEndsWith('/', \Mercurio\App::getApp('URL'));
     }
 
     public function testRandomKeyReturnsString() {
-        $this->assertIsString(\Mercurio\App::randomKey(), 'Received a non string');
+        $this->assertIsString(\Mercurio\App::randomKey());
     }
 
     public function testRandomKeyIsRandom() {

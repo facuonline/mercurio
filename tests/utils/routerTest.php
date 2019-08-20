@@ -25,12 +25,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsIterable($url);
     }
 
-    public function testGetUrlParamsReturnsMainPageOnEmptyQuery() {
-        $page = \Mercurio\Utils\Router::getUrlParams('/')['page'];
-
-        $this->assertTrue($page);
-    }
-
     public function testGetUrlParamsReturnsDefaultOnEmptyQueries() {
         $url = \Mercurio\Utils\Router::getUrlParams();
 
@@ -38,6 +32,12 @@ class RouterTest extends \PHPUnit\Framework\TestCase {
         $this->assertNull($url['target']);
         // empty actions are true by default
         $this->assertTrue($url['action']);
+    }
+
+    public function testGetUrlParamsReturnsMainPageOnEmptyQuery() {
+        $page = \Mercurio\Utils\Router::getUrlParams('/')['page'];
+
+        $this->assertTrue($page);
     }
 
     /**
