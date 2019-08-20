@@ -32,12 +32,16 @@ class RouterTest extends \PHPUnit\Framework\TestCase {
         $this->assertNull($url['target']);
         // empty actions are true by default
         $this->assertTrue($url['action']);
+        // Delete $_GET so it doesn't contaminates other tests
+        unset($_GET);
     }
 
     public function testGetUrlParamsReturnsMainPageOnEmptyQuery() {
         $page = \Mercurio\Utils\Router::getUrlParams('/')['page'];
 
         $this->assertTrue($page);
+        // Delete $_GET so it doesn't contaminates other tests
+        unset($_GET);
     }
 
     /**
