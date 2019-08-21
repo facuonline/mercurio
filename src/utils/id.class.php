@@ -2,7 +2,6 @@
 
 namespace Mercurio\Utils;
 
-
 /** 
  * ID generation and obfuscation
  * @package Mercurio
@@ -25,7 +24,8 @@ class ID {
 	 * 1 digit connection port based discriminator.\
 	 * 1 digit client ip based discriminator.\
 	 * 1 digit random entropic discriminator.
-	 * @return int */
+	 * @return int 
+	 */
 	public static function new() : int {
 		// Custom epoch from the january 1st 2019
 		$time = time() - 1546300800;
@@ -48,21 +48,31 @@ class ID {
 	}
 
 	/**
-	 * Encrypts and decrypts a ID to prevent CSRF
+	 * Encrypts an ID number using AES192-CTR
 	 *
 	 * Encrypted values are session wise decryptable 
 	 *
-	 * @param int|string $ID ID to encrypt or decrypt
-	 * @return int|string */
-	public static function enc($ID = false){
-		if (!$ID) $ID = self::new();
+	 * @param int $ID ID to encrypt or decrypt
+	 * Leave int 0 to create a new ID
+	 * @return string
+	 * @see `\Mercurio\Utils\Encryption` for more advanced encryption
+	 */
+	public static function encrypt(int $ID = 0) : string {
+		if ($ID === 0) $ID = self::new();
 		/* aes-192-ctr is chosen because it allows for faster system performance in encryption and this function is supposed to provide an obfuscation layer rather than actually cryptosafe values, that's also the reason for no random IV */
-		if (ctype_digit($ID)) {
-			$iv = substr(md5(getenv('APP_KEY')), -16);
-			return openssl_encrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
-		} else {
-			$iv = substr(md5(getenv('APP_KEY')), -16);
-			return openssl_decrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
-		}
+		$iv = substr(md5(getenv('APP_KEY')), -16);
+		return openssl_encrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
+	}
+
+	/**
+	 * Decrypts an ID encoded by `\Mercurio\Utils\ID::encrypt()`
+	 * 
+	 * @return int Decrypted original ID
+	 * @see `\Mercurio\Utils\Encryption` for more advanced encryption
+	 */
+	public static function decrypt(string $ID) : int {
+		/* aes-192-ctr is chosen because it allows for faster system performance in encryption and this function is supposed to provide an obfuscation layer rather than actually cryptosafe values, that's also the reason for no random IV */
+		$iv = substr(md5(getenv('APP_KEY')), -16);
+		return openssl_decrypt($ID, 'aes-192-ctr', session_id(), 0, $iv);
 	}
 }
