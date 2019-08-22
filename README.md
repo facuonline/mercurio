@@ -35,7 +35,7 @@ Alternatively if you have a database:
     ]);
 ```
 
-This will prepare your environment to work with Mercurio. To work with all of the `App` classes and most `Utils` it's necessary that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e just some Utils).
+This will prepare your environment to work with Mercurio. To work with all of the `App` classes and a small part of some `Utils` it's necessary (recommended in case of utils) that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e just some Utils).
 >You can obtain a random, safe key using **`Mercurio\App:randomKey()`** (without directly passing it in the array, the app key needs to remain consistent trough the App's life)
 
 ### Utils and App
@@ -106,7 +106,7 @@ To organize our app view we will define some pages.
         include 'views/pages/users.php';
     });
 ```
-By defining pages this way we actually define what the sections of our app will be and what templates we'll use.
+By defining pages this way we actually define what the sections of our app will be and what templates we will use.
 
 This is pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will route requests to their designated paths. **Actually our whole app will happen inside index.php** much like a React.js app, just in PHP, so you can add your header, footer and other page classic and universal elements in your index.php.
 
@@ -123,7 +123,8 @@ If you wish you can use any templating language you want. Like [Twig](https://tw
 Now here comes the fun and where Mercurio will really excel at. Our example app will only have basic support for simple users, but you'll still be able to see the perks of Mercurio.
 
 ```php
-$user = new \Mercurio\App\User(new \Mercurio\App\Database);
+$db = new \Mercurio\App\Database;
+$user = new \Mercurio\App\User($db);
 
 if ($user->get()) {
     include 'user_profile.php';
@@ -168,7 +169,9 @@ We can process this form like following:
 ```php
     if ($form->isSuccess()) {
         $values = $form->getValues();
-        $user = new \Mercurio\App\User(new \Mercurio\App\Database);
+
+        $db = new \Mercurio\App\Database;
+        $user = new \Mercurio\App\User($db);
 
         try {
             $user->login($values['username'], $values['password'], 
