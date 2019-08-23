@@ -153,9 +153,13 @@ If get does not find an user for us to work with it will return **false**, else 
 ##### user_login.php
 You've already seen how Mercurio makes handling and retrieving users an easy task. But Mercurio does not stop there.
 ```php
-    $form = new \Mercurio\Utils\Form;
+    $netteForm = new \Nette\Forms\Form;
+    // Nette\Forms\Form comes bundled with Mercurio
+    $formFactory = new \Mercurio\Utils\Form($netteForm);
+    $formFactory->addSpamProtection();
     // Mercurio form objects are an extension of Nette\Forms
     // they only add an extra layer of security against SPAM 
+    $form = $formFactory->getForm();
 
     $form->addText('username', 'Username or email:')
         ->setRequired(true);

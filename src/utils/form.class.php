@@ -23,6 +23,8 @@ class Form {
      */
     public function __construct(\Nette\Forms\Form $nette) {
         $this->form = $nette;
+
+        $this->form->onSuccess[] = $this->form->isSuccess();
     }
 
     /**
@@ -31,9 +33,6 @@ class Form {
      * @return object \Nette\Forms\Form
      */
     public function addSpamProtection(string $key = '') {
-        // Add APP url to harden Mercurio specific spam submission
-        if (empty($key)) $key = '_'.getenv('APP_URL');
-
         $this->form->addHidden('url_website_pot'.$key)
             ->addRule(\Nette\Forms\Form::BLANK);
         $this->form->addHidden('name_title_pot'.$key)
