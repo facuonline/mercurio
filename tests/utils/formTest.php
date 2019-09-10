@@ -3,13 +3,13 @@ namespace Mercurio\Test;
 class FormTest extends \PHPUnit\Framework\TestCase {
 
     public function testSetSpamProtection() {
-        $form = new \Mercurio\Utils\Form(new \Nette\Forms\Form);
-        $form->setSpamProtection('test');
-        $test = $form->getForm();
+        $form = new \Mercurio\Utils\Form;
+        $form->addSpamProtection('test');
+        $form = $form->getForm();
 
-        $this->assertIsObject($test['url_website_pot_test']);
-        $this->assertIsObject($test['name_title_pot_test']);
-        $this->assertIsObject($test['form_stamp_test']);
+        $this->assertIsObject($form['url_website_pottest']);
+        $this->assertIsObject($form['name_title_pottest']);
+        $this->assertIsObject($form['form_stamptest']);
     }
 
 }

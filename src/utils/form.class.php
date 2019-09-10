@@ -19,10 +19,9 @@ class Form {
 
     /**
      * Start new form object
-     * @param object $nette Dependency injected \Nette\Forms\Form class
      */
-    public function __construct(\Nette\Forms\Form $nette) {
-        $this->form = $nette;
+    public function __construct() {
+        $this->form = new \Nette\Forms\Form;
 
         $this->form->onSuccess[] = $this->form->isSuccess();
     }

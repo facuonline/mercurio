@@ -18,8 +18,8 @@ class IdTest extends \PHPUnit\Framework\TestCase {
      */
     public function testNewReturnsDifferentNumbers() {
         // We fake this because this is what ID will find in real world environments
-        $_SERVER['REMOTE_PORT'] = '1234';
-        $_SERVER['REMOTE_ADDR'] = '123.45.678.9';
+        $_SERVER['REMOTE_PORT'] = '7000';
+        $_SERVER['REMOTE_ADDR'] = '123.456.789.0';
         $start = time();
         
         $i = 0;
