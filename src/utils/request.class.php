@@ -5,7 +5,7 @@ namespace Mercurio\Utils;
 /**
  * Simple HTTP requests 
  * @package Mercurio
- * @package Utilitary classes
+ * @subpackage Utilitary classes
  */
 class Request {
 
@@ -27,7 +27,7 @@ class Request {
         $route = ltrim($_SERVER['REQUEST_URI'], $base);
         $route = rtrim($route, '/');
         if ($route === '') $route = '/';
-        
+
         $this->route = $route;
     }
 
