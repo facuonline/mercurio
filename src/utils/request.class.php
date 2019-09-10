@@ -9,13 +9,31 @@ namespace Mercurio\Utils;
  */
 class Request {
 
+    /**
+     * Request method
+     */
+    public $method;
+
+    /**
+     * Request route
+     */
+    public $route;
+
     public function __construct() {
+        $method = $_SERVER['REQUEST_METHOD'];
+
+        // Strip slashes and App basepath from Request URI
+        $base = parse_url(\Mercurio\App::getApp('url'))['path'];
+        $route = ltrim($_SERVER['REQUEST_URI'], $base);
+        $route = rtrim($route, '/');
+        if ($route === '') $route = '/';
         
+        $this->route = $route;
     }
 
     /**
      * Filter requests bodies
-     * @param array $request Request array\
+     * @param array $request PHP Request array\
      *  $_GET, $_POST, etc
      * @param string $method filter_input() filtering type \
      *  Must go along with the request
@@ -34,12 +52,12 @@ class Request {
      * @return array Filtered post body
      */
     public function getBody() {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            return $this->filterBody($_GET, INPUT_GET);
+        if ($this->method === 'GET') {
+            return $this->filterBody($_GET, INPUT_GET, FILTER_SANITIZE_URL);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            return $this->filterBody($_POST, INPUT_POST);
+        if ($this->method === 'POST') {
+            return $this->filterBody($_POST, INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
         }
     }
 
