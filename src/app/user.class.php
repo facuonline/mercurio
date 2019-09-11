@@ -314,7 +314,8 @@ class User {
      */
     public function getLink(string $page, string $action = '') {
         return $this->get(false, function($user) use (&$page, &$action) {
-            return (string) \Mercurio\Utils\Router::getLink($page, $user['handle'], $action);
+            return;
+            // TODO
         });
     }
 

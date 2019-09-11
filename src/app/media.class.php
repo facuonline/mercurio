@@ -179,7 +179,8 @@ class Media {
      */
     public function getLink(string $page, string $action = '') {
         return $this->get(false, function($media) use (&$page, &$action) {
-            return (string) \Mercurio\Utils\Router::getLink($page, $media['id'], $action);
+            return;
+            // TODO
         });
     }
 

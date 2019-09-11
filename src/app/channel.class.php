@@ -169,9 +169,10 @@ class Channel {
      * @param string $action Optional channel action
      * @return string URL
      */
-    public function getLink(string $action = '') {
+    public function getLink() {
         return $this->get(false, function($channel) use (&$page, &$action) {
-            return (string) \Mercurio\Utils\Router::getLink($page, $channel['handle'], $action);
+            return;
+            // TODO
         });
     }
 

@@ -20,7 +20,7 @@ class Request {
     public $route;
 
     public function __construct() {
-        $method = $_SERVER['REQUEST_METHOD'];
+        $this->method = $_SERVER['REQUEST_METHOD'];
 
         // Strip slashes and App basepath from Request URI
         $base = parse_url(\Mercurio\App::getApp('url'))['path'];
