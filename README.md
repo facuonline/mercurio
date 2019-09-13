@@ -3,7 +3,8 @@ Courier. Not CMS. (Still in development)
 
 Comprehensive library to help you develop safer, better web apps in PHP.
 
-[Contributing](#contributing)
+[Example App](#your_first_app) /
+[Contributing](#contributing) /
 [TODOs](#TODOs)
 
 ## Installation
@@ -94,8 +95,8 @@ Router controller will easily help us to listen for specific requests and respon
     });
 
     // By using ':' we tell Mercurio that this is a variable value
-    // This value can be later obtained as part of the request
-    $router->GET('user/:handle', function($request) {
+    // This value can be later obtained by the router
+    $router->GET('user/:userid', function($request) {
         include 'views/user_profile.php';
         echo $request->getParams('handle');
     });
@@ -126,28 +127,23 @@ If you wish you can use any templating language you want. Like [Twig](https://tw
 Now here comes the fun and where Mercurio will really excel at. Our example app will only have basic support for simple users, but you'll still be able to see the perks of Mercurio.
 
 ```php
-$db = new \Mercurio\App\Database;
-$user = new \Mercurio\App\User($db);
+$user = new \Mercurio\App\User;
 
-if ($user->get()) {
+$id = $router->getParams()['userid']);
+if ($user->getById($id) {
     include 'user_profile.php';
 } else {
     include 'user_login.php';
 }
 ```
-This code first instantiates the `App\User` model. The `App\Database` class does not require configuration and will take the connection parameters from the defined ones when setting up the Mercurio App. Still it needs to be injected on every `App` model.
+This code first instantiates the `App\User` model. We tell this empty instance to load an user by their id. If it succeeds we show it's profile, else we show a login page.
 
-With the **`get`** method we can automatically load an user from the **database** into instance. Mercurio will try to find an user in the following order:
-1. User at self instance.
-2. User by hint at Target query.
-3. User in session. (Logged in)
+>The **`getBy*`** methods serve to load an user from the database into the instance. Not to be mistaken with the **`get*`** methods that return user properties.
 
->Alternatively you can directly provide an user hint (user string handle, email or numeric id) to bypass this list.
+**^Due to changes in Routing this behaviour is yet not ready.**
 
-**^Due to changes in Routing this behaviour is broken and needs to be refactored**
 
-If get does not find an user for us to work with it will return **false**, else it will return an array with user's info and load the instance.
->Alternatively you can provide a closure function as second argument to directly access user data without loading instance.
+>Alternatively you can provide a closure function as second argument to directly access user data without loading instance. Also you can provide a closure as third argument to be executed if no user is found.
 
 ##### user_profile.php
 ```php
@@ -176,8 +172,7 @@ We can process this form like following:
     if ($form->isSuccess()) {
         $values = $form->getValues();
 
-        $db = new \Mercurio\App\Database;
-        $user = new \Mercurio\App\User($db);
+        $user = new \Mercurio\App\User();
 
         try {
             $user->login($values['username'], $values['password'], 
@@ -200,8 +195,9 @@ Mercurio is a personal project of me, born out of my desire to learn backend web
 If you have significative input to add, *Pull Requests* are open, however consider the following TODOs before submitting any changes or additions to the existing codebase:
 
 ## TODOs
-1. Implement dependency injection on App classes
-2. Work `Utils\Router` as a well optimized Router and request handler.
-3. Finish tests for existing code and fully adopt TDD.
-4. Conduct tests asserting file related tasks.
-5. Conduct tests asserting database related tasks.
+1. Work `Utils\Router` as a well optimized Router and request handler.
+2. Finish tests for existing code and fully adopt TDD.
+3. Conduct tests asserting file related tasks.
+4. Conduct tests asserting database related tasks.
+
+Apart from this list, codebase is full of "todo" tags, if you find one feel free to try and finish it.
