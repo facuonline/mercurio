@@ -24,13 +24,12 @@ class User extends Model {
      */
     private $email;
     
-
     /**
      * Users table in database
      */
     protected $DBTABLE = DB_USERS;
     
-    public function __construct(\Mercurio\App\Database $db) {
+    public function __construct() {
         $this->info = [
             'id' => NULL, 
             'handle' => NULL, 
@@ -39,7 +38,6 @@ class User extends Model {
             'stamp' => NULL
         ];
         $this->meta = [];
-        $this->DB = $db->getSQL();
     }
 
     /**

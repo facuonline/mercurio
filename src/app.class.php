@@ -199,7 +199,7 @@ class App {
     /**
      * Set database tables and columns via SQL \
      * Run only if your database hasn't been set before
-     * @param object $DB Instance of dependency injection \Mercurio\App\Database
+     * @param object $DB Instance of dependency injection `\Mercurio\App\Database`
      * @throws object Exception if array does not contain expected values
      */
     public static function setDatabase(\Mercurio\App\Database $DB) {

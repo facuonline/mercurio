@@ -19,21 +19,10 @@ class Channel {
      */
     public $meta;
 
-    /**
-     * Instance of dependency injected Database class
-     */
-    protected $DB;
-
-    /**
-     * SQL query builder
-     */
-    private $SQL;
 
     public function __construct(\Mercurio\App\Database $db) {
         $this->info = false;
         $this->meta = [];
-        $this->DB = $db;
-        $this->SQL = $db->getSQL();
     }
 
     /**

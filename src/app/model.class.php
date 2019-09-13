@@ -16,7 +16,7 @@ class Model {
     public $info;
 
     /**
-     * Instance of SQL builder via dependency injected database class
+     * Instance of SQL builder via database class
      */
     protected $DB;
 
@@ -25,9 +25,11 @@ class Model {
      */
     protected $DBTABLE = false;
 
-    public function __construct(\Mercurio\App\Database $database) {
+    public function __construct() {
         $this->info = ['id' => NULL];
-        $this->DB = $database->getSQL();
+
+        $db = new \Mercurio\App\Database;
+        $this->DB = $db->getSQL();
 
         if (!$this->DBTABLE) throw new \Mercurio\Exception\Usage("You must define a DBTABLE class property.");
     }
