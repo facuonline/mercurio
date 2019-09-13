@@ -6,25 +6,28 @@ include 'modelMockup.php';
 
 class ModelTest extends \PHPUnit\Framework\TestCase {
 
+    protected $model;
+
+    protected function setUp(): void {
+        $this->model = new \Mercurio\Test\ModelMockup(new \Mercurio\App\Database);
+    }
+
     public function testMockupHasTableDefined() {
-        $model = new \Mercurio\Test\ModelMockup(new \Mercurio\App\Database);
-        $this->assertEquals(DB_USERS, $model->getTable());
+        $this->assertEquals(DB_USERS, $this->model->getTable());
     }
 
     public function testGetReturnsClosureDefined() {
-        $model = new \Mercurio\Test\ModelMockup(new \Mercurio\App\Database);
-        $value = $model->get('vito', function($user) {
+        $test = $this->model->get(['handle' => 'vito'], function($user) {
             return (int) $user['id'];
         });
 
-        $this->assertIsInt($value);
+        $this->assertIsInt($test);
     }
 
     public function testGetReturnsBoolOnNoClosure() {
-        $model = new \Mercurio\Test\ModelMockup(new \Mercurio\App\Database);
-        $value = $model->get('vito');
+        $test = $this->model->get(['handle' => 'vito']);
         
-        $this->assertTrue($value);
+        $this->assertTrue($test);
     }
 
 }

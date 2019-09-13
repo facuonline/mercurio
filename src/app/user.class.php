@@ -31,7 +31,13 @@ class User extends Model {
     protected $DBTABLE = DB_USERS;
     
     public function __construct(\Mercurio\App\Database $db) {
-        $this->info = ['id', 'handle', 'nickname', 'img', 'stamp'];
+        $this->info = [
+            'id' => NULL, 
+            'handle' => NULL, 
+            'nickname' => NULL, 
+            'img' => NULL, 
+            'stamp' => NULL
+        ];
         $this->meta = [];
         $this->DB = $db->getSQL();
     }
