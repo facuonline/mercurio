@@ -3,7 +3,8 @@
 namespace Mercurio\Utils;
 
 /**
- * Form creator
+ * Form creator \
+ * Non static Util
  * 
  * Extended from nette/forms \
  * @see https://doc.nette.org/en/3.0/forms

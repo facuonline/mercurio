@@ -3,7 +3,8 @@
 namespace Mercurio\Utils;
 
 /**
- * HTTP Requests router middleware
+ * HTTP Requests router middleware \
+ * Non static Util
  * @package Mercurio
  * @subpackage Utilitary classes
  */
