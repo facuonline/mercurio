@@ -1,12 +1,12 @@
 <?php
+namespace Mercurio\Exception;
+use Exception;
 /**
  * @package Mercurio
  * @subpackage Extended Exception classes
  * 
  * Base model exception
  */
-namespace Mercurio\Exception;
-use Exception;
 class Model extends Exception {
 
     /**

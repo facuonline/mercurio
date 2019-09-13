@@ -26,26 +26,15 @@ class Model {
     protected $DBTABLE = false;
 
     public function __construct(\Mercurio\App\Database $database) {
-        $this->info = false;
+        $this->info = ['id' => NULL];
         $this->DB = $database->getSQL();
 
         if (!$this->DBTABLE) throw new \Mercurio\Exception\Usage("You must define a DBTABLE class property.");
     }
-
-    /**
-     * Finds entities hint for database selection
-     * @return null|int|string NULL on no found hint
-     */
-    public function getHint() {
-        if ($this->info) return $this->info['id'];
-        if (\Mercurio\Utils\Router::getTarget()) return \Mercurio\Utils\Router::getTarget();
-        
-        return NULL;
-    }
     
     /**
      * Load entity from database into instance
-     * @param int|string $hint Entity identifier
+     * @param array $select Selection criteria
      * @param callable $closure Closure function to access info without loading instance
      * function (array $entity) :
      * @param callable $fallback Closure function to execute in case of failure retrieving user
@@ -54,16 +43,8 @@ class Model {
      * Use string '*' to return all properties
      * @return callable|bool
      */
-    public function get($hint = false, callable $closure = NULL, callable $fallback = NULL, $properties = '*') {
-        if(!$hint) $hint = $this->getHint();
-
-        $entity = $this->DB->get($this->DBTABLE, $properties, [
-            'OR' => [
-                'id' => $hint,
-                'handle' => $hint,
-                'email' => $hint
-            ]
-        ]);
+    public function get(array $select, callable $closure = NULL, callable $fallback = NULL, $properties = '*') {
+        $entity = $this->DB->get($this->DBTABLE, $properties, $select);
 
         if ($entity !== NULL
         && $closure !== NULL) return $closure($entity);
@@ -80,7 +61,7 @@ class Model {
      * @param array $properties Associative array of properties and values
      */
     public function set(array $properties) {
-        $this->get(false, function($entity) use ($properties) {
+        $this->get(['id' => $this->info['id']], function($entity) use ($properties) {
             $this->DB->update($this->DBTABLE, $properties, ['id' => $entity['id']]);
         });
     }
@@ -91,7 +72,7 @@ class Model {
      */
     public function unset(bool $meta = true) {
         if ($meta) $this->unsetMeta();
-        $this->get(false, function($entity) {
+        $this->get(['id' => $this->info['id']], function($entity) {
             $this->DB->delete($this->DBTABLE, ['id' => $entity['id']]);
         });
     }
@@ -103,7 +84,7 @@ class Model {
      * @param string $grouping Name of meta group
      */
     public function getMeta($meta = '', string $grouping = '') {
-        return $this->get(false, function($entity) use ($meta, $grouping) {
+        return $this->get(['id' => $this->info['id']], function($entity) use ($meta, $grouping) {
             // Get all meta
             if (empty($meta)
             && empty($grouping)) return $this->DB->select(DB_META, '*', [
@@ -135,7 +116,7 @@ class Model {
      * @param string $grouping Name of meta group
      */
     public function setMeta(array $meta, string $grouping = '') {
-        $this->get(false, function($entity) use ($meta, $grouping) {
+        $this->get(['id' => $this->info['id']], function($entity) use ($meta, $grouping) {
             foreach ($meta as $key => $value) {
                 if (!is_string($key)) throw new \Mercurio\Exception\Usage\StringKeysRequired('setMeta');
     
@@ -175,7 +156,7 @@ class Model {
      * @param string $grouping Name of meta group
      */
     public function unsetMeta($meta = '', string $grouping = '') {
-        $this->get(false, function($entity) use ($meta, $grouping) {
+        $this->get(['id' => $this->info['id']], function($entity) use ($meta, $grouping) {
             // Delete all meta
             if (empty($meta)
             && empty($grouping)) {
@@ -205,7 +186,7 @@ class Model {
      * @param string|int Entity id
      */
     public function getID(bool $string = false) {
-        return $this->get(false, function($entity) use ($string) {
+        return $this->get(['id' => $this->info['id']], function($entity) use ($string) {
             if ($string) return (string) $entity['id'];
             return (int) $entity['id'];
         });
@@ -216,7 +197,7 @@ class Model {
      * @return int Entity timestamp in UNIX epoch
      */
     public function getTimeStamp() {
-        return $this->get(false, function($entity) {
+        return $this->get(['id' => $this->info['id']], function($entity) {
             return (int) $entity['stamp'];
         });
     }
