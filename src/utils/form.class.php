@@ -20,11 +20,13 @@ class Form {
 
     /**
      * Start new form object
+     * @param string $key Unique personalized key to avoid spambots from bypassing the filter
      */
-    public function __construct() {
+    public function __construct(string $key = '') {
         $this->form = new \Nette\Forms\Form;
 
         $this->form->onSuccess[] = $this->form->isSuccess();
+        $this->addSpamProtection($key);
     }
 
     /**

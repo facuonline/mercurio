@@ -3,8 +3,7 @@ namespace Mercurio\Test;
 class FormTest extends \PHPUnit\Framework\TestCase {
 
     public function testSetSpamProtection() {
-        $form = new \Mercurio\Utils\Form;
-        $form->addSpamProtection('test');
+        $form = new \Mercurio\Utils\Form('test');
         $form = $form->getForm();
 
         $this->assertIsObject($form['url_website_pottest']);
