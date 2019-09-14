@@ -37,7 +37,7 @@ Alternatively if you have a database:
 ```
 
 This will prepare your environment to work with Mercurio. To work with all of the `App` classes and a small part of some `Utils` it's necessary (recommended in case of utils) that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e just some Utils).
->You can obtain a random, safe key using **`Mercurio\App:randomKey()`** (hardcoding the value in the array, the app key needs to remain consistent trough the App's life)
+>You can obtain a random, safe key using **`Mercurio\App::randomKey()`** (hardcoding the value in the array, the app key needs to remain consistent trough the App's life)
 
 ### Utils and App
 Mercurio is divided in two sets of classes. 
@@ -130,13 +130,14 @@ Now here comes the fun and where Mercurio will really excel at. Our example app 
 $dbparams = \Mercurio\App::getDatabase();
 $database = new \Mercurio\App\Database($dbparams);
 
-$id = $router->getParams()['userid']);
+// Due to changes in Router this behaviour is not ready yet
+$id = $router->getParams()['userid'];
 
 $user = new \Mercurio\App\User;
 $user->getById($id);
 $user = $database->get($user);
 
-if ($user->id) {
+if ($user) {
     include 'user_profile.php';
 } else {
     include 'user_login.php';
@@ -146,9 +147,7 @@ This code first instantiates the `App\Database` model. This instance will contro
 
 To do an user selection we create a new, empty `App\User` instance and prepare it to get an user via their **id** property. Ultimately we perform the selection injecting the User model into the Database model.
 
->The **`getBy*()`** methods serve to prepare a selection. In order to perform such selection, object must be passed to **`Database::get()`**, this will return an instance of the same object, but loaded with the retrieved data from database, or *NULL* if the selection wasn't succesful.
-
-**^Due to changes in Routing this behaviour is not ready yet.**
+>The **`getBy*()`** methods serve to prepare a selection. In order to perform such selection, object must be passed to **`Database->get()`**, this will return an instance of the same object, but loaded with the retrieved data from database, or *NULL* if the selection wasn't succesful.
 
 ##### user_profile.php
 ```php
