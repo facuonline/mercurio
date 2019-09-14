@@ -16,14 +16,14 @@ class Config extends \Mercurio\App\Model {
         'stamp' => NULL
     ];
 
-    public $dbTable = DB_CONF;
+    public $db_table = DB_CONF;
 
     /**
      * Prepare configuration to be selected by name
      * @param string $name
      */
     public function getByName(string $name) {
-        $this->getBy = ['name' => $name];
+        $this->get_by = ['name' => $name];
     }
 
     /**

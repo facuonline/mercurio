@@ -17,7 +17,7 @@ class System {
      */
     public static function property(array $array) {
         if (array_key_exists('id', $array)
-        && array_key_exists('stamp', $array)) throw new \Mercurio\Exception\Usage\SystemProperty('id or stamp');
+        || array_key_exists('stamp', $array)) throw new \Mercurio\Exception\Usage\SystemProperty('id or stamp');
 
         $array['id'] = \Mercurio\Utils\ID::new();
         $array['stamp'] = time();

@@ -79,8 +79,10 @@ class Image {
 		$srcw = imagesx($src);
 		$srch = imagesy($src);
 		$img = imagecreatetruecolor($width, $height);
+		
 		imagefill($img, 0, 0, imagecolorallocate($img, 255, 255, 255));
 		imagealphablending($img, TRUE);
+		
 		// to properly crop an image we take the min value and use it as max in the final img
 		if ($crop) {
 			if ($srcw < $srch) {
@@ -89,9 +91,12 @@ class Image {
 				$srcw = $srch;
 			}
         }
-        $this->hash = sha1_file($this->file).'.jpg';
+		
+		$this->hash = sha1_file($this->file).'.jpg';
+		
 		imagecopyresampled($img, $src, 0, 0, 0, 0, $width, $height, $srcw, $srch);
 		imagedestroy($src);
+		
 		/**
 		 * JPEG is chosen because it's more lightweight than other formats and because png allows for exploitation
 		 * @see https://www.idontplaydarts.com/2012/06/encoding-web-shells-in-png-idat-chunks/ */
@@ -110,11 +115,14 @@ class Image {
 	public function new($file, $path, $width, $ratio = false){
 		$this->file = $file['tmp_name'];
 		$this->path = rtrim($path, '\/').DIRECTORY_SEPARATOR;
+
 		chmod($this->file, 0666);
 		if (!is_dir($this->path)) mkdir($this->path, 0666);
+		
 		$src = $this->ext();
 		$srcw = imagesx($src);
 		$srch = imagesy($src);
+		
 		if (!$ratio) {
 			$height = $width*$srch/$srcw;
 			$crop = false;
@@ -125,6 +133,7 @@ class Image {
 			$height = $width*$srch/$srcw;
 			$crop = true;
 		}
+		
 		$this->canvas($width, $height, $crop);
 		return $this->path.$this->hash;
     }

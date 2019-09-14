@@ -23,16 +23,16 @@ class Model {
     /**
      * Array to prepare component selection criteria
      */
-    public $getBy;
+    public $get_by;
 
     /**
      * Table where this class objects are stored
      * Must be defined when extending a new component
      */
-    public $dbTable = NULL;
+    public $db_table = NULL;
 
     public function __construct() {
-        if ($this->dbTable === NULL) throw new \Mercurio\Exception\Usage("App components must define a 'dbTable' class variable with public scope.");
+        if ($this->db_table === NULL) throw new \Mercurio\Exception\Usage("App components must define a 'db_table' class variable with public scope.");
     }
 
     /**
@@ -41,7 +41,7 @@ class Model {
      * @see http://medoo.in/api/where
      */
     public function getBy(array $getBy) {
-        $this->getBy = $getBy;
+        $this->get_by = $getBy;
     }
 
     /**
@@ -49,7 +49,7 @@ class Model {
      * @param int $id Component numeric ID
      */
     public function getById(int $id) {
-        $this->getBy = ['id' => $id];
+        $this->get_by = ['id' => $id];
     }
 
     /**

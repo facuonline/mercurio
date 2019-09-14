@@ -33,14 +33,14 @@ class ID {
 		$mili = substr($miliseconds, 0, 3);
 
 		$serveraddress = base_convert(gethostbyname(gethostname()), 10, 10);
-		$server = $serveraddress[random_int(0, strlen($serveraddress))-1];
+		$server = $serveraddress[random_int(0, \strlen($serveraddress))-1];
 		
 		$portaddress = $_SERVER['REMOTE_PORT'];
-		$port = $portaddress[random_int(0, strlen($portaddress))-1];
+		$port = $portaddress[random_int(0, \strlen($portaddress))-1];
 
 		$clientaddress = base_convert($_SERVER['REMOTE_ADDR'], 10, 10);
-		$client = $clientaddress[random_int(0, strlen($clientaddress)-1)];
-		
+		$client = $clientaddress[random_int(0, \strlen($clientaddress)-1)];
+
 		$entropy = random_int(0, 9);
 		
 		return $time.$mili.$server.$port.$client.$entropy;

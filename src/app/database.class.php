@@ -38,11 +38,11 @@ class Database {
      * @return object PDO Statement
      */
     public function insert(object $object) {
-        // These are system properties
+        // System properties
         $object->data['id'] = \Mercurio\Utils\ID::new();
         $object->data['stamp'] = time();
 
-        return $this->sql->insert($object->dbTable, $object->data);
+        return $this->sql->insert($object->db_table, $object->data);
     }
 
     /**
@@ -51,11 +51,11 @@ class Database {
      * @return object|null Loaded instance of entry object, NULL on failure
      */
     public function get(object $object) {
-        $data = $this->sql->get($object->dbTable, '*', $object->getBy);
+        $data = $this->sql->get($object->db_table, '*', $object->get_by);
         if (!$data) return NULL;
 
         // Reassign data to object and return it
-        $class = get_class($object);
+        $class = \get_class($object);
         $object = new $class;
         $object->data = $data;
         $object->id = $object->data['id'];
@@ -69,11 +69,11 @@ class Database {
      * @return object PDO Statement
      */
     public function update(object $object) {
-        // Ensure system properties remain untouched
-        if (array_key_exists('id', $object->data)) unset($object->data['id']);
-        if (array_key_exists('stamp', $object->data)) unset($object->data['stamp']);
+        // System properties
+        unset($object->data['id']);
+        unset($object->data['stamp']);
 
-        return $this->sql->update($object->dbTable, $object->data, ['id' => $object->id]);
+        return $this->sql->update($object->db_table, $object->data, ['id' => $object->id]);
     }
 
     /**
@@ -82,7 +82,7 @@ class Database {
      * @return object PDO Statement
      */
     public function delete(object $object) {
-        return $this->sql->delete($object->dbTable, ['id' => $object->id]);
+        return $this->sql->delete($object->db_table, ['id' => $object->id]);
     }
 
 }
