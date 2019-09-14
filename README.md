@@ -1,9 +1,9 @@
 # Mercurio
-Courier. Not CMS. (Still in development)
+Courier. Not CMS. **Still in development**.
 
 Comprehensive library to help you develop safer, better web apps in PHP.
 
-[Example App](#your_first_app) /
+[Example App](#your-first-app) /
 [Contributing](#contributing) /
 [TODOs](#TODOs)
 
@@ -27,8 +27,8 @@ Alternatively if you have a database:
         'KEY' => 'your_secret_key',
         'URL' => 'http://localhost/mercurio/'
     ], [
-        'TYPE' => 'mysql', 
         // check catfan/medoo for a complete list of supported database types
+        'TYPE' => 'mysql', 
         'HOST' => 'localhost',
         'USER' => 'root',
         'PASS' => '',
@@ -44,12 +44,12 @@ Mercurio is divided in two sets of classes.
 
 **`Utils`** is a list of microservices both for the system and for the developer. These classes are mostly static so their methods can be accessed on the go and for the most part don't require a database to work. Their importance varies, sometimes they'll be at the very core of our App and sometimes they won't be called once.
 
-**`App`** classes are the main App model services. They encapsulate Mercurio entities and their behaviour under simple and easy to use objects and methods.
+**`App`** classes are the main App services model. They encapsulate Mercurio components and their behaviour under simple and easy to use objects and methods.
 
->**Utils** are part of the **Controller** and **App** are the **Model** in the Model-View-Controller design pattern. So all is left to you after glueing these bricks as you wish, is to develop a nice **View** template.
+>**Utils** are part of the **Controller** and **App** are the **Model** in the Model-View-Controller design pattern. All there is left to you after glueing these bricks as you wish, is to develop a nice **View** template.
 
 ### **Your first app**
-Mercurio is not a framework, it does not force on you any scheme, practices, etc. in fact Mercurio tries hard to adapt to whatever app you try to build. That said, let's start making an example app.
+Mercurio is not and does not aim to be a framework. Following is an example App, Mercurio can be used in a plethora of ways and the apps can be developed using any scheme and design patterns.
 
 #### Folder structure
 After installing mercurio your project folder sure looks something like this:
@@ -98,7 +98,7 @@ Router controller will easily help us to listen for specific requests and respon
     // This value can be later obtained by the router
     $router->GET('user/:userid', function($request) {
         include 'views/user_profile.php';
-        echo $request->getParams('handle');
+        echo $request->getParams()['userid'];
     });
 
     $router->GET('user/login', function($request) {
@@ -127,30 +127,36 @@ If you wish you can use any templating language you want. Like [Twig](https://tw
 Now here comes the fun and where Mercurio will really excel at. Our example app will only have basic support for simple users, but you'll still be able to see the perks of Mercurio.
 
 ```php
-$user = new \Mercurio\App\User;
+$dbparams = \Mercurio\App::getDatabase();
+$database = new \Mercurio\App\Database($dbparams);
 
 $id = $router->getParams()['userid']);
-if ($user->getById($id) {
+
+$user = new \Mercurio\App\User;
+$user->getById($id);
+$user = $database->get($user);
+
+if ($user->id) {
     include 'user_profile.php';
 } else {
     include 'user_login.php';
 }
 ```
-This code first instantiates the `App\User` model. We tell this empty instance to load an user by their id. If it succeeds we show it's profile, else we show a login page.
+This code first instantiates the `App\Database` model. This instance will control all Database related tasks via injections of objects into the desired methods. `Database` takes the connection parameters at instantiation. You can directly provide them or dynamically obtain them from your App settings as this code does.
 
->The **`getBy*`** methods serve to load an user from the database into the instance. Not to be mistaken with the **`get*`** methods that return user properties.
+To do an user selection we create a new, empty `App\User` instance and prepare it to get an user via their **id** property. Ultimately we perform the selection injecting the User model into the Database model.
 
-**^Due to changes in Routing this behaviour is yet not ready.**
+>The **`getBy*()`** methods serve to prepare a selection. In order to perform such selection, object must be passed to **`Database::get()`**, this will return an instance of the same object, but loaded with the retrieved data from database, or *NULL* if the selection wasn't succesful.
 
-
->Alternatively you can provide a closure function as second argument to directly access user data without loading instance. Also you can provide a closure as third argument to be executed if no user is found.
+**^Due to changes in Routing this behaviour is not ready yet.**
 
 ##### user_profile.php
 ```php
-<h1><?php echo $user->getHandle(); ?></h1>
-<p><?php echo $user->getNickname(); ?></p>
-<img src="<?php echo $user->getImg(); ?>">
+echo $user->getHandle();
+echo $user->getNickname();
+echo "<img src=" . $user->getImg() . ">";
 ```
+
 ##### user_login.php
 You've already seen how Mercurio makes handling and retrieving users an easy task. But Mercurio does not stop there.
 ```php
@@ -188,6 +194,8 @@ We can process this form like following:
 ```
 And thats really it. We've sucessfully built an app with users that is secure, fast and easy to develop and extend.
 
+>All **`App\*`** classes are going under a heavy refactoring of API and codebase. This example doesn't work and is left for legacy purposes. Further updates of Mercurio are expected to include a similar login API.
+
 # Contributing
 
 Mercurio is a personal project of me, born out of my desire to learn backend web technologies and build a system to optimise my sites. Still all critique, review, change and improvement over my base code will be welcome via *Issues*. Discussion about this project itself and meta talk is also very welcome.
@@ -195,9 +203,9 @@ Mercurio is a personal project of me, born out of my desire to learn backend web
 If you have significative input to add, *Pull Requests* are open, however consider the following TODOs before submitting any changes or additions to the existing codebase:
 
 ## TODOs
-1. Work `Utils\Router` as a well optimized Router and request handler.
+1. Work `Utils\Router` as a well optimized one-way Router and request handler including basic paremeterizing.
 2. Finish tests for existing code and fully adopt TDD.
 3. Conduct tests asserting file related tasks.
-4. Conduct tests asserting database related tasks.
+4. Review and extend `Utils\Filter`.
 
 Apart from this list, codebase is full of "todo" tags, if you find one feel free to try and finish it.
