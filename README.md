@@ -62,55 +62,43 @@ After installing mercurio your project folder sure looks something like this:
 Our example app will now include an index.php file where we'll start our Mercurio app as seen above. And a /views/ folder where we will be storing our different view templates.
 
 #### Routing
-We will be using `\Mercurio\Utils\Router` to sort user query requests, serve the correct view template and in the end, just organize our app out. 
+We will be using [`\Klein\Klein`](https://github.com/klein/klein.php) to sort user requests, serve the correct view template and in the end, just organize our app out. This package comes bundled with Mercurio.
 
 ##### URL masking
 
 ```php
     // Apache only
-    \Mercurio\Utils\Router\Htaccess::setMasking();
+    \Mercurio\Utils\Htaccess::setMasking();
     // For nginx you'll need to manually configure a rewrite rule
 ```
 This method will set up, if possible, URL masking via apache's mod_rewrite. Just write it in your **index.php** and run the page in your browser. Nothing will happen in your screen but Mercurio will silently set up the URL masking in your app folder.
 
 After running it you can delete that line to avoid calling the same method over and over. It will not perform a new masking, but it will consume some resources on every request just by having to check if it needs to do the masking.
 
->**It is not necessary** that you run this method. If you skip this step your app will still work, just not with nice URLs.
+**It is necessary** that you run this method in order for Klein to work. If you use Nginx you'll need to update your settings like so:
+```
+server {
+    location / {
+        try_files $uri $uri/ /my-mercurio-app/index.php?$args;
+    }
+}
+```
 
 ##### Templating
 
-**`Utils\Router` is still under heavy refactoring and is not yet ready to satisfy the expected behaviour shown belown.**
-
-Router controller will easily help us to listen for specific requests and respond to them much like an express.js app:
+[Klein]((https://github.com/klein/klein.php)) router will easily help us to listen for specific requests and respond to them much like an express.js app:
 ```php
-    $request = new \Mercurio\Utils\Request;
-    $router = new \Mercurio\Utils\Router($request);
+    $router = new \Klein\Klein;
 
-    $router->GET('/', function() {
-        include 'views/main.php';
+    $router->respond('GET', '/', function() {
+        include 'main.php';
     });
 
-    $router->GET('user', function() {
-        include 'views/user.php';
-    });
-
-    // By using ':' we tell Mercurio that this is a variable value
-    // This value can be later obtained by the router
-    $router->GET('user/:userid', function($request) {
-        include 'views/user_profile.php';
-        echo $request->getParams()['userid'];
-    });
-
-    $router->GET('user/login', function($request) {
-        include 'views/user_login.php';
-    });
-
-    // We can also listen for POST requests
-    $router->POST('api', function($request) {
-        # Some API action
+    $router->respond('GET', '/user/[i:userid]', function($request) {
+        include 'user.php';
     });
 ```
-By defining pages this way we actually define what the sections of our app will be and what templates we will use. You probably noticed that routes were defined in a hierarchical way, this is only preferred for readability reasons but routes can be defined at any moment in the script.
+By defining pages this way we actually define what the sections of our app will be and what templates we will use.
 
 This is pretty much all you'll need to do in your index.php file. Upon call this file will be served and Mercurio will route requests to their designated paths. **Actually our whole app will happen inside index.php**, so you can add your header, footer and other page classic and universal elements in your index.php.
 
@@ -130,8 +118,8 @@ Now here comes the fun and where Mercurio will really excel at. Our example app 
 $dbparams = \Mercurio\App::getDatabase();
 $database = new \Mercurio\App\Database($dbparams);
 
-// Due to changes in Router this behaviour is not ready yet
-$id = $router->getParams()['userid'];
+// $request is actually initialized at index.php
+$id = $request->userid;
 
 $user = new \Mercurio\App\User;
 $user->getById($id);
@@ -202,9 +190,8 @@ Mercurio is a personal project of me, born out of my desire to learn backend web
 If you have significative input to add, *Pull Requests* are open, however consider the following TODOs before submitting any changes or additions to the existing codebase:
 
 ## TODOs
-1. Work `Utils\Router` as a well optimized one-way Router and request handler including basic paremeterizing.
-2. Finish tests for existing code and fully adopt TDD.
-3. Conduct tests asserting file related tasks.
-4. Review and extend `Utils\Filter`.
+1. Finish tests for existing code and fully adopt TDD.
+2. Conduct tests asserting file related tasks.
+3. Review and extend `Utils\Filter`.
 
 Apart from this list, codebase is full of "todo" tags, if you find one feel free to try and finish it.
