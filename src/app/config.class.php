@@ -27,6 +27,14 @@ class Config extends \Mercurio\App\Model {
     }
 
     /**
+     * Prepare configurations to be selected by value
+     * @param mixed $value
+     */
+    public function selectByValue($value) {
+        $this->get_by = ['value' => $value];
+    }
+
+    /**
      * Set configuration name
      * @param string $name
      */

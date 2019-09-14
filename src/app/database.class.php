@@ -46,7 +46,7 @@ class Database {
     }
 
     /**
-     * Get record from database
+     * Select one record from database
      * @param object $object Instance of a `Mercurio\App\*` class
      * @return object|null Loaded instance of entry object, NULL on failure
      */
@@ -61,6 +61,27 @@ class Database {
         $object->id = $object->data['id'];
 
         return $object;
+    }
+
+    /**
+     * Select multiple records from database
+     * @param object $object Instance of a `Mercurio\App\*` class
+     * @return array|null Array with loaded instances of entry object, NULL on failure
+     */
+    public function select(object $object) {
+        $results = $this->sql->select($object->db_table, '*', $object->get_by);
+        if (!$results) return NULL;
+
+        // Reassign data to objects and return array
+        $objects = [];
+        $class = \get_class($object);
+        foreach ($results as $key => $data) {
+            $objects[$key] = new $class;
+            $objects[$key]->data = $data;
+            $objects[$key]->id = $data['id'];
+        }
+
+        return $objects;
     }
 
     /**

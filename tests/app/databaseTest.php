@@ -39,6 +39,16 @@ class DatabaseTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals('test', $config->data['name']);
     }
 
+    public function testSelectReturnsArray() {
+        $configs = new \Mercurio\App\Config;
+        $configs->selectByValue('test value');
+        $configs = $this->database->select($configs);
+
+        $this->assertIsIterable($configs);
+        $this->assertIsObject($configs[0]);
+        $this->assertIsIterable($configs[0]->data);
+    }
+
     public function testUpdate() {
         $config = new \Mercurio\App\Config;
         $config->getByName('test');
@@ -59,6 +69,25 @@ class DatabaseTest extends \PHPUnit\Framework\TestCase {
         $this->database->delete($config);
 
         $this->assertNull($this->database->get($config));
+        $this->assertNull($this->database->select($config));
+    }
+
+    /**
+     * This is example API of what `App` components usage should look like
+     */
+    public function exampleAPI() {
+        $database = new \Mercurio\App\Database($dbparams);
+
+        // 1 object
+        $config = new \Mercurio\App\Config;
+        $config->getByName('test');
+        $config = $database->get($config);
+        $config->getValue();
+
+        // Varios objetos
+        $configs->selectByValue(40);
+        $configs = $database->select($config);
+        $configs[0]->getValue();
     }
 
 }
