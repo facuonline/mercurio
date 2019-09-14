@@ -1,14 +1,14 @@
 <?php 
 
-namespace Mercurio\Utils\Router;
+namespace Mercurio\Utils;
 
 /**
- * Subset of htaccess utils for Router \
+ * Htaccess utils for Klein router \
  * Read and write htaccess rewrite conditions via Apache's mod_rewrite
  * 
- * For NGINX instances use `\Mercurio\Utils\Router\Masking` (@todo)
  * @package Mercurio
  * @subpackage Router utils
+ * @see https://github.com/klein/klein.php/wiki/Sub-Directory-Installation
  */
 class Htaccess {
 
@@ -109,12 +109,16 @@ class Htaccess {
                 $conditions = $key+3;
             }
         }
+
+        $app = APP_ROOT_HOST . '/' . APP_PATH;
+
         if ($conditions) {
             $htaccess[$conditions] = "
+            RewriteBase $app
             RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule ^(.*)$ ?mroroute=$1\n";
+            RewriteRule ^ index.php [L]";
         }
+
         return $htaccess;
     }
 
@@ -123,9 +127,6 @@ class Htaccess {
      */
     private static function writeHtacess(string $location, $htaccess) {
         file_put_contents($location, $htaccess);
-        
-        $DB = new \Mercurio\App\Database;
-        $DB->setConfig('urlmasking', 1);
     }
 
 }

@@ -4,7 +4,7 @@ namespace Mercurio;
 
 /**
  * Mercurio main class \
- * **Must** instantiate to be able to use Mercurio
+ * **Must** call `App::setApp()` to be able to use Mercurio
  * @package Mercurio
  * @subpackage App class
  */
@@ -14,9 +14,11 @@ class App {
      * Returns an App setting set by setApp
      * @param string $key
      * @return mixed
-     * @throws object Runtime exception if setting not found
+     * @throws \Mercurio\Exception\Runtime
      */
     public static function getApp(string $key) {
+        $key = strtoupper($key);
+
         if (getenv('APP_'.$key)) {
             if ($key == 'URL') return rtrim(getenv('APP_URL'), '/').'/';
             return getenv('APP_'.$key);
@@ -29,7 +31,7 @@ class App {
      * Set App settings and start Mercurio 
      * @param array $settings App generic settings
      * @param array $connection Database connection arguments
-     * @throws object Usage exception if required setting not present
+     * @throws \Mercurio\Exception\Usage
      */
     public static function setApp(array $settings, array $connection = []) {
         // check for minimum required app settings
@@ -50,7 +52,7 @@ class App {
     /**
      * Defines app constants
      */
-    private function constants() {
+    private static function constants() {
 
         /**
          * APP_ROOT must equals $_SERVER['DOCUMENT_ROOT] in terms of route
@@ -58,9 +60,30 @@ class App {
         $APP_URL = parse_url(self::getApp('URL'));
         $APP_ROOT = $APP_URL['scheme']
             .'://'
-            .$APP_URL['host'];
+            .$APP_URL['host']
+            .'/'
+            .$APP_URL['path'];
 
         /**
+         * App host, stripped from APP_ROOT
+         */
+        define('APP_HOST', $APP_URL['host']);
+
+        /**
+         * App path relative to app host
+         */
+        define('APP_PATH', $APP_URL['PATH']);
+
+        /**
+         * Link to app root
+         */
+        define('APP_ROOT', $APP_ROOT);
+
+        /**
+         * Path to App vendor folder, relative to Mercurio installation
+         */
+        define('APP_VENDOR', dirname(__FILE__, -4));
+        /* ^ Why?
          * This file will be located at
          * | vendor
          *   | mercurio
@@ -68,12 +91,6 @@ class App {
          *       | src
          * So we want to go up 4 levels to locate the vendor folder
          */
-        $APP_VENDOR = dirname(__FILE__, 4);
-
-        /**
-         * Link to app root
-         */
-        define('APP_ROOT', $APP_ROOT);
 
         /**
          * Path to mercurio statics
@@ -90,7 +107,7 @@ class App {
         /**
          * Link to mercurio statics
          */
-        define('APP_STATIC_ABS', 
+        define('APP_STATIC_LINK', 
             APP_ROOT
             .'mercurio/'
             .'static/'
@@ -113,7 +130,7 @@ class App {
         /**
          * Link to mercurio user statics
          */
-        define('APP_USERSTATIC_ABS', 
+        define('APP_USERSTATIC_LINK', 
             APP_ROOT
             .'mercurio/'
             .'static/'
@@ -130,13 +147,13 @@ class App {
             .'csrf-protector-php/'
             .'js/'
             .'csrsprotector.js'
-        );
+        ); 
 
         /**
          * Path to Owasp CSRF config file
          */
         define('APP_CSRFPHP', 
-            $APP_VENDOR
+            APP_VENDOR
             .DIRECTORY_SEPARATOR
             .'owasp'
             .DIRECTORY_SEPARATOR
@@ -200,7 +217,7 @@ class App {
      * Get database connection parameters
      * @return array
      */
-    public function getDatabase() {
+    public static function getDatabase() {
         return [
             'database_type' => getenv('DB_TYPE'),
             'database_name' => getenv('DB_NAME'),
@@ -212,9 +229,9 @@ class App {
 
     /**
      * Set database tables and columns via SQL \
-     * Run only if your database hasn't been set before
+     * Run only if your database hasn't been set beforehand
      * @param object $DB Instance of dependency injection `\Mercurio\App\Database`
-     * @throws object Exception if array does not contain expected values
+     * @throws \Mercurio\Exception\Usage 
      */
     public static function setDatabase(\Mercurio\App\Database $DB) {
         // Check that database connection parameters have been set
@@ -372,6 +389,7 @@ class App {
     public static function setCsrfProtection(array $csrf = []) {
         // Exact copy of the array at config.sample.php
         if (empty($csrf)) $csrf = [
+            // token modified for app distinction
             "CSRFP_TOKEN" => 'MercurioCSRF',
             "logDirectory" => "../log",
             "failedAuthAction" => array(
@@ -379,7 +397,7 @@ class App {
                 "POST" => 0),
             "errorRedirectionPage" => "",
             "customErrorMessage" => "",
-            // jsUrl modified for app convinience
+            // jsUrl modified for app convenience
             "jsUrl" => APP_CSRFJS,
             "tokenLength" => 10,
             "cookieConfig" => array(
