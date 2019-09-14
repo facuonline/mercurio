@@ -3,83 +3,86 @@
 namespace Mercurio\App;
 
 /**
- * Database connection \
- * To configure your database use `\Mercurio\App::setDatabase()`
+ * Database middleware
  * @package Mercurio
  * @subpackage App classes
  */
 class Database {
 
     /**
-     * Instance of SQL middleware Medoo
+     * SQL query builder Medoo
+     * @see https://github.com/catfan/medoo
      */
-    public $DB;
+    protected $sql;
 
-    public function __construct() {
-        $this->DB = new \Medoo\Medoo($this->getDatabaseParams());
+    /**
+     * @param array $parameters Database connection arguments,
+     * use `Mercurio\App::getDatabase()` if you have configured the database with `App`
+     * @see https://medoo.in/api/new
+     */
+    public function __construct(array $parameters) {
+        $this->sql = new \Medoo\Medoo($parameters);
     }
 
     /**
-     * Get SQL builder instance 
-     * @return object instance of SQL builder Medoo
+     * Obtain SQL builder instance
+     * @return object
      */
-    public function getSQL() {
-        return $this->DB;
+    public function getSql() {
+        return $this->sql;
     }
 
     /**
-     * Get database connection parameters
-     * @return array
+     * Insert new record in database
+     * @param object $object Instance of a `Mercurio\App\*` class
+     * @return object PDO Statement
      */
-    public function getDatabaseParams() {
-        return [
-            'database_type' => getenv('DB_TYPE'),
-            'database_name' => getenv('DB_NAME'),
-            'server' => getenv('DB_HOST'),
-            'username' => getenv('DB_USER'),
-            'password' => getenv('DB_PASS')
-        ];
-    }
-    
-    /**
-     * Get a configuration value by name
-     * @param string $name Config name
-     * @return array|bool
-     */
-    public function getConfig(string $name) {
-        $result = $this->DB->get('mro_conf', '*', ['name' => $name]);
-        return ($result ? $result['value'] : false);
+    public function insert(object $object) {
+        // These are system properties
+        $object->data['id'] = \Mercurio\Utils\ID::new();
+        $object->data['stamp'] = time();
+
+        return $this->sql->insert($object->dbTable, $object->data);
     }
 
     /**
-     * Set or update a configuration
-     * @param string $name Config name
-     * @param mixed $value Config value
+     * Get record from database
+     * @param object $object Instance of a `Mercurio\App\*` class
+     * @return object|null Loaded instance of entry object, NULL on failure
      */
-    public function setConfig(string $name, $value) {
-        if ($this->getConfig($name)) {
-            $this->DB->update('mro_conf', 
-                ['value' => $value],
-                ['name' => $name]
-            );
-        } else {
-            $this->DB->insert('mro_conf',
-                [
-                    'name' => $name,
-                    'value' => $value
-                ]
-            );
-        }
+    public function get(object $object) {
+        $data = $this->sql->get($object->dbTable, '*', $object->getBy);
+        if (!$data) return NULL;
+
+        // Reassign data to object and return it
+        $class = get_class($object);
+        $object = new $class;
+        $object->data = $data;
+        $object->id = $object->data['id'];
+
+        return $object;
     }
 
     /**
-     * Delete a configuration row from database
-     * @param string $name Name of configuration to be deleted
+     * Update record in database
+     * @param object $object Instance of a `Mercurio\App\*` class
+     * @return object PDO Statement
      */
-    public function unsetConfig(string $name) {
-        $this->DB->delete('mro_conf',
-            ['name' => $name]
-        );
+    public function update(object $object) {
+        // Ensure system properties remain untouched
+        if (array_key_exists('id', $object->data)) unset($object->data['id']);
+        if (array_key_exists('stamp', $object->data)) unset($object->data['stamp']);
+
+        return $this->sql->update($object->dbTable, $object->data, ['id' => $object->id]);
+    }
+
+    /**
+     * Delete record in database
+     * @param object $object Instance of a `Mercurio\App\*` class
+     * @return object PDO Statement
+     */
+    public function delete(object $object) {
+        return $this->sql->delete($object->dbTable, ['id' => $object->id]);
     }
 
 }

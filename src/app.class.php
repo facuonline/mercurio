@@ -197,6 +197,20 @@ class App {
     }
 
     /**
+     * Get database connection parameters
+     * @return array
+     */
+    public function getDatabase() {
+        return [
+            'database_type' => getenv('DB_TYPE'),
+            'database_name' => getenv('DB_NAME'),
+            'server' => getenv('DB_HOST'),
+            'username' => getenv('DB_USER'),
+            'password' => getenv('DB_PASS')
+        ];
+    }
+
+    /**
      * Set database tables and columns via SQL \
      * Run only if your database hasn't been set before
      * @param object $DB Instance of dependency injection `\Mercurio\App\Database`
@@ -213,12 +227,21 @@ class App {
 
         // Set up tables
         $DB->create(DB_CONF, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
             'name' => [
                 'VARCHAR(30)',
-                'NOT NULL'
+                'NOT NULL',
+                'PRIMARY_KEY'
             ],
             'value' => [
                 'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'stamp' => [
+                'BIGINT',
                 'NOT NULL'
             ]
         ]);

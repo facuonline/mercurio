@@ -3,40 +3,62 @@ namespace Mercurio\Test;
 
 class DatabaseTest extends \PHPUnit\Framework\TestCase {
 
-    public function testGetConfigReturnsFalseOnNoConfigurationFound() {
-        $DB = new \Mercurio\App\Database;
-        $config = $DB->getConfig('this configuration should not exist');
+    protected $database;
 
-        $this->assertFalse($config);
+    protected function setUp(): void {
+        $dbparams = \Mercurio\App::getDatabase();
+        $this->database = new \Mercurio\App\Database($dbparams);
     }
 
-    public function testSetConfigInsertsNewValueAndGetConfigReturnsIt() {
-        $DB = new \Mercurio\App\Database;
-        $config = $DB->setConfig('test_config', 'test Value');
-
-        $this->assertEquals('test Value', $DB->getConfig('test_config'));
+    public function testDatabaseInstantiatesMedoo() {
+        $this->assertIsObject($this->database->getSql());
     }
 
-    public function testSetConfigUpdatesValue() {
-        $DB = new \Mercurio\App\Database;
-        $config = $DB->setConfig('test_config', 'test Value changed');
+    public function testInsertCreatesNewRecord() {
+        // Faking ID needed values
+        $_SERVER['REMOTE_PORT'] = 7777;
 
-        $this->assertEquals('test Value changed', $DB->getConfig('test_config'));
+        $config = new \Mercurio\App\Config;
+        $config->setName('test');
+        $config->setValue('test value');
+
+        $this->database->insert($config);
+
+        $result = $this->database->getSql()->get(DB_CONF, 'value', ['name' => 'test']);
+        $this->assertEquals('test value', $result);
     }
 
-    public function testSetConfigDoesNotDuplicateEntries() {
-        $DB = new \Mercurio\App\Database;
-        $result = $DB->DB->select('mro_conf', '*', ['name' => 'test_config']);
+    public function testGetLoadsData() {
+        $config = new \Mercurio\App\Config;
+        $config->getByName('test');
+        $config = $this->database->get($config);
 
-        $this->assertCount(1, $result);
+        $this->assertIsObject($config);
+        $this->assertIsIterable($config->data);
+        $this->assertArrayHasKey('name', $config->data);
+        $this->assertEquals('test', $config->data['name']);
     }
 
-    public function testUnsetDeletesRow() {
-        $DB = new \Mercurio\App\Database;
-        $DB->unsetConfig('test_config');
-        $config = $DB->getConfig('test_config');
+    public function testUpdate() {
+        $config = new \Mercurio\App\Config;
+        $config->getByName('test');
+        $config = $this->database->get($config);
+        $config->setValue('new test value');
 
-        $this->assertFalse($config);
+        $this->database->update($config);
+        $config = $this->database->get($config);
+
+        $this->assertEquals('new test value', $config->data['value']);
+    }
+
+    public function testDelete() {
+        $config = new \Mercurio\App\Config;
+        $config->getByName('test');
+        $config = $this->database->get($config);
+
+        $this->database->delete($config);
+
+        $this->assertNull($this->database->get($config));
     }
 
 }

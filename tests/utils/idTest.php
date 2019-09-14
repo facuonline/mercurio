@@ -11,9 +11,6 @@ class IdTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsInt($id);
     }
 
-    /**
-     * Utils\ID::new() must be able to retrieve at least 1000 different numbers
-     */
     public function testNewReturnsDifferentNumbers() {
         // We fake this because this is what ID will find in real world environments
         $_SERVER['REMOTE_PORT'] = '7000';
@@ -23,8 +20,8 @@ class IdTest extends \PHPUnit\Framework\TestCase {
         while ($i < 499) {
             $id1 = \Mercurio\Utils\ID::new();
             /* Delay for 0.006 second not precisely to simulate system latency 
-            but the fastest human latency actually, 10 miliseconds buffer to accomodate actual latency of running system*/
-            usleep(5990);
+            but the fastest human latency actually*/
+            usleep(6000);
             $id2 = \Mercurio\Utils\ID::new();
 
             $this->assertNotEquals($id1, $id2, "ID generation test nº$i:");

@@ -30,7 +30,7 @@ class ID {
 		$time = time();
 
 		$miliseconds = gettimeofday()['usec'];
-		$mili = substr($miliseconds, 0, 2);
+		$mili = substr($miliseconds, 0, 3);
 
 		$serveraddress = base_convert(gethostbyname(gethostname()), 10, 10);
 		$server = $serveraddress[random_int(0, strlen($serveraddress))-1];
