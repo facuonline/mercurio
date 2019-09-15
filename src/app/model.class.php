@@ -57,7 +57,7 @@ class Model {
      * @param bool $string Return id as a string
      * @return int|string
      */
-    public function getId(bool $string = false) {
+    public function getId(bool $as_string = false) {
         if ($string) return (string) $this->id;
         return (int) $this->id;
     }

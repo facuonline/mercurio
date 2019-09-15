@@ -19,11 +19,13 @@ class User extends \Mercurio\App\Model {
 
     /**
      * Load user from session instead of from database
+     * @return array|false 
      */
     public function getFromSession() {
         $session = \Mercurio\Utils\Session::get('User', false);
 
         if ($session) $this->data = $session;
+        return $session;
     }
 
     /**
@@ -55,7 +57,7 @@ class User extends \Mercurio\App\Model {
      * @param bool $as_string Returns the ID as an string
      * @return int|string
      */
-    public function getId(bool $as_string) {
+    public function getId(bool $as_string = false) {
         if ($as_string) return (string) $this->data['id'];
         return (int) $this->data['id'];
     }
