@@ -14,7 +14,7 @@
         "catfan/medoo": "^1.7.2",
         "samayo/bulletproof": "4.0.*",
         "nette/forms": "^3.0.1",
-        "klein/klein": "^2.1"
+        "altorouter/altorouter": "1.1.0"
     },
     "license": "GPL-3.0-or-later",
     "version": "0.41.1-dev",
