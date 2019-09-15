@@ -9,6 +9,8 @@ namespace Mercurio\App;
  */
 class User extends \Mercurio\App\Model {
 
+    public $db_table = DB_USERS;
+
     /**
      * Unhashed user password
      * Meant to temporarily store user password during logins
