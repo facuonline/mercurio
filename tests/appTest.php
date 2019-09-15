@@ -23,9 +23,9 @@ class AppTest extends \PHPUnit\Framework\TestCase {
     public function testSetAppDefinesConstants() {
         $this->assertIsString(APP_ROOT);
         $this->assertIsString(APP_STATIC);
-        $this->assertIsString(APP_STATIC_ABS);
+        $this->assertIsString(APP_STATIC_LINK);
         $this->assertIsString(APP_USERSTATIC);
-        $this->assertIsString(APP_USERSTATIC_ABS);
+        $this->assertIsString(APP_USERSTATIC_LINK);
         $this->assertIsString(APP_CSRFJS);
         $this->assertIsString(APP_CSRFPHP);
     }
