@@ -72,14 +72,37 @@ class Htaccess {
      */
     private static function startHtaccess($htaccess) {
         $engine = count($htaccess)+2;
+        
         foreach ($htaccess as $key => $value) {
-            if (strpos($value, "Mercurio URL masking")) {
+            if (strpos($value, "# Mercurio URL masking")) {
                 $engine = false;
             }
         }
+
         if ($engine) {
-            $htaccess[$engine] = "# Mercurio URL masking\n<IfModule mod_rewrite.c>\nRewriteEngine On";
+            $htaccess[$engine] = "# Mercurio URL masking\n<IfModule mod_rewrite.c>\nRewriteEngine On\n";
         }
+        
+        return $htaccess;
+    }
+
+    /**
+     * Sets up a rewrite mask for referrers and targets
+     */
+    private static function routeHtaccess($htaccess) {
+        $app = APP_PATH;
+        $conditions = count($htaccess)+3;
+        
+        foreach ($htaccess as $key => $value) {
+            if (strpos($value, "RewriteBase $app")) {
+                $conditions = false;
+            }
+        }
+
+        if ($conditions) {
+            $htaccess[$conditions] = "\nRewriteBase $app\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteRule ^ index.php [L]\n";
+        }
+
         return $htaccess;
     }
 
@@ -88,37 +111,17 @@ class Htaccess {
      */
     private static function endHtaccess($htaccess) {
         $end = count($htaccess)+1;
+        
         foreach ($htaccess as $key => $value) {
-            if (strpos($value, "</IfModule>\n# URL masking end")) {
+            if (strpos($value, "# URL masking end")) {
                 $end = false;
             }
         }
+
         if ($end) {
-            $htaccess[$end] = "</IfModule>\n# URL masking end";
+            $htaccess[$end] = "\n</IfModule>\n# URL masking end\n";
         }
-        return $htaccess;
-    }
-
-    /**
-     * Sets up a rewrite mask for referrers and targets
-     */
-    private static function routeHtaccess($htaccess) {
-        $conditions = false;
-        foreach ($htaccess as $key => $value) {
-            if (strpos($value, "# Mercurio URL masking")) {
-                $conditions = $key+3;
-            }
-        }
-
-        $app = APP_HOST . '/' . APP_PATH;
-
-        if ($conditions) {
-            $htaccess[$conditions] = "
-            RewriteBase $app
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteRule ^ index.php [L]";
-        }
-
+        
         return $htaccess;
     }
 
