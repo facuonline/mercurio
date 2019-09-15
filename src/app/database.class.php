@@ -86,10 +86,13 @@ class Database {
 
     /**
      * Update record in database
-     * @param object $object Instance of a `Mercurio\App\*` class
+     * @param object $object Loaded instance of a `Mercurio\App\*` class
      * @return object PDO Statement
+     * @throws \Mercurio\Exception\Usage
      */
     public function update(object $object) {
+        // Instances not loaded
+        if (!$object->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
         // System properties
         unset($object->data['id']);
         unset($object->data['stamp']);
@@ -101,8 +104,12 @@ class Database {
      * Delete record in database
      * @param object $object Instance of a `Mercurio\App\*` class
      * @return object PDO Statement
+     * @throws \Mercurio\Exception\Usage
      */
     public function delete(object $object) {
+        // Instances not loaded
+        if (!$object->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
+
         return $this->sql->delete($object->db_table, ['id' => $object->id]);
     }
 
