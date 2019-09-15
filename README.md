@@ -36,7 +36,7 @@ Alternatively if you have a database:
     ]);
 ```
 
-This will prepare your environment to work with Mercurio. To work with all of the `App` classes and a small part of some `Utils` it's necessary (recommended in case of utils) that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e just some Utils).
+This will prepare your environment to work with Mercurio. To work with the `App` classes it's necessary that you have a SQL database, either way you'll only be able to use a basic set of Mercurio tools (i.e jus Utils).
 >You can obtain a random, safe key using **`Mercurio\App::randomKey()`** (hardcoding the value in the array, the app key needs to remain consistent trough the App's life)
 
 ### Utils and App
@@ -136,6 +136,8 @@ This code first instantiates the `App\Database` model. This instance will contro
 To do an user selection we create a new, empty `App\User` instance and prepare it to get an user via their **id** property. Ultimately we perform the selection injecting the User model into the Database model.
 
 >The **`getBy*()`** methods serve to prepare a selection. In order to perform such selection, object must be passed to **`Database->get()`**, this will return an instance of the same object, but loaded with the retrieved data from database, or *NULL* if the selection wasn't succesful.
+>Only exceptions are **`User->getFromSession()`** and **`User->setLogin()`**, you'll see these later in this example app.
+
 
 ##### user_profile.php
 ```php
@@ -152,7 +154,7 @@ You've already seen how Mercurio makes handling and retrieving users an easy tas
     // they only add an extra layer of security against SPAM 
     $form = $factory->getForm();
 
-    $form->addText('username', 'Username or email:')
+    $form->addText('handle', 'Username or email:')
         ->setRequired(true);
     $form->addPassword('password', 'Password:')
         ->setRequired(true);
@@ -165,23 +167,24 @@ We can process this form like following:
     if ($form->isSuccess()) {
         $values = $form->getValues();
 
-        $user = new \Mercurio\App\User();
-
         try {
-            $user->login($values['username'], $values['password'], 
-            function() {
+            $user = new \Mercurio\App\User();
+            $user->getByLogin($values['handle'], $values['password']);
+            $result = $database->get($user);
+
+            if ($user->setLogin($result)) {
                 header('Location:');
-            });
-        } catch (\Mercurio\Exception\User\WrongLoginCredential $e) {
-            echo "Wrong username or password";
-        } catch (\Mercurio\Exception\User\LoginBlocked $e) {
-            echo "Login blocked. Try again in 5 minutes.";
+            }
+        } catch (\Mercurio\Exception\User\LoginFailed $e) {
+            echo "Login failed. Please try again";
         }
     }
 ```
-And thats really it. We've sucessfully built an app with users that is secure, fast and easy to develop and extend.
+Again we prepare a selection, in this case `getByLogin()` will prepare an user to be selected by their handle or email, and inject it into the database to get a result. This time instead of overriding the **$user** instance, we conserve it because we need to pass the database result to `setLogin()`.
 
->All **`App\*`** classes are going under a heavy refactoring of API and codebase. This example doesn't work and is left for legacy purposes. Further updates of Mercurio are expected to include a similar login API.
+This method will terminate to perform the login validation, if succesful it will automatically load the user data into the instance and also save them into the session, later we can directly load other instances using `getFromSession()` to populate object with user data from the PHP Session.
+
+Optionally this method can also enforce a progressive execution delay to harden bruteforce attacks, and perform blocks of 5 minutes where login is unavailable to users with too many failed attempts.
 
 # Contributing
 
@@ -194,4 +197,4 @@ If you have significative input to add, *Pull Requests* are open, however consid
 2. Conduct tests asserting file related tasks.
 3. Review and extend `Utils\Filter`.
 
-Apart from this list, codebase is full of "todo" tags, if you find one feel free to try and finish it.
+Apart from this list, source code is full of "todo" tags, if you find one feel free to try and finish it.
