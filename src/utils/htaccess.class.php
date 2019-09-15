@@ -110,7 +110,7 @@ class Htaccess {
             }
         }
 
-        $app = APP_ROOT_HOST . '/' . APP_PATH;
+        $app = APP_HOST . '/' . APP_PATH;
 
         if ($conditions) {
             $htaccess[$conditions] = "
