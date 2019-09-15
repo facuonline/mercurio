@@ -2,10 +2,9 @@
 namespace Mercurio\Exception;
 use Exception;
 /**
+ * Base model exception
  * @package Mercurio
  * @subpackage Extended Exception classes
- * 
- * Base model exception
  */
 class Model extends Exception {
 
