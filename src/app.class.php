@@ -72,7 +72,7 @@ class App {
         /**
          * App path relative to app host
          */
-        define('APP_PATH', $APP_URL['PATH']);
+        define('APP_PATH', $APP_URL['path']);
 
         /**
          * Link to app root
@@ -82,7 +82,7 @@ class App {
         /**
          * Path to App vendor folder, relative to Mercurio installation
          */
-        define('APP_VENDOR', dirname(__FILE__, -4));
+        define('APP_VENDOR', dirname(__FILE__, 4));
         /* ^ Why?
          * This file will be located at
          * | vendor
