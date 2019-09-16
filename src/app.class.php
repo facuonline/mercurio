@@ -61,7 +61,6 @@ class App {
         $APP_ROOT = $APP_URL['scheme']
             .'://'
             .$APP_URL['host']
-            .'/'
             .$APP_URL['path'];
 
         /**
