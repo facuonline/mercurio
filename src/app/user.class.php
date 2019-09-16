@@ -34,7 +34,10 @@ class User extends \Mercurio\App\Model {
     public function getFromSession() {
         $session = \Mercurio\Utils\Session::get('User', false);
 
-        if ($session) $this->data = $session;
+        if ($session) {
+            $this->data = $session;
+            $this->id = $session['id'];
+        }
         return $session;
     }
 
