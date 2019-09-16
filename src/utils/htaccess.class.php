@@ -93,7 +93,7 @@ class Htaccess {
         $conditions = count($htaccess)+3;
         
         foreach ($htaccess as $key => $value) {
-            if (strpos($value, "RewriteBase $app")) {
+            if (strpos($value, "\nRewriteCond %{REQUEST_FILENAME} !-f")) {
                 $conditions = false;
             }
         }
