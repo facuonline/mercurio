@@ -297,7 +297,6 @@ class App {
             ],
             'handle' => [
                 'VARCHAR(26)',
-                'NOT NULL'
             ],
             'email' => [
                 'VARCHAR(255)'
@@ -326,11 +325,9 @@ class App {
             ],
             'handle' => [
                 'VARCHAR(26)',
-                'NOT NULL'
             ],
             'author' => [
                 'BIGINT',
-                'NOT NULL'
             ],
             'channel' => [
                 'BIGINT'
@@ -353,11 +350,9 @@ class App {
             ],
             'author' => [
                 'BIGINT',
-                'NOT NULL'
             ],
             'channel' => [
                 'BIGINT',
-                'NOT NULL'
             ],
             'body' => [
                 'TEXT',
