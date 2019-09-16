@@ -42,7 +42,7 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Prepare channel to be selected by numeric ID
-     * @param int $id Numeric id
+     * @param int $id Numeric ID
      */
     public function getById(int $id) {
         $this->get_by = ['id' => $id];
@@ -85,7 +85,7 @@ class Channel extends \Mercurio\App\Model {
     }
 
     /**
-     * Return channel author id
+     * Return channel author ID
      * @return int
      */
     public function getAuthor() {
@@ -103,7 +103,7 @@ class Channel extends \Mercurio\App\Model {
     }
 
     /**
-     * Return channel parent channel id
+     * Return channel parent channel ID
      * @return int
      */
     public function getChannel() {
