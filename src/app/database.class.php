@@ -16,6 +16,11 @@ class Database {
     protected $sql;
 
     /**
+     * Instance of last inserted object
+     */
+    protected $last_insert;
+
+    /**
      * @param array $parameters Database connection arguments,
      * use `Mercurio\App::getDatabase()` if you have configured the database with `App`
      * @see https://medoo.in/api/new
@@ -41,6 +46,8 @@ class Database {
         // System properties
         $object->data['id'] = \Mercurio\Utils\ID::new();
         $object->data['stamp'] = time();
+
+        $this->last_insert = $object;
 
         return $this->sql->insert($object->db_table, $object->data);
     }
@@ -111,6 +118,14 @@ class Database {
         if (!$object->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         return $this->sql->delete($object->db_table, ['id' => $object->id]);
+    }
+
+    /**
+     * Return object of latest database insertion using this database instance
+     * @return object
+     */
+    public function lastInsert() {
+        return $this->last_insert;
     }
 
 }
