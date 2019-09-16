@@ -9,6 +9,16 @@ namespace Mercurio\App;
  */
 class User extends \Mercurio\App\Model {
 
+    public $data = [
+        'id' => NULL,
+        'handle' => NULL,
+        'email' => NULL,
+        'nickname' => NULL,
+        'password' => NULL,
+        'img' => NULL,
+        'stamp' => NULL
+    ];
+
     public $db_table = DB_USERS;
 
     /**
@@ -126,7 +136,8 @@ class User extends \Mercurio\App\Model {
 
     /**
      * Update user image
-     * @param string $image Image filename inside of Mercurio User's statics
+     * @param string $image Image filename inside of Mercurio User's statics \
+     * Use constant APP_USERSTATIC to access this folder
      * @see \Mercurio\Utils\Image;
      */
     public function setImage(string $image) {

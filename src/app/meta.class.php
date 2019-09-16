@@ -9,6 +9,15 @@ namespace Mercurio\App;
  */
 class Meta extends Model {
 
+    public $data = [
+        'id' => NULL,
+        'name' => NULL,
+        'grouping' => NULL,
+        'value' => NULL,
+        'target' => NULL,
+        'stamp' => NULL
+    ];
+
     public $db_table = DB_META;
 
     /**

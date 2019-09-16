@@ -313,9 +313,6 @@ class App {
             'img' => [
                 'VARCHAR(255)'
             ],
-            'token' => [
-                'VARCHAR(255)'
-            ],
             'stamp' => [
                 'BIGINT',
                 'NOT NULL'
