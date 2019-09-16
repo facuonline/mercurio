@@ -3,12 +3,12 @@
 namespace Mercurio\Utils;
 
 /**
- * Htaccess utils for Klein router \
+ * Htaccess utils for router \
  * Read and write htaccess rewrite conditions via Apache's mod_rewrite
  * 
  * @package Mercurio
  * @subpackage Router utils
- * @see https://github.com/klein/klein.php/wiki/Sub-Directory-Installation
+ * @see http://altorouter.com/usage/rewrite-requests.html
  */
 class Htaccess {
 
@@ -43,7 +43,7 @@ class Htaccess {
             .'.htaccess';
         }
 
-        if (!file_exists($location) || !is_readable($location)) throw new \Mercurio\Exception\Runtime("The file located at '$location' could not be accessed or is not readable. URL masking could not be possible.");
+        if (file_exists($location) && !is_readable($location)) throw new \Mercurio\Exception\Runtime("The file located at '$location' could not be readed. URL masking could not be possible.");
         if (!function_exists('apache_get_modules')) throw new \Mercurio\Exception\Environment("Apache seems to not be running or active on this server. URL masking is not possible without Apache.");
         if (!in_array('mod_rewrite', apache_get_modules())) throw new \Mercurio\Exception\Environment("Apache module 'mod_rewrite' is not present. URL masking is not possible without mod_rewrite.");
         
