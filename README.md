@@ -130,21 +130,21 @@ If you wish you can use any templating language you want. Like [Twig](https://tw
 Now here comes the fun and where Mercurio will really excel at. Our example app will only have basic support for simple users, but you'll still be able to see the perks of Mercurio.
 
 ```php
-$dbparams = \Mercurio\App::getDatabase();
-$database = new \Mercurio\App\Database($dbparams);
+    $dbparams = \Mercurio\App::getDatabase();
+    $database = new \Mercurio\App\Database($dbparams);
 
-$user = new \Mercurio\App\User;
-// $id is provided by the closure provided to the router, which serves this page
-$user->getById($id);
-$user = $database->get($user);
+    $user = new \Mercurio\App\User;
+    // $id is provided by the closure provided to the router, which serves this page
+    $user->getById($id);
+    $user = $database->get($user);
 
-if ($user) {
-    echo $user->getHandle();
-    echo $user->getNickname();
-    echo "<img src=" . $user->getImg() . ">";
-} else {
-    echo "User not found";
-}
+    if ($user) {
+        echo $user->getHandle();
+        echo $user->getNickname();
+        echo "<img src=" . $user->getImg() . ">";
+    } else {
+        echo "User not found";
+    }
 ```
 This code first instantiates the `App\Database` model. This instance will control all Database related tasks via injections of objects into the desired methods. `Database` takes the connection parameters at instantiation. You can directly provide them or dynamically obtain them from your App settings as this code does.
 
