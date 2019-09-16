@@ -360,7 +360,7 @@ class App {
                 'BIGINT',
                 'NOT NULL'
             ],
-            'content' => [
+            'body' => [
                 'TEXT',
                 'FULL TEXT'
             ],

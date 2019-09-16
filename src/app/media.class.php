@@ -13,7 +13,7 @@ class Media extends \Mercurio\App\Model {
         'id' => NULL, 
         'author' => NULL, 
         'channel' => NULL,
-        'content' => NULL,
+        'body' => NULL,
         'stamp' => NULL
     ];
 
@@ -98,7 +98,7 @@ class Media extends \Mercurio\App\Model {
      * @return string
      */
     public function getBody() {
-        return $this->data['content'];
+        return $this->data['body'];
     }
 
     /**
@@ -106,7 +106,7 @@ class Media extends \Mercurio\App\Model {
      * @param string $body
      */
     public function setBody(string $body) {
-        $this->data['content'] = $body;
+        $this->data['body'] = $body;
     }
 
 }
