@@ -17,7 +17,7 @@
         "altorouter/altorouter": "1.1.0"
     },
     "license": "GPL-3.0-or-later",
-    "version": "0.41.1-dev",
+    "version": "0.91-dev",
     "homepage": "https://github.com/facuonline/mercurio",
     "require-dev": {
         "phpunit/phpunit": "^8.1"

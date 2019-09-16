@@ -95,11 +95,11 @@ try_files $uri /index.php;
         require 'views/home.php';
     });
 
-    $router->map('GET', '/user/[i:id]/', function($id) {
+    $router->map('GET', '/user/[i:id]/', function($request) {
         require 'views/user/profile.php';
     });
 
-    $router->map('GET', '/user/login/', function() {
+    $router->map('GET|POST', '/user/login/', function() {
         require 'views/user/login.php';
     });
 
@@ -134,8 +134,8 @@ Now here comes the fun and where Mercurio will really excel at. Our example app 
     $database = new \Mercurio\App\Database($dbparams);
 
     $user = new \Mercurio\App\User;
-    // $id is provided by the closure provided to the router, which serves this page
-    $user->getById($id);
+    // $request is given by the closure provided to the router, which serves this page
+    $user->getById($request['id']);
     $user = $database->get($user);
 
     if ($user) {
@@ -181,7 +181,7 @@ You've already seen how Mercurio makes handling and retrieving users an easy tas
             $result = $database->get($user);
 
             if ($user->setLogin($result)) {
-                header('Location:');
+                header('Location:' . APP_ROOT);
             }
         } catch (\Mercurio\Exception\User\LoginFailed $e) {
             echo "Login failed. Please try again";
