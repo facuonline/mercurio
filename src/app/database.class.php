@@ -47,6 +47,7 @@ class Database {
         $object->data['id'] = \Mercurio\Utils\ID::new();
         $object->data['stamp'] = time();
 
+        $object->id = $object->data['id'];
         $this->last_insert = $object;
 
         return $this->sql->insert($object->db_table, $object->data);
