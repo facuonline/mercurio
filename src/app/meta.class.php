@@ -75,7 +75,7 @@ class Meta extends Model {
      * @param mixed $value
      */
     public function setValue($value) {
-        $this->data['value'] = $name;
+        $this->data['value'] = $value;
     }
 
     /**
