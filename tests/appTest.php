@@ -21,18 +21,16 @@ class AppTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testSetAppDefinesConstants() {
-        $this->assertIsString(APP_ROOT);
+        $this->assertEquals('http://localhost/mercurio/tests/', APP_URL);
         $this->assertIsString(APP_STATIC);
         $this->assertIsString(APP_STATIC_LINK);
         $this->assertIsString(APP_USERSTATIC);
         $this->assertIsString(APP_USERSTATIC_LINK);
-        $this->assertIsString(APP_CSRFJS);
-        $this->assertIsString(APP_CSRFPHP);
     }
 
     public function testSetAppDefinesDatabaseConstants() {
-        $this->assertIsString(DB_PREFIX);
-        $this->assertIsString(DB_CONF);
+        $this->assertEquals('mro_', DB_PREFIX);
+        $this->assertEquals('mro_conf', DB_CONF);
         $this->assertIsString(DB_META);
         $this->assertIsString(DB_USERS);
         $this->assertIsString(DB_CHANNELS);
