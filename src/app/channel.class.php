@@ -51,8 +51,11 @@ class Channel extends \Mercurio\App\Model {
     /**
      * Prepare channel to be selected by handle
      * @param string $handle Alphanumeric handle
+     * @param bool $hashtag Handle is in '#' format
      */
-    public function getByHandle(string $handle) {
+    public function getByHandle(string $handle, bool $hashtag = false) {
+        if ($hashtag) $handle = ltrim($handle, '#');
+
         $this->get_by = ['handle' => $handle];
     }
 
@@ -71,8 +74,8 @@ class Channel extends \Mercurio\App\Model {
      * @param bool $hashtag Returns the handle with the symbol '#' prepended
      * @return string
      */
-    public function getHandle(bool $arroba) {
-        if ($arroba) return '#' . $this->data['handle'];
+    public function getHandle(bool $hashtag) {
+        if ($hashtag) return '#' . $this->data['handle'];
         return $this->data['handle'];
     }
 
@@ -81,6 +84,8 @@ class Channel extends \Mercurio\App\Model {
      * @param string $handle New user handle
      */
     public function setHandle(string $handle) {
+        $handle = ltrim($handle, '#');
+        
         $this->data['handle'] = $handle;
     }
 

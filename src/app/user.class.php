@@ -52,8 +52,11 @@ class User extends \Mercurio\App\Model {
     /**
      * Prepare user to be selected by handle
      * @param string $handle User alphanumeric handle
+     * @param bool $arroba Handle is in '@' format
      */
-    public function getByHandle(string $handle) {
+    public function getByHandle(string $handle, bool $arroba = false) {
+        if ($arroba) $handle = ltrim($handle, '@');
+        
         $this->get_by = ['handle' => $handle];
     }
 
@@ -71,7 +74,7 @@ class User extends \Mercurio\App\Model {
      * @return int|string
      */
     public function getId(bool $as_string = false) {
-        if ($as_string) return (string) $this->data['id'];
+        if ($as_string) return (string) $this->data['id']; 
         return (int) $this->data['id'];
     }
 
@@ -90,6 +93,8 @@ class User extends \Mercurio\App\Model {
      * @param string $handle New user handle
      */
     public function setHandle(string $handle) {
+        $handle = ltrim($handle, '@');
+        
         $this->data['handle'] = $handle;
     }
 
