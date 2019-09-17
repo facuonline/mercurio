@@ -37,7 +37,7 @@ class Form {
         // Anti CSRF
         \Mercurio\Utils\Session::set('Csrf', \Mercurio\App::randomKey());
         $this->form->addHidden('_csrftoken')
-            ->setHtmlAttribute('value', \Mercurio\Utils\Session::get('Csrf'))
+            ->setDefaultValue(\Mercurio\Utils\Session::get('Csrf'))
             ->addRule(\Nette\Forms\Form::EQUAL, \Mercurio\Utils\Session::get('Csrf'));
         // Anti SPAM
         $this->form->addHidden('url_website_pot'.$key)
