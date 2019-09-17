@@ -217,13 +217,13 @@ class User extends \Mercurio\App\Model {
     protected function loginBlock($block) {
         // Start cookie attempts counter
         $attempt = (array_key_exists('loginTokenVal', $_COOKIE) ? $_COOKIE['loginTokenVal'] : 0);
-        setcookie('loginTokenVal', $attempt++, time() + 3000, '/', APP_ROOT);
+        setcookie('loginTokenVal', $attempt++, time() + 3000, '/', APP_URL);
         
         // Avoid login during cookie block
         if (array_key_exists('loginToken', $_COOKIE)) return false;
 
         if ($block > 3 && $attempt > $block + 1) {
-            setcookie('loginToken', 'Verification cookie. Do not delete', time() + 300, '/', APP_ROOT);
+            setcookie('loginToken', 'Verification cookie. Do not delete', time() + 300, '/', APP_URL);
         }
 
         return true;
