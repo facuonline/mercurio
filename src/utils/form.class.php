@@ -21,25 +21,29 @@ class Form {
     /**
      * Start new form object
      * @param string $key Unique personalized key to avoid spambots from bypassing the filter
-     * @param string $csrf Message to be displayed by CSRF protector
      */
-    public function __construct(string $key = '', string $csrf = 'Security token has expired, please submit the form again.') {
+    public function __construct(string $key = '') {
         $this->form = new \Nette\Forms\Form;
 
         $this->form->onSuccess[] = $this->form->isSuccess();
-        $this->form->addProtection($csrf);
-        $this->addSpamProtection($key);
+        $this->addProtection($key);
     }
 
     /**
      * Add hidden honeypot fields to protect against automated SPAM
      * @param string $key Your own personalized key to avoid spambots from bypassing the filter
      */
-    public function addSpamProtection(string $key = '') {
+    public function addProtection(string $key = '') {
+        // Anti CSRF
+        \Mercurio\Utils\Session::set('Csrf', \Mercurio\App::randomKey());
+        $this->form->addHidden('_csrftoken')
+            ->addRule(\Nette\Forms\Form::EQUAL, \Mercurio\Utils\Session::get('Csrf'));
+        // Anti SPAM
         $this->form->addHidden('url_website_pot'.$key)
             ->addRule(\Nette\Forms\Form::BLANK);
         $this->form->addHidden('name_title_pot'.$key)
             ->addRule(\Nette\Forms\Form::BLANK);
+        // Time check
         $this->form->addHidden('form_stamp'.$key)
             ->setDefaultValue(time() + 3)
             ->addRule(\Nette\Forms\Form::MIN, 'Please try again.', time());
