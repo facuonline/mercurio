@@ -21,9 +21,9 @@ class Media extends \Mercurio\App\Model {
 
     /**
      * Prepare medias to be selected by author
-     * @param Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
      */
-    public function selectByAuthor(Mercurio\App\User $author) {
+    public function selectByAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->get_by = ['author' => $author->id];
@@ -31,9 +31,9 @@ class Media extends \Mercurio\App\Model {
 
     /**
      * Prepare medias to be selected by thei channel
-     * @param Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
      */
-    public function selectByChannel(Mercurio\App\Channel $channel) {
+    public function selectByChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->get_by = ['channel' => $channel->id];
@@ -67,7 +67,7 @@ class Media extends \Mercurio\App\Model {
 
     /**
      * Update media author
-     * @param Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
      */
     public function setAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
@@ -85,7 +85,7 @@ class Media extends \Mercurio\App\Model {
 
     /**
      * Update media channel
-     * @param Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
      */
     public function setChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");

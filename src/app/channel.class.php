@@ -22,9 +22,9 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Prepare channels to be selected by author
-     * @param Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
      */
-    public function selectByAuthor(Mercurio\App\User $author) {
+    public function selectByAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->get_by = ['author' => $author->id];
@@ -32,9 +32,9 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Prepare channels to be selected by their parent channel
-     * @param Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
      */
-    public function selectByChannel(Mercurio\App\Channel $channel) {
+    public function selectByChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->get_by = ['channel' => $channel->id];
@@ -85,7 +85,7 @@ class Channel extends \Mercurio\App\Model {
      */
     public function setHandle(string $handle) {
         $handle = ltrim($handle, '#');
-        
+
         $this->data['handle'] = $handle;
     }
 
@@ -99,7 +99,7 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Update channel author
-     * @param Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
      */
     public function setAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
@@ -117,7 +117,7 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Update channel parent channel
-     * @param Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
      */
     public function setChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
