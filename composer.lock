@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49ec52c79cfb164887db7b7a7a09da85",
+    "content-hash": "c1793e88f620573d81dab846424169f9",
     "packages": [
         {
             "name": "altorouter/altorouter",
@@ -487,42 +487,6 @@
             "time": "2019-03-22T01:00:30+00:00"
         },
         {
-            "name": "owasp/csrf-protector-php",
-            "version": "v1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mebjas/CSRF-Protector-PHP.git",
-                "reference": "80348b30a85b8cb04bfe3bfa24546edf25c74663"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mebjas/CSRF-Protector-PHP/zipball/80348b30a85b8cb04bfe3bfa24546edf25c74663",
-                "reference": "80348b30a85b8cb04bfe3bfa24546edf25c74663",
-                "shasum": ""
-            },
-            "require-dev": {
-                "satooshi/php-coveralls": "~1.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "libs/csrf/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": "CSRF protector php, a standalone php library for csrf mitigation in web applications. Easy to integrate in any php web app.",
-            "homepage": "https://github.com/mebjas/CSRF-Protector-PHP",
-            "keywords": [
-                "csrf",
-                "owasp",
-                "security"
-            ],
-            "time": "2018-03-17T12:58:34+00:00"
-        },
-        {
             "name": "paragonie/random_compat",
             "version": "v2.0.18",
             "source": {
@@ -570,52 +534,6 @@
                 "random"
             ],
             "time": "2019-01-03T20:59:08+00:00"
-        },
-        {
-            "name": "samayo/bulletproof",
-            "version": "v4.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/samayo/bulletproof.git",
-                "reference": "4e485530522c0f3af81eba3955f1c459401cdd54"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/samayo/bulletproof/zipball/4e485530522c0f3af81eba3955f1c459401cdd54",
-                "reference": "4e485530522c0f3af81eba3955f1c459401cdd54",
-                "shasum": ""
-            },
-            "require": {
-                "ext-exif": "*",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "samayo"
-                }
-            ],
-            "description": "A simple and secure PHP image uploader",
-            "homepage": "http://github.com/samayo/bulletproof",
-            "keywords": [
-                "Simple",
-                "image",
-                "security",
-                "upload"
-            ],
-            "time": "2018-06-23T22:16:47+00:00"
         }
     ],
     "packages-dev": [

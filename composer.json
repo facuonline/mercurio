@@ -10,9 +10,7 @@
     "require": {
         "ezimuel/php-secure-session": "^1.1",
         "ezyang/htmlpurifier": "^4.10",
-        "owasp/csrf-protector-php": "^1.0",
         "catfan/medoo": "^1.7.2",
-        "samayo/bulletproof": "4.0.*",
         "nette/forms": "^3.0.1",
         "altorouter/altorouter": "1.1.0"
     },
