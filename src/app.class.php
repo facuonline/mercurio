@@ -30,10 +30,10 @@ class App {
     /**
      * Set App settings and start Mercurio 
      * @param array $settings App generic settings
-     * @param array $connection Database connection arguments
+     * @param array $database Database connection arguments
      * @throws \Mercurio\Exception\Usage
      */
-    public static function setApp(array $settings, array $connection = []) {
+    public static function setApp(array $settings, array $database = []) {
         // check for minimum required app settings
         if (!getenv('APP_KEY') && !array_key_exists('KEY', $settings)) throw new \Mercurio\Exception\Usage("setApp expects a 'KEY' index in given array. Use \Mercurio\App::randomKey to generate a safe hash value.", 1);
         if (!getenv('APP_URL') && !array_key_exists('URL', $settings)) throw new \Mercurio\Exception\Usage("setApp expects an 'URL' index in given array.", 1);
@@ -45,7 +45,8 @@ class App {
         // Define app constants
         self::constants();
         
-        if (!empty($connection)) self::prepareDatabase($connection);
+        // Configure database connection
+        if (!empty($database)) self::prepareDatabase($database);
 
     }
 
@@ -55,7 +56,7 @@ class App {
     private static function constants() {
 
         /**
-         * APP_ROOT must equals $_SERVER['DOCUMENT_ROOT] in terms of route
+         * `APP_URL` must equals $_SERVER['DOCUMENT_ROOT] in terms of route
          */
         $APP_URL = parse_url(self::getApp('URL'));
         $APP_ROOT = $APP_URL['scheme']
@@ -63,33 +64,25 @@ class App {
             .$APP_URL['host']
             .$APP_URL['path'];
 
+         /**
+         * Link to app root
+         */
+        define('APP_URL', $APP_ROOT);
+
         /**
-         * App host, stripped from APP_ROOT
+         * App http scheme, stripped from `APP_URL`
+         */
+        define('APP_SCHEME', $APP_URL['scheme']);
+
+        /**
+         * App host, stripped from `APP_URL`
          */
         define('APP_HOST', $APP_URL['host']);
 
         /**
-         * App path relative to app host
+         * App path, stripped from `APP_URL`
          */
         define('APP_PATH', $APP_URL['path']);
-
-        /**
-         * Link to app root
-         */
-        define('APP_ROOT', $APP_ROOT);
-
-        /**
-         * Path to App vendor folder, relative to Mercurio installation
-         */
-        define('APP_VENDOR', dirname(__FILE__, 4));
-        /* ^ Why?
-         * This file will be located at
-         * | vendor
-         *   | mercurio
-         *     | mercurio
-         *       | src
-         * So we want to go up 4 levels to locate the vendor folder
-         */
 
         /**
          * Path to mercurio statics
@@ -107,7 +100,7 @@ class App {
          * Link to mercurio statics
          */
         define('APP_STATIC_LINK', 
-            APP_ROOT
+            APP_URL
             .'mercurio/'
             .'static/'
         );
@@ -130,38 +123,12 @@ class App {
          * Link to mercurio user statics
          */
         define('APP_USERSTATIC_LINK', 
-            APP_ROOT
+            APP_URL
             .'mercurio/'
             .'static/'
             .'user/'
         );
 
-        /**
-         * Link to Owasp CSRF js file
-         */
-        define('APP_CSRFJS', 
-            APP_ROOT
-            .'vendor/'
-            .'owasp/'
-            .'csrf-protector-php/'
-            .'js/'
-            .'csrsprotector.js'
-        ); 
-
-        /**
-         * Path to Owasp CSRF config file
-         */
-        define('APP_CSRFPHP', 
-            APP_VENDOR
-            .DIRECTORY_SEPARATOR
-            .'owasp'
-            .DIRECTORY_SEPARATOR
-            .'csrf-protector-php'
-            .DIRECTORY_SEPARATOR
-            .'libs'
-            .DIRECTORY_SEPARATOR
-            .'config.php'
-        );
     }
 
     /**
@@ -170,11 +137,11 @@ class App {
      */
     private static function prepareDatabase(array $connection) {
         // check that $connection array has needed indexes
-        if (!array_key_exists('HOST', $connection)) throw new \Mercurio\Exception\Usage("setDatabase expects a 'HOST' index in given array.");
-        if (!array_key_exists('USER', $connection)) throw new \Mercurio\Exception\Usage("setDatabase expects a 'USER' index in given array.");
-        if (!array_key_exists('PASS', $connection)) throw new \Mercurio\Exception\Usage("setDatabase expects a 'PASS' index in given array.");
-        if (!array_key_exists('NAME', $connection)) throw new \Mercurio\Exception\Usage("setDatabase expects a 'NAME' index in given array.");
-        if (!array_key_exists('TYPE', $connection)) throw new \Mercurio\Exception\Usage("setDatabase expects a 'TYPE' index in given array.");
+        if (!array_key_exists('HOST', $connection)) throw new \Mercurio\Exception\Usage("setApp expects a 'HOST' index in database array.");
+        if (!array_key_exists('USER', $connection)) throw new \Mercurio\Exception\Usage("setApp expects a 'USER' index in database array.");
+        if (!array_key_exists('PASS', $connection)) throw new \Mercurio\Exception\Usage("setApp expects a 'PASS' index in database array.");
+        if (!array_key_exists('NAME', $connection)) throw new \Mercurio\Exception\Usage("setApp expects a 'NAME' index in database array.");
+        if (!array_key_exists('TYPE', $connection)) throw new \Mercurio\Exception\Usage("setApp expects a 'TYPE' index in database array.");
 
         foreach ($connection as $key => $value) {
             putenv("DB_$key=$value");
@@ -364,46 +331,6 @@ class App {
             ]
         ]);
         
-    }
-
-    /**
-     * Set necessary parameters for CSRF protection
-     * @param array $csrf
-     * Configuration array for CSRF Protector
-     * Necessary configurations are (library would throw exception otherwise)
-     * ---- logDirectory
-     * ---- failedAuthAction
-     * ---- jsUrl
-     * ---- tokenLength
-     * @see https://github.com/mebjas/CSRF-Protector-PHP/wiki/Configurations
-     */
-    public static function setCsrfProtection(array $csrf = []) {
-        // Exact copy of the array at config.sample.php
-        if (empty($csrf)) $csrf = [
-            // token modified for app distinction
-            "CSRFP_TOKEN" => 'MercurioCSRF',
-            "logDirectory" => "../log",
-            "failedAuthAction" => array(
-                "GET" => 0,
-                "POST" => 0),
-            "errorRedirectionPage" => "",
-            "customErrorMessage" => "",
-            // jsUrl modified for app convenience
-            "jsUrl" => APP_CSRFJS,
-            "tokenLength" => 10,
-            "cookieConfig" => array(
-                "path" => '',
-                "domain" => '',
-                "secure" => false,
-                "expire" => '',
-            ),
-            "disabledJavascriptMessage" => "This site attempts to protect users against <a href=\"https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29\">
-            Cross-Site Request Forgeries </a> attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you.
-            See details of your web browser for how to enable JavaScript.",
-            "verifyGetFor" => array()
-        ];
-
-        file_put_contents(APP_CSRFPHP, $csrf);
     }
 
     /**
