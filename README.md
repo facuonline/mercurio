@@ -158,15 +158,9 @@ To do an user selection we create a new, empty `App\User` instance and prepare i
 You've already seen how Mercurio makes handling and retrieving users an easy task. But Mercurio does not stop there.
 ```php
     $factory = new \Mercurio\Utils\Form('login');
-    // Mercurio form objects are an extension of Nette\Forms
-    // they only add an extra layer of security against SPAM 
-    $form = $factory->getForm();
-
-    $form->addText('handle', 'Username or email:')
-        ->setRequired(true);
-    $form->addPassword('password', 'Password:')
-        ->setRequired(true);
-    $form->addSubmit('login', 'Enter');
+    // Mercurio form objects are built using `Nette\Forms`
+    // https://github.com/nette/forms
+    $form = $factory->login();
 
     // We can process this form like following
     if ($form->isSuccess()) {
@@ -177,11 +171,11 @@ You've already seen how Mercurio makes handling and retrieving users an easy tas
             $database = new \Mercurio\App\Database($dbparams);
 
             $user = new \Mercurio\App\User();
-            $user->getByLogin($values['handle'], $values['password']);
+            $user->getByLogin($values['credential'], $values['password']);
             $result = $database->get($user);
 
             if ($user->setLogin($result)) {
-                header('Location:' . APP_ROOT);
+                header('Location:' . APP_URL);
             }
         } catch (\Mercurio\Exception\User\LoginFailed $e) {
             echo "Login failed. Please try again";
