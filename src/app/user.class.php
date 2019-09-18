@@ -156,10 +156,9 @@ class User extends \Mercurio\App\Model {
      * Update user password
      * @param string $password User new password
      * Plain text, Mercurio will do the encryption
-     * @param array $options Options for `password_hash()`
      */
-    public function setPassword(string $password, array $options = NULL) {
-        $this->data['password'] = password_hash($password, PASSWORD_DEFAULT, $options);
+    public function setPassword(string $password) {
+        $this->data['password'] = password_hash($password, PASSWORD_DEFAULT);
     }
 
     /**
