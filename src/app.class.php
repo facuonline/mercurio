@@ -195,29 +195,25 @@ class App {
 
     /**
      * Set database tables and columns via SQL \
-     * Run only if your database hasn't been set beforehand
-     * @param object $DB Instance of dependency injection `\Mercurio\App\Database`
+     * Run to populate your database with required App tables 
+     * @param object $db Instance of dependency injection `\Mercurio\App\Database`
+     * @param string $engine Type of engine for tables
      * @throws \Mercurio\Exception\Usage 
      */
-    public static function setDatabase(\Mercurio\App\Database $DB) {
-        // Check that database connection parameters have been set
-        if (!getenv('DB_NAME')) throw new \Mercurio\Exception\Usage("You must define your database connection using \Mercurio\App::setApp() before setting up the Database.");
+    public static function setDatabase(\Mercurio\App\Database $db, string $engine = 'InnoDB') {
+        $db = $db->getSql();
 
-        // Set up db
-        $dbName = getenv('DB_NAME');
-        $DB = $DB->getSQL();
-        $DB->query("CREATE DATABASE $dbName");
-
-        // Set up tables
-        $DB->create(DB_CONF, [
+        // Set up app persistent configurations
+        $db->create(DB_CONF, [
             'id' => [
                 'BIGINT',
-                'NOT NULL'
+                'NOT NULL',
+                'PRIMARY KEY'
             ],
             'name' => [
                 'VARCHAR(30)',
                 'NOT NULL',
-                'PRIMARY_KEY'
+                'UNIQUE'
             ],
             'value' => [
                 'VARCHAR(255)',
@@ -227,13 +223,15 @@ class App {
                 'BIGINT',
                 'NOT NULL'
             ]
+        ], [
+            'ENGINE' => $engine,
         ]);
-
-        $DB->create(DB_META, [
+        // App entities meta properties
+        $db->create(DB_META, [
             'id' => [
                 'BIGINT',
                 'NOT NULL',
-                'PRIMARY_KEY'
+                'PRIMARY KEY'
             ],
             'name' => [
                 'VARCHAR(30)',
@@ -254,19 +252,23 @@ class App {
                 'BIGINT',
                 'NOT NULL'
             ]
+        ], [
+            'ENGINE' => $engine,
         ]);
-
-        $DB->create(DB_USERS, [
+        // App users
+        $db->create(DB_USERS, [
             'id' => [
                 'BIGINT',
                 'NOT NULL',
-                'PRIMARY_KEY'
+                'PRIMARY KEY'
             ],
             'handle' => [
                 'VARCHAR(26)',
+                'UNIQUE'
             ],
             'email' => [
-                'VARCHAR(255)'
+                'VARCHAR(255)',
+                'UNIQUE'
             ],
             'nickname' => [
                 'VARCHAR(255)'
@@ -282,16 +284,19 @@ class App {
                 'BIGINT',
                 'NOT NULL'
             ]
+        ], [
+            'ENGINE' => $engine,
         ]);
-
-        $DB->create(DB_CHANNELS, [
+        // App channels
+        $db->create(DB_CHANNELS, [
             'id' => [
                 'BIGINT',
                 'NOT NULL',
-                'PRIMARY_KEY'
+                'PRIMARY KEY'
             ],
             'handle' => [
                 'VARCHAR(26)',
+                'UNIQUE'
             ],
             'author' => [
                 'BIGINT',
@@ -300,20 +305,22 @@ class App {
                 'BIGINT'
             ],
             'body' => [
-                'VARCHAR(4000)',
-                'FULL TEXT'
+                'VARCHAR(4000)'
             ],
             'stamp' => [
                 'BIGINT',
                 'NOT NULL'
-            ]
+            ],
+            'FULLTEXT KEY (<body>)'
+        ], [
+            'ENGINE' => $engine,
         ]);
-
-        $DB->create(DB_MEDIA, [
+        // App medias
+        $db->create(DB_MEDIA, [
             'id' => [
                 'BIGINT',
                 'NOT NULL',
-                'PRIMARY_KEY'
+                'PRIMARY KEY'
             ],
             'author' => [
                 'BIGINT',
@@ -322,13 +329,15 @@ class App {
                 'BIGINT',
             ],
             'body' => [
-                'TEXT',
-                'FULL TEXT'
+                'TEXT'
             ],
             'stamp' => [
                 'BIGINT',
                 'NOT NULL'
-            ]
+            ],
+            'FULLTEXT KEY (<body>)'
+        ], [
+            'ENGINE' => $engine,
         ]);
         
     }
