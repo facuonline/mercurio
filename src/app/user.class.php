@@ -136,12 +136,12 @@ class User extends \Mercurio\App\Model {
     }
 
     /**
-     * Return user image link
+     * Return user image
      * @return string|null
      */
     public function getImage() {
         if (!empty($this->data['img'])) {
-            return APP_USERSTATIC . '/' . $this->data['img'];
+            return $this->data['img'];
         }
 
         return NULL;
