@@ -6,6 +6,6 @@ namespace Mercurio\Exception\User;
  * @package Mercurio
  * @subpackage Extended Exception classes
  */
-class WrongLoginCredential extends \Mercurio\Exception\Model {
+class LoginWrongCredential extends \Mercurio\Exception\Model {
     
 }

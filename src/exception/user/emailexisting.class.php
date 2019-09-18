@@ -6,6 +6,6 @@ namespace Mercurio\Exception\User;
  * @package Mercurio
  * @subpackage Extended Exception classes
  */
-class ExistingEmail extends \Mercurio\Exception\Model {
+class EmailExisting extends \Mercurio\Exception\Model {
     
 }
