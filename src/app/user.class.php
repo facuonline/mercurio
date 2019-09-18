@@ -83,7 +83,7 @@ class User extends \Mercurio\App\Model {
      * @param bool $arroba Returns the handle with the symbol '@' prepended
      * @return string
      */
-    public function getHandle(bool $arroba) {
+    public function getHandle(bool $arroba = false) {
         if ($arroba) return '@' . $this->data['handle'];
         return $this->data['handle'];
     }
