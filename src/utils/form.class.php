@@ -35,10 +35,10 @@ class Form {
      */
     public function addProtection(string $key = '') {
         // Anti CSRF
-        \Mercurio\Utils\Session::set('Csrf', \Mercurio\App::randomKey());
+        \Mercurio\Utils\Session::set('csrf', \Mercurio\Utils\ID::enc());
         $this->form->addHidden('_csrftoken')
-            ->setDefaultValue(\Mercurio\Utils\Session::get('Csrf'))
-            ->addRule(\Nette\Forms\Form::EQUAL, \Mercurio\Utils\Session::get('Csrf'));
+            ->setDefaultValue(\Mercurio\Utils\Session::get('csrf'))
+            ->addRule(\Nette\Forms\Form::EQUAL, \Mercurio\Utils\Session::get('csrf'));
         // Anti SPAM
         $this->form->addHidden('url_website_pot'.$key)
             ->addRule(\Nette\Forms\Form::BLANK);
