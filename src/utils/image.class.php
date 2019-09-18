@@ -27,12 +27,25 @@ namespace Mercurio\Utils;
  */
 class Image {
 	
-	public $hash, $maxfilesize;
+	/**
+	 * Final file hash name
+	 */
+	public $hash;
+
+	/**
+	 * Maximum file allowed size in bytes
+	 */
+	public $maxfilesize;
+
+	/**
+	 * Image resource created with source()
+	 */
+	public $src;
+
 	private $file, $path;
 
 	/**
 	 * @param int $max Maximum allowed input file size in bytes
-	 * @param string $path Destination of final file
 	 */
 	public function __construct(int $max = 2097152) {
 		$this->maxfilesize = $max;
@@ -43,13 +56,11 @@ class Image {
 	 * @return resource Generated copy of input file
 	 * @throws object Exception on error
 	 */
-	private function ext() {
+	private function source() {
 		if (filesize($this->file) < $this->maxfilesize) {
 			if (getimagesize($this->file)) {
 				$ext = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $this->file);
-				if ($ext == 'image/jpeg') {
-					return imagecreatefromjpeg($this->file);
-				} elseif ($ext === 'image/jpg') {
+				if ($ext === 'image/jpeg' || $ext === 'image/jpg') {
 					return imagecreatefromjpeg($this->file);
 				} elseif ($ext === 'image/png') {
 					return imagecreatefrompng($this->file);
@@ -75,7 +86,7 @@ class Image {
 	 * @param bool $crop Tells the method wether to crop or resize an image inside the new dimensions
 	 */
 	private function canvas($width, $height, $crop = true){
-		$src = $this->ext($this->file);
+		$src = $this->src;
 		$srcw = imagesx($src);
 		$srch = imagesy($src);
 		$img = imagecreatetruecolor($width, $height);
@@ -92,11 +103,10 @@ class Image {
 			}
         }
 		
-		$this->hash = sha1_file($this->file).'.jpg';
-		
 		imagecopyresampled($img, $src, 0, 0, 0, 0, $width, $height, $srcw, $srch);
 		imagedestroy($src);
 		
+		$this->hash = sha1_file($this->file) . '.jpg';
 		/**
 		 * JPEG is chosen because it's more lightweight than other formats and because png allows for exploitation
 		 * @see https://www.idontplaydarts.com/2012/06/encoding-web-shells-in-png-idat-chunks/ */
@@ -111,26 +121,29 @@ class Image {
 	 * @param int $width Desired output width of the image
 	 * @param int|bool $ratio Tells the method wether to calc the output height based on the new width or use the defined integer (will crop the image), if left to true will crop the image with an aspect ratio based height
 	 * @return string Image file path
+	 * @throws \Mercurio\Exception\User\ImageInvalid
+	 * @throws \Mercurio\Exception\User\ImageMIMEUnknown
 	 */
 	public function upload($file, $path, $width, $ratio = false){
 		$this->file = $file;
-		$this->path = rtrim($path, '\/').DIRECTORY_SEPARATOR;
+		$this->path = preg_replace('/[\\\\\/]/', DIRECTORY_SEPARATOR, $path);
 
+		// 0666 will prevent unexpected behaviour from files
+		if (!is_dir($this->path)) mkdir($this->path, null, true);
 		chmod($this->file, 0666);
-		if (!is_dir($this->path)) mkdir($this->path, 0666);
 		
-		$src = $this->ext();
-		$srcw = imagesx($src);
-		$srch = imagesy($src);
+		$this->src = $this->source();
+		$src_width = imagesx($this->src);
+		$src_height = imagesy($this->src);
 		
 		if (!$ratio) {
-			$height = $width*$srch/$srcw;
+			$height = $width*$src_height/$src_width;
 			$crop = false;
 		} elseif (ctype_digit($ratio)) {
 			$height = $ratio;
 			$crop = true;
 		} else {
-			$height = $width*$srch/$srcw;
+			$height = $width*$src_height/$src_width;
 			$crop = true;
 		}
 		

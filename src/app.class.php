@@ -88,8 +88,8 @@ class App {
          * Path to mercurio statics
          */
         define('APP_STATIC', 
-            $_SERVER['DOCUMENT_ROOT']
-            .DIRECTORY_SEPARATOR
+            preg_replace('/\//', DIRECTORY_SEPARATOR, $_SERVER['DOCUMENT_ROOT'])
+            .preg_replace('/\//', DIRECTORY_SEPARATOR, APP_PATH)
             .'mercurio'
             .DIRECTORY_SEPARATOR
             .'static'
@@ -109,12 +109,7 @@ class App {
          * Path to mercurio users statics
          */
         define('APP_USERSTATIC', 
-            $_SERVER['DOCUMENT_ROOT']
-            .DIRECTORY_SEPARATOR
-            .'mercurio'
-            .DIRECTORY_SEPARATOR
-            .'static'
-            .DIRECTORY_SEPARATOR
+            APP_STATIC
             .'user'
             .DIRECTORY_SEPARATOR
         );
