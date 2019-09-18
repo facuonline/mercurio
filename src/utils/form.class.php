@@ -35,7 +35,7 @@ class Form {
      */
     public function addProtection(string $key = '') {
         // Anti CSRF
-        \Mercurio\Utils\Session::set('csrf', \Mercurio\Utils\ID::enc());
+        \Mercurio\Utils\Session::set('csrf', \Mercurio\Utils\ID::encrypt());
         $this->form->addHidden('_csrftoken')
             ->setDefaultValue(\Mercurio\Utils\Session::get('csrf'))
             ->addRule(\Nette\Forms\Form::EQUAL, \Mercurio\Utils\Session::get('csrf'));
