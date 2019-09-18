@@ -227,7 +227,7 @@ class User extends \Mercurio\App\Model {
         $delay = \Mercurio\Utils\Session::get('login', 1);
 
         sleep($delay);
-        \Mercurio\Utils\Session::set('login', $delay++, false);
+        \Mercurio\Utils\Session::set('login', $delay+1, false);
     }
 
     /**
