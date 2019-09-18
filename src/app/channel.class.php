@@ -81,10 +81,15 @@ class Channel extends \Mercurio\App\Model {
 
     /**
      * Update channel alphanumeric handle
-     * @param string $handle New user handle
+     * @param string $handle New channel handle
+     * This value will be regex compared to strip whitespace, '#' and everything non 'a-z', '0-9' and '_'
+     * @param string $replacement Replacement value for regex comparison
+     * @throws \Mercurio\Exception\User\HandleInvalid if processed handle turns out blank
      */
-    public function setHandle(string $handle) {
-        $handle = ltrim($handle, '#');
+    public function setHandle(string $handle, string $replacement = '') {
+        $handle = strtolower($handle);
+        $handle = preg_replace('/[^a-z0-9_]/', $replacement, $handle);
+        if ($handle === '') throw new \Mercurio\Exception\User\HandleInvalid;
 
         $this->data['handle'] = $handle;
     }
