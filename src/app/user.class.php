@@ -91,9 +91,15 @@ class User extends \Mercurio\App\Model {
     /**
      * Update user alphanumeric handle
      * @param string $handle New user handle
+     * This value will be regex compared to strip whitespace, '@' and everything non 'a-z', '0-9' and '_'
+     * @throws \Mercurio\Exception\User\HandleInvalid if processed handle turns out blank
      */
     public function setHandle(string $handle) {
+        $handle = strtolower($handle);
+        $handle = preg_replace('/[^a-z0-9_]/', $handle);
+        $handle = preg_replace('/\s+/', '', $handle);
         $handle = ltrim($handle, '@');
+        if ($handle === '') throw new \Mercurio\Exception\User\HandleInvalid;
         
         $this->data['handle'] = $handle;
     }
@@ -150,6 +156,21 @@ class User extends \Mercurio\App\Model {
      */
     public function setImage(string $image) {
         $this->data['img'] = $image;
+    }
+
+    /**
+     * Return user data in session
+     * @return array|false
+     */
+    public function getSession() {
+        return \Mercurio\Utils\Session::get('User', false);
+    }
+
+    /**
+     * Update user data in session
+     */
+    public function setSession() {
+        \Mercurio\Utils\Session::set('User', $this->data, false);
     }
 
     /**
