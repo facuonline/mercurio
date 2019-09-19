@@ -165,16 +165,17 @@ class User extends \Mercurio\App\Model {
         if ($this->id !== \Mercurio\Utils\Session::get('User', ['id' => false])['id']) {
             return false;
         }
-        
+
         return \Mercurio\Utils\Session::get('User');
     }
 
     /**
      * Update user data in session, overriding the data \
      * Will update the session regardless of the instance
+     * @param bool $regenerate Will regenerate the session id
      */
-    public function setSession() {
-        \Mercurio\Utils\Session::set('User', $this->data, false);
+    public function setSession(bool $regenerate = true) {
+        \Mercurio\Utils\Session::set('User', $this->data, $regenerate);
     }
 
     /**
