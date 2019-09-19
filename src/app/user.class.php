@@ -158,15 +158,20 @@ class User extends \Mercurio\App\Model {
     }
 
     /**
-     * Return user data in session
+     * Return user data in session, if user in instance is the one in session
      * @return array|false
      */
     public function getSession() {
-        return \Mercurio\Utils\Session::get('User', false);
+        if ($this->id !== \Mercurio\Utils\Session::get('User', ['id' => false])['id']) {
+            return false;
+        }
+        
+        return \Mercurio\Utils\Session::get('User');
     }
 
     /**
-     * Update user data in session
+     * Update user data in session, overriding the data \
+     * Will update the session regardless of the instance
      */
     public function setSession() {
         \Mercurio\Utils\Session::set('User', $this->data, false);

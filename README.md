@@ -17,7 +17,7 @@ Once installed you must start Mercurio with some basic configurations.
 ```php
     \Mercurio\App::setApp([
         'KEY' => 'your_secret_key',
-        'URL' => 'http://localhost/mercurio/'
+        'URL' => 'http://localhost/my-mercurio-app/'
     ]);
 ```
 
@@ -25,7 +25,7 @@ Alternatively if you have a database:
 ```php
     \Mercurio\App::setApp([
         'KEY' => 'your_secret_key',
-        'URL' => 'http://localhost/mercurio/'
+        'URL' => 'http://localhost/my-mercurio-app/'
     ], [
         // check catfan/medoo for a complete list of supported database types
         'TYPE' => 'mysql', 

@@ -11,12 +11,12 @@ class Model {
 
     /**
      * Associative array of component data \
-     * `*` Is used to define all database columns 
+     * `'*'` Is used to define all database columns 
      */
     public $data = '*';
 
     /**
-     * Database ID of object, also in $data
+     * Database ID of object, also in `$data`
      */
     public $id = NULL;
 
