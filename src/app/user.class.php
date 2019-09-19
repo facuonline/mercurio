@@ -158,15 +158,17 @@ class User extends \Mercurio\App\Model {
     }
 
     /**
-     * Return user data in session, if user in instance is the one in session
-     * @return array|false
+     * Is the user in instance the one in the session?
+     * @return bool|false
      */
-    public function getSession() {
-        if ($this->id !== \Mercurio\Utils\Session::get('User', ['id' => false])['id']) {
-            return false;
-        }
+    public function isSession() {
+        $session = \Mercurio\Utils\Session::get('User', false);
+        if (!$session) return false;
 
-        return \Mercurio\Utils\Session::get('User');
+        if ($session['id'] === $this->data['id']) {
+            return true;
+        }
+        return false;
     }
 
     /**
