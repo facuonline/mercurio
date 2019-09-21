@@ -68,11 +68,13 @@ class Media extends \Mercurio\App\Model {
     /**
      * Update media author
      * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @return object Self instance
      */
     public function setAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->data['author'] = $author->id;
+        return $this;
     }
 
     /**
@@ -86,11 +88,13 @@ class Media extends \Mercurio\App\Model {
     /**
      * Update media channel
      * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @return object Self instance
      */
     public function setChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->data['channel'] = $channel->id;
+        return $this;
     }
 
     /**
@@ -104,9 +108,11 @@ class Media extends \Mercurio\App\Model {
     /**
      * Update media content body
      * @param string $body
+     * @return object Self instance
      */
     public function setBody(string $body) {
         $this->data['body'] = $body;
+        return $this;
     }
 
 }

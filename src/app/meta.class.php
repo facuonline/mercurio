@@ -57,9 +57,11 @@ class Meta extends Model {
     /**
      * Set meta property name
      * @param string $name
+     * @return object Self instance
      */
     public function setName(string $name) {
         $this->data['name'] = $name;
+        return $this;
     }
 
     /**
@@ -73,9 +75,11 @@ class Meta extends Model {
     /**
      * Set meta property value
      * @param mixed $value
+     * @return object Self instance
      */
     public function setValue($value) {
         $this->data['value'] = $value;
+        return $this;
     }
 
     /**
@@ -89,17 +93,21 @@ class Meta extends Model {
     /**
      * Set meta property group
      * @param string $group
+     * @return object Self instance
      */
     public function setGroup(string $group) {
         $this->data['group'] = $group;
+        return $this;
     }
 
     /**
      * Set meta property target
      * @param object $object Loaded instance of class `Mercurio\App\*`
+     * @return object Self intance
      */
     public function setTarget($object) {
         $this->data['target'] = $object->id;
+        return $this;
     }
     
 }

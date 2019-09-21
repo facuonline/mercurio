@@ -29,7 +29,7 @@ class User extends \Mercurio\App\Model {
 
     /**
      * Load user from session instead of from database
-     * @return array|false 
+     * @return object|false Self instance or false
      */
     public function getFromSession() {
         $session = \Mercurio\Utils\Session::get('User', false);
@@ -37,6 +37,7 @@ class User extends \Mercurio\App\Model {
         if ($session) {
             $this->data = $session;
             $this->id = $session['id'];
+            return $this;
         }
         return $session;
     }
@@ -93,6 +94,7 @@ class User extends \Mercurio\App\Model {
      * @param string $handle New user handle
      * This value will be regex compared to strip whitespace, '@' and everything non 'a-z', '0-9' and '_'
      * @param string $replacement Replacement value for regex comparison
+     * @return object Self instance
      * @throws \Mercurio\Exception\User\HandleInvalid if processed handle turns out blank
      */
     public function setHandle(string $handle, string $replacement = '') {
@@ -101,6 +103,7 @@ class User extends \Mercurio\App\Model {
         if ($handle === '') throw new \Mercurio\Exception\User\HandleInvalid;
         
         $this->data['handle'] = $handle;
+        return $this;
     }
 
     /**
@@ -114,9 +117,11 @@ class User extends \Mercurio\App\Model {
     /**
      * Update user email address
      * @param string $email New user email address
+     * @return object Self instance
      */
     public function setEmail(string $email) {
         $this->data['email'] = $email;
+        return $this;
     }
 
     /**
@@ -130,9 +135,11 @@ class User extends \Mercurio\App\Model {
     /**
      * Update user nickname
      * @param string $nickname New user nickname
+     * @return object Self instance
      */
     public function setNickname(string $nickname) {
         $this->data['nickname'] = $nickname;
+        return $this;
     }
 
     /**
@@ -152,16 +159,18 @@ class User extends \Mercurio\App\Model {
      * @param string $image Image filename inside of Mercurio User's statics \
      * Use constant APP_USERSTATIC to access this folder
      * @see \Mercurio\Utils\Image;
+     * @return object Self instance
      */
     public function setImage(string $image) {
         $this->data['img'] = $image;
+        return $this;
     }
 
     /**
      * Is the user in instance the one in the session?
      * @return bool|false
      */
-    public function isSession() {
+    public function isInSession() {
         $session = \Mercurio\Utils\Session::get('User', false);
         if (!$session) return false;
 
@@ -176,7 +185,7 @@ class User extends \Mercurio\App\Model {
      * Will update the session regardless of the instance
      * @param bool $regenerate Will regenerate the session id
      */
-    public function setSession(bool $regenerate = true) {
+    public function setInSession(bool $regenerate = true) {
         \Mercurio\Utils\Session::set('User', $this->data, $regenerate);
     }
 
@@ -184,9 +193,11 @@ class User extends \Mercurio\App\Model {
      * Update user password
      * @param string $password User new password
      * Plain text, Mercurio will do the encryption
+     * @return object Self instance
      */
     public function setPassword(string $password) {
         $this->data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
     }
 
     /**

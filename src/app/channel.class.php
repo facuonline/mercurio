@@ -84,6 +84,7 @@ class Channel extends \Mercurio\App\Model {
      * @param string $handle New channel handle
      * This value will be regex compared to strip whitespace, '#' and everything non 'a-z', '0-9' and '_'
      * @param string $replacement Replacement value for regex comparison
+     * @return object Self instance
      * @throws \Mercurio\Exception\User\HandleInvalid if processed handle turns out blank
      */
     public function setHandle(string $handle, string $replacement = '') {
@@ -92,6 +93,7 @@ class Channel extends \Mercurio\App\Model {
         if ($handle === '') throw new \Mercurio\Exception\User\HandleInvalid;
 
         $this->data['handle'] = $handle;
+        return $this;
     }
 
     /**
@@ -105,11 +107,13 @@ class Channel extends \Mercurio\App\Model {
     /**
      * Update channel author
      * @param \Mercurio\App\User $author Loaded instance of class `Mercurio\App\User`
+     * @return object Self instance
      */
     public function setAuthor(\Mercurio\App\User $author) {
         if (!$author->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->data['author'] = $author->id;
+        return $this;
     }
 
     /**
@@ -123,11 +127,13 @@ class Channel extends \Mercurio\App\Model {
     /**
      * Update channel parent channel
      * @param \Mercurio\App\Channel $channel Loaded instance of class `Mercurio\App\Channel`
+     * @return object Self instance
      */
     public function setChannel(\Mercurio\App\Channel $channel) {
         if (!$channel->id) throw new \Mercurio\Exception\Usage("Passed object must be a loaded instance with valid database data.");
 
         $this->data['channel'] = $channel->id;
+        return $this;
     }
 
     /**
@@ -141,9 +147,11 @@ class Channel extends \Mercurio\App\Model {
     /**
      * Update channel message body
      * @param string $body
+     * @return object Self instance
      */
     public function setBody(string $body) {
         $this->data['body'] = $body;
+        return $this;
     }
 
 }
