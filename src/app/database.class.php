@@ -129,4 +129,153 @@ class Database {
         return $this->last_insert;
     }
 
+    /**
+     * Set database tables and columns \
+     * Run to populate your database with required App tables
+     * @param string $engine Type of engine for tables
+     */
+    public  function setTables(string $engine = 'InnoDB') {
+        // App persistent configurations
+        $this->sql->create(DB_CONF, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY KEY'
+            ],
+            'name' => [
+                'VARCHAR(30)',
+                'NOT NULL',
+                'UNIQUE'
+            ],
+            'value' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ], [
+            'ENGINE' => $engine,
+        ]);
+
+        // App entities meta properties
+        $this->sql->create(DB_META, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY KEY'
+            ],
+            'name' => [
+                'VARCHAR(30)',
+                'NOT NULL'
+            ],
+            'grouping' => [
+                'VARCHAR(30)',
+            ],
+            'value' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'target' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ], [
+            'ENGINE' => $engine,
+        ]);
+
+        // App users
+        $this->sql->create(DB_USERS, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY KEY'
+            ],
+            'handle' => [
+                'VARCHAR(26)',
+                'UNIQUE'
+            ],
+            'email' => [
+                'VARCHAR(255)',
+                'UNIQUE'
+            ],
+            'nickname' => [
+                'VARCHAR(255)'
+            ],
+            'password' => [
+                'VARCHAR(255)',
+                'NOT NULL'
+            ],
+            'img' => [
+                'VARCHAR(255)'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ]
+        ], [
+            'ENGINE' => $engine,
+        ]);
+        
+        // App channels
+        $this->sql->create(DB_CHANNELS, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY KEY'
+            ],
+            'handle' => [
+                'VARCHAR(26)',
+                'UNIQUE'
+            ],
+            'author' => [
+                'BIGINT',
+            ],
+            'channel' => [
+                'BIGINT'
+            ],
+            'body' => [
+                'VARCHAR(4000)'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'FULLTEXT KEY (<body>)'
+        ], [
+            'ENGINE' => $engine,
+        ]);
+        
+        // App medias
+        $this->sql->create(DB_MEDIA, [
+            'id' => [
+                'BIGINT',
+                'NOT NULL',
+                'PRIMARY KEY'
+            ],
+            'author' => [
+                'BIGINT',
+            ],
+            'channel' => [
+                'BIGINT',
+            ],
+            'body' => [
+                'TEXT'
+            ],
+            'stamp' => [
+                'BIGINT',
+                'NOT NULL'
+            ],
+            'FULLTEXT KEY (<body>)'
+        ], [
+            'ENGINE' => $engine,
+        ]);
+        
+    }
+
 }
