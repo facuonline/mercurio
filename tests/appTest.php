@@ -41,14 +41,4 @@ class AppTest extends \PHPUnit\Framework\TestCase {
         $this->assertStringEndsWith('/', \Mercurio\App::getApp('URL'));
     }
 
-    public function testRandomKeyReturnsString() {
-        $this->assertIsString(\Mercurio\App::randomKey());
-    }
-
-    public function testRandomKeyIsRandom() {
-        $key1 = \Mercurio\App::randomKey();
-        $key2 = \Mercurio\App::randomKey();
-        $this->assertNotEquals($key1, $key2);
-    }
-
 }
