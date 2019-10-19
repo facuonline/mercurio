@@ -337,19 +337,4 @@ class App {
         
     }
 
-    /**
-     * Returns a very random sha256 hash
-     * @param mixed $entropy Optional additional entropy
-     * @return string SHA256 hash
-     */
-    public static function randomKey($entropy = 'EUreka') {
-        $lame[] = microtime();
-        $lame[] = mt_rand(1111, 9999);
-        $lame[] = openssl_random_pseudo_bytes(16);
-        $lame[] = $entropy;
-        $glue = base64_encode(random_bytes(4));
-        shuffle($lame);
-        return hash('sha256', implode($glue, $lame));
-    }
-
 }
