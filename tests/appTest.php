@@ -1,6 +1,7 @@
 <?php
 namespace Mercurio\Test;
 
+// Run here to have it ready for other tests
 \Mercurio\App::setApp([
     'KEY' => 'test',
     'URL' => 'http://localhost/mercurio/tests',
@@ -35,10 +36,6 @@ class AppTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsString(DB_USERS);
         $this->assertIsString(DB_CHANNELS);
         $this->assertIsString(DB_MEDIA);
-    }
-
-    public function testGetAppTrimsUrl() {
-        $this->assertStringEndsWith('/', \Mercurio\App::getApp('URL'));
     }
 
 }

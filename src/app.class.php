@@ -11,23 +11,6 @@ namespace Mercurio;
 class App {
 
     /**
-     * Returns an App setting set by setApp
-     * @param string $key
-     * @return mixed
-     * @throws \Mercurio\Exception\Runtime
-     */
-    public static function getApp(string $key) {
-        $key = strtoupper($key);
-
-        if (getenv('APP_'.$key)) {
-            if ($key == 'URL') return rtrim(getenv('APP_URL'), '/').'/';
-            return getenv('APP_'.$key);
-        } else {
-            throw new \Mercurio\Exception\Runtime("getApp could not find '$key' setting.", 400);
-        }
-    }
-
-    /**
      * Set App settings and start Mercurio 
      * @param array $settings App generic settings
      * @param array $database Database connection arguments
@@ -36,7 +19,12 @@ class App {
     public static function setApp(array $settings, array $database = []) {
         // check for minimum required app settings
         if (!array_key_exists('KEY', $settings)) throw new \Mercurio\Exception\Usage("setApp expects a 'KEY' index in given array.", 1);
-        if (!array_key_exists('URL', $settings)) throw new \Mercurio\Exception\Usage("setApp expects an 'URL' index in given array.", 1);
+
+        if (!array_key_exists('URL', $settings)) {
+            throw new \Mercurio\Exception\Usage("setApp expects an 'URL' index in given array.", 1);
+        } else {
+            $settings['URL'] = rtrim($settings['URL'], '/') . '/';
+        }
 
         foreach ($settings as $key => $value) {
             putenv("APP_$key=$value");
@@ -58,7 +46,7 @@ class App {
         /**
          * `APP_URL` must equals $_SERVER['DOCUMENT_ROOT] in terms of route
          */
-        $APP_URL = parse_url(self::getApp('URL'));
+        $APP_URL = parse_url(getenv('APP_URL'));
         $APP_ROOT = $APP_URL['scheme']
             .'://'
             .$APP_URL['host']
