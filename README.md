@@ -97,6 +97,8 @@ After running it you can delete that line to avoid calling the same method over 
 
 ##### Request matching and controllers
 AltoRouter will easily help us at listening for specific requests and respond to them:
+
+`index.php`
 ```php
     $router = new AltoRouter;
     // This constant is provided by Mercurio
@@ -141,7 +143,7 @@ This is pretty much all you'll need to do in your index.php file. Upon call this
     class Index {
 
         // Remember? We call this method for every controller matched to a route
-        public function send() {
+        public static function send() {
             // Simply load the view as a file
             include 'app/Views/Index.php';
         }
@@ -169,7 +171,7 @@ Now here comes the fun and where Mercurio will really excel at. Our example app 
         public $user;
 
         // $request is given by the router on match at index.php
-        public function send($request) {
+        public static function send($request) {
             
             // Instantiate Database model
             $dbparams = \Mercurio\App::getDatabase();
@@ -215,7 +217,7 @@ You've already seen how Mercurio makes handling and retrieving users an easy tas
         
         public $message, $form;
 
-        public function send() {
+        public static function send() {
             $factory = new \Mercurio\Utils\Form;
             // Mercurio form objects are built using `Nette\Forms`
             // https://github.com/nette/forms
